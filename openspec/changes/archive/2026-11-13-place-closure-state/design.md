@@ -2,7 +2,7 @@
 
 ## Context
 
-Мотивация и согласованный объём: [proposal](/openspec/changes/place-closure-state/proposal.md), [issue #1329](https://github.com/silentroach/kpshelkovo/issues/1329).
+Мотивация и согласованный объём: [proposal](/openspec/changes/archive/2026-11-13-place-closure-state/proposal.md), [issue #1329](https://github.com/silentroach/kpshelkovo/issues/1329).
 
 - `status` места сейчас различает `existing`, `planned` и `underConstruction`. По [place-markdown-card](/openspec/specs/place-markdown-card/spec.md) это lifecycle, а не открытость.
 - [Вилладж](/apps/www/src/data/places/village-checkpoint.md) имеет `existing`, маркер `kpp` и расписание 07:00–23:00 ежедневно. [Парк](/apps/www/src/data/places/park-checkpoint.md) имеет `planned`, маркер `construction`, описание ворот и инструкции об открытии по телефону; расписания нет.

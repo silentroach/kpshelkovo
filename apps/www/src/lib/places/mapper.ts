@@ -35,6 +35,7 @@ export const mapRawPlace = (
     category: entry.data.category,
     marker: entry.data.marker,
     status: entry.data.status,
+    availability: entry.data.availability,
     summary: entry.data.summary,
     searchAliases: entry.data.search_aliases,
     body: body.markdown,
@@ -43,16 +44,17 @@ export const mapRawPlace = (
     coordinates,
     geometry: opts?.geometry,
     mapUrl: entry.data.location.map_url ?? buildYandexMapUrl(coordinates),
-    openingHours: entry.data.opening_hours
-      ? {
-          description: entry.data.opening_hours.description,
-          periods: entry.data.opening_hours.periods.map((period) => ({
-            days: period.days,
-            opensAt: period.opens_at,
-            closesAt: period.closes_at
-          }))
-        }
-      : undefined,
+    openingHours:
+      entry.data.availability !== 'closed' && entry.data.opening_hours
+        ? {
+            description: entry.data.opening_hours.description,
+            periods: entry.data.opening_hours.periods.map((period) => ({
+              days: period.days,
+              opensAt: period.opens_at,
+              closesAt: period.closes_at
+            }))
+          }
+        : undefined,
     contact: opts?.contact,
     url: placeUrl(entry.id),
     markdownUrl: placeMarkdownUrl(entry.id),

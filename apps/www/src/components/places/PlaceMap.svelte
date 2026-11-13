@@ -31,6 +31,8 @@
   } from '@/lib/yandex-maps/runtime';
 
   import { PLACE_MARKER_IMAGES } from './marker-images';
+
+  import './place-closure.css';
   import type { ParcelLayer, ParcelMapItem, ParcelMapPayload } from './parcel-layer-types';
   import {
     createMapFeatures,
@@ -81,6 +83,7 @@
     name: place.name,
     marker: place.marker,
     status: place.status,
+    availability: place.availability,
     statusLabel: place.status_label,
     coordinates: place.coordinates,
     geometry: place.geometry ? fromPublicEditorialGeometry(place.geometry) : undefined,
@@ -251,7 +254,9 @@
     const status = place.statusLabel ? `, ${place.statusLabel}` : '';
     let openingStatus = '';
 
-    if (place.openingHours) {
+    if (place.availability === 'closed') {
+      openingStatus = 'Закрыто';
+    } else if (place.openingHours) {
       openingStatus = closingTime ? `открыто до ${closingTime}` : 'сейчас закрыто';
     }
 
@@ -260,7 +265,7 @@
       `Открыть место «${place.name}»${status}${openingStatus ? `, ${openingStatus}` : ''}`
     );
     link.title =
-      place.status === 'underConstruction'
+      place.status === 'underConstruction' && !place.availability
         ? place.name
         : `${place.name}${status}${openingStatus ? `\n${openingStatus}` : ''}`;
   };
@@ -342,6 +347,12 @@
       const closedIndicator = document.createElement('span');
 
       closedIndicator.className = 'place-map-marker-closed-indicator';
+      visual.append(closedIndicator);
+    }
+
+    if (place.availability === 'closed') {
+      const closedIndicator = document.createElement('span');
+      closedIndicator.className = 'place-closure-indicator';
       visual.append(closedIndicator);
     }
 
@@ -2305,12 +2316,12 @@
     display: block;
   }
 
-  :global(.place-map-marker[data-status='planned'] .place-map-marker-point) {
+  :global(.place-map-marker[data-status='planned'] .place-map-marker-point-surface) {
     border-style: dashed;
     opacity: 0.76;
   }
 
-  :global(.place-map-marker[data-status='planned'] .place-map-marker-graphic) {
+  :global(.place-map-marker[data-status='planned'] .place-map-marker-image) {
     opacity: 0.76;
   }
 

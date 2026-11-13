@@ -16,7 +16,7 @@
 
 ### Requirement: Необязательное расписание определяется интервалами
 
-`opening_hours` SHALL быть необязательным. При отсутствии редакционного закрытия HTML SHALL показывать полную неделю из `opening_hours.periods` без JavaScript и раскрытия блока, независимо от общей карты. Markdown SHALL передавать те же интервалы во frontmatter `opening_hours.periods` (`days`, `opens_at`, `closes_at`) и `opening_hours.timezone: Europe/Moscow`, без generated-печатной недели и текущего статуса. Дни `mon`, `tue`, `wed`, `thu`, `fri`, `sat`, `sun` без интервалов SHALL означать выходные, не неизвестные часы.
+`opening_hours` SHALL быть необязательным. Без `closed` HTML SHALL показывать полную неделю из `opening_hours.periods` без JavaScript и раскрытия блока, независимо от общей карты. Markdown SHALL передавать те же интервалы во frontmatter `opening_hours.periods` (`days`, `opens_at`, `closes_at`) и `opening_hours.timezone: Europe/Moscow`, без generated-печатной недели и текущего статуса. Дни `mon`, `tue`, `wed`, `thu`, `fri`, `sat`, `sun` без интервалов SHALL означать выходные, не неизвестные часы.
 
 #### Scenario: Чтение без JavaScript
 

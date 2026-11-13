@@ -3,13 +3,15 @@ import MapPreview from '@/components/maps/MapPreview.astro';
 import type { MapPreviewData } from '@/components/maps/map-preview.types';
 import { normalizeCoordinate } from '@/lib/geometry/coordinate-precision';
 import { EditorialMapDataSchema } from '@/lib/geometry/editorial-map-data-schema';
+import { formatPlaceStatus } from '@/lib/places/view';
 
 import { PLACE_MARKER_IMAGES } from './marker-images';
+import './place-closure.css';
 import type { PlacePreviewProps as Props } from './place-preview.types';
 
 const { place } = Astro.props;
 const marker = place.marker ? PLACE_MARKER_IMAGES[place.marker] : undefined;
-const markerLabel = `Открыть карту: ${place.name}`;
+const markerLabel = `Открыть карту: ${place.name}${place.availability === 'closed' ? `${place.status === 'existing' ? '' : `, ${formatPlaceStatus(place.status)}`}, Закрыто` : ''}`;
 const preview = {
   coordinates: {
     lat: normalizeCoordinate(place.coordinates.lat),
@@ -52,6 +54,9 @@ const preview = {
         <span class="ui-map-marker" />
       )}
       {place.openingHours && <span class="place-preview__closed-indicator" />}
+      {place.availability === 'closed' && (
+        <span class="place-closure-indicator" aria-hidden="true" />
+      )}
     </a>
   </MapPreview>
 </div>

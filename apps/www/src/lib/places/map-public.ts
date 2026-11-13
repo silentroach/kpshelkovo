@@ -26,6 +26,7 @@ const toPublicPlace = (place: Place): PlaceMapPublicItemDto => ({
   name: place.name,
   marker: place.marker,
   status: place.status,
+  availability: place.availability,
   status_label: place.status === 'existing' ? undefined : formatPlaceStatus(place.status),
   coordinates: {
     lat: normalizeCoordinate(place.coordinates.lat),

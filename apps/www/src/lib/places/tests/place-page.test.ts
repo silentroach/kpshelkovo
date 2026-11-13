@@ -24,6 +24,7 @@ const fixture = vi.hoisted(() => ({
     name: 'Яблоневый сад',
     category: 'nature' as const,
     status: 'existing' as const,
+    availability: undefined as 'closed' | undefined,
     summary: 'Сад рядом со спортивной площадкой',
     body: 'Подробное описание места.',
     mentions: [],
@@ -204,6 +205,29 @@ describe('place preview marker', () => {
 });
 
 describe('/map/[slug]/', () => {
+  it('renders static closure and preview annotation without schedule scripts', async () => {
+    fixture.place.availability = 'closed';
+    const document = await renderPage();
+    const marker = document
+      .querySelector('map-preview')
+      ?.querySelector('template')
+      ?.content.querySelector('a');
+    expect({
+      label: document.querySelector('.place-availability')?.textContent?.trim(),
+      hours: Boolean(document.querySelector('place-opening-hours')),
+      cross: Boolean(marker?.querySelector('.place-closure-indicator')),
+      link: marker?.getAttribute('href'),
+      accessibleName: marker?.getAttribute('aria-label')
+    }).toMatchInlineSnapshot(`
+      {
+        "accessibleName": "Открыть карту: Яблоневый сад, Закрыто",
+        "cross": true,
+        "hours": false,
+        "label": "Закрыто",
+        "link": "https://yandex.ru/maps/?pt=37.724333,55.06371",
+      }
+    `);
+  });
   it('uses the same bounded point in preview and JSON-LD and preserves an explicit map URL', async () => {
     const coordinates = { lat: 55.06070312345, lng: 37.74689498765 };
     const mapUrl = 'https://yandex.ru/maps/?pt=37.74689498765,55.06070312345&source=editor';

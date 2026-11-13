@@ -6,6 +6,7 @@ export type PlaceMarkdownPublicDto = {
   readonly title: string;
   readonly category: PlaceCategory;
   readonly status: PlaceStatus;
+  readonly availability?: 'closed';
   readonly address?: string;
   readonly map: {
     readonly url: string;

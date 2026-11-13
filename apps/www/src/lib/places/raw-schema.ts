@@ -113,6 +113,7 @@ export const RawPlaceSchema = z
     category: z.enum(PLACE_CATEGORIES),
     marker: z.enum(PLACE_MARKERS).optional(),
     status: z.enum(PLACE_STATUSES),
+    availability: z.literal('closed').optional(),
     show_on_map: z.boolean().optional(),
     map_layer: z.enum(PLACE_MAP_LAYERS).optional(),
     map_preview: z.literal('square').optional(),

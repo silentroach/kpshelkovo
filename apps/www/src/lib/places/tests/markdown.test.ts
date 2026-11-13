@@ -30,6 +30,7 @@ const frontmatterSchema = z.strictObject({
     'infrastructure'
   ]),
   status: z.enum(['existing', 'planned', 'underConstruction']),
+  availability: z.literal('closed').optional(),
   address: z.string().min(1).optional(),
   map: z.strictObject({
     url: z.url(),
@@ -126,6 +127,25 @@ beforeAll(async () => {
 });
 
 describe('places Markdown', () => {
+  it('exports editorial closure without effective hours', () => {
+    const { frontmatter } = readCard({
+      ...place,
+      availability: 'closed',
+      openingHours: undefined
+    });
+    expect({
+      availability: frontmatter.availability,
+      status: frontmatter.status,
+      hours: frontmatter.opening_hours
+    }).toMatchInlineSnapshot(`
+      {
+        "availability": "closed",
+        "hours": undefined,
+        "status": "existing",
+      }
+    `);
+    expect(readCard(place).frontmatter).not.toHaveProperty('availability');
+  });
   it('keeps the complete graph and context independently of the compact HTML selection', () => {
     const incidents = [
       testRelatedStatus('short-a', { ended_at: '05.11.2026 11:00' }),

@@ -4,7 +4,7 @@
 
 ### Requirement: Метаданные карточки доступны во frontmatter
 
-`/map/[slug]/index.md` SHALL начинаться с YAML frontmatter: название в `title`, машинный `category`, lifecycle `status` (`existing`, `planned`, `underConstruction`), `map.coordinates` с числовыми `lat` и `lng` по `public-coordinate-precision`, `address` при наличии. `status` SHALL NOT означать текущую открытость. Редакторское закрытие SHALL передаваться отдельным `availability` по `place-availability`, действующее расписание — по `place-opening-hours`. Неизвестные необязательные сведения и внутренние редакционные или технические поля SHALL NOT публиковаться автоматически.
+`/map/[slug]/index.md` SHALL начинаться с YAML frontmatter: название в `title`, машинный `category`, lifecycle `status` (`existing`, `planned`, `underConstruction`), `map.coordinates` с числовыми `lat` и `lng` по `public-coordinate-precision`, `address` при наличии. `status` SHALL NOT означать текущую открытость. Расписание SHALL передаваться по `place-opening-hours`. Неизвестные необязательные сведения и внутренние редакционные или технические поля SHALL NOT публиковаться автоматически.
 
 #### Scenario: Карточка с адресом
 

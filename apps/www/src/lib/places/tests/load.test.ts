@@ -49,6 +49,34 @@ const entry = (overrides?: Partial<PlaceEntry>): PlaceEntry => ({
 });
 
 describe('buildPlacesDataset', () => {
+  it.each(['existing', 'planned', 'underConstruction'] as const)(
+    'withholds hours during closure without losing the source or %s lifecycle',
+    (status) => {
+      const data = RawPlaceSchema.parse(
+        rawPlace({ contact: undefined, status, availability: 'closed' })
+      );
+      const sourceHours = structuredClone(data.opening_hours);
+      const closed = buildPlacesDataset([entry({ data })]).places[0]!;
+      const reopened = buildPlacesDataset([entry({ data: { ...data, availability: undefined } })])
+        .places[0]!;
+
+      expect(closed.status).toBe(status);
+      expect({
+        availability: closed.availability,
+        effectiveHours: closed.openingHours,
+        sourcePreserved: JSON.stringify(data.opening_hours) === JSON.stringify(sourceHours),
+        restored: reopened.openingHours?.periods.length
+      }).toMatchInlineSnapshot(`
+        {
+          "availability": "closed",
+          "effectiveHours": undefined,
+          "restored": 1,
+          "sourcePreserved": true,
+        }
+      `);
+    }
+  );
+
   it.each([undefined, 'Вход со двора.'])(
     'maps periods with optional explanation %s',
     (description) => {
@@ -125,6 +153,7 @@ describe('buildPlacesDataset', () => {
     expect(place).toMatchInlineSnapshot(`
       {
         "address": "Шелково Форест, Берёзовая улица, 21А",
+        "availability": undefined,
         "body": "Описание **места**.",
         "canonical": "https://kpshelkovo.online/map/burzhuyka/",
         "category": "food",

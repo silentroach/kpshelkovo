@@ -1,19 +1,19 @@
 - file: static/404.XXXXXXXX.css
   bytes: 1647
-  brotli: 619
+  brotli: 612
   gzip: 720
 - file: static/BaseLayout.XXXXXXXX.css
   bytes: 58319
-  brotli: 9207
-  gzip: 10306
+  brotli: 9192
+  gzip: 10305
 - file: static/BaseLayout.astro_astro_type_script_index_0_lang.XXXXXXXX.js
   bytes: 11149
   brotli: 3528
   gzip: 4066
 - file: static/Breadcrumbs.XXXXXXXX.css
   bytes: 2418
-  brotli: 534
-  gzip: 628
+  brotli: 532
+  gzip: 629
 - file: static/ClientRouter.astro_astro_type_script_index_0_lang.XXXXXXXX.js
   bytes: 14184
   brotli: 4316
@@ -80,8 +80,8 @@
   gzip: 194
 - file: static/LinkWithIcon.XXXXXXXX.css
   bytes: 488
-  brotli: 200
-  gzip: 244
+  brotli: 203
+  gzip: 242
 - file: static/MapPreview.XXXXXXXX.css
   bytes: 1200
   brotli: 350
@@ -111,13 +111,13 @@
   brotli: 290
   gzip: 371
 - file: static/PlaceMap.XXXXXXXX.css
-  bytes: 14497
-  brotli: 2685
-  gzip: 3104
+  bytes: 15128
+  brotli: 2768
+  gzip: 3182
 - file: static/PlaceMap.XXXXXXXX.js
-  bytes: 32477
-  brotli: 10249
-  gzip: 11515
+  bytes: 32684
+  brotli: 10297
+  gzip: 11554
 - file: static/PlaceOpeningHours.astro_astro_type_script_index_0_lang.XXXXXXXX.js
   bytes: 693
   brotli: 338
@@ -244,11 +244,11 @@
   brotli: 1154
   gzip: 1361
 - file: static/index-8.XXXXXXXX.css
-  bytes: 8892
-  brotli: 1689
-  gzip: 1979
+  bytes: 9000
+  brotli: 1703
+  gzip: 2006
 - file: static/index-9.XXXXXXXX.css
-  bytes: 15068
+  bytes: 15074
   brotli: 2805
   gzip: 3228
 - file: static/index-10.XXXXXXXX.css
@@ -347,9 +347,9 @@
   bytes: 120
   brotli: 104
 - file: static/index.astro_astro_type_script_index_0_lang-2.XXXXXXXX.js
-  bytes: 5535
-  brotli: 2514
-  gzip: 2779
+  bytes: 5776
+  brotli: 2642
+  gzip: 2921
 - file: static/index.astro_astro_type_script_index_0_lang-3.XXXXXXXX.js
   bytes: 1416
   brotli: 634
@@ -406,6 +406,10 @@
   bytes: 42203
   brotli: 13692
   gzip: 15038
+- file: static/place-closure.XXXXXXXX.css
+  bytes: 626
+  brotli: 246
+  gzip: 304
 - file: static/prefetch.XXXXXXXX.js
   bytes: 2491
   brotli: 964

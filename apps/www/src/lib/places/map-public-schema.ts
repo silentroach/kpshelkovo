@@ -21,6 +21,7 @@ export const PlaceMapPublicPayloadSchema = z
           name: z.string().trim().min(1),
           marker: z.enum(PLACE_MARKERS).optional(),
           status: z.enum(PLACE_STATUSES),
+          availability: z.literal('closed').optional(),
           status_label: z.string().optional(),
           coordinates: z
             .object({
@@ -49,6 +50,10 @@ export const PlaceMapPublicPayloadSchema = z
           html_url: z.url()
         })
         .strict()
+        .refine((place) => place.availability !== 'closed' || !place.opening_hours, {
+          message: 'Closed places must not publish opening_hours',
+          path: ['opening_hours']
+        })
     )
   })
   .strict();
