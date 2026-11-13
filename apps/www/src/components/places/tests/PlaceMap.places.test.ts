@@ -74,8 +74,8 @@ describe('PlaceMap', () => {
         aria: marker.getAttribute('aria-label'),
         title: marker.title,
         open: marker.dataset.open,
-        cross: Boolean(marker.querySelector('.place-closure-indicator')),
-        clock: Boolean(marker.querySelector('.place-map-marker-closed-indicator'))
+        cross: Boolean(marker.querySelector('.place-marker-badge--closed')),
+        clock: Boolean(marker.querySelector('.place-marker-badge--hours'))
       }).toMatchInlineSnapshot(`
         {
           "aria": "Открыть место «Буржуйка», Планируется, Закрыто",
@@ -118,7 +118,8 @@ describe('PlaceMap', () => {
             class="place-map-marker-point-surface ui-map-marker"
           />
           <span
-            class="place-map-marker-closed-indicator"
+            aria-hidden="true"
+            class="place-marker-badge place-marker-badge--hours"
           />
         </span>
       </a>
@@ -296,7 +297,7 @@ describe('PlaceMap', () => {
         open: marker.dataset.open,
         ariaLabel: marker.getAttribute('aria-label'),
         title: marker.title,
-        hasClosedIndicator: !!marker.querySelector('.place-map-marker-closed-indicator')
+        hasClosedIndicator: !!marker.querySelector('.place-marker-badge--hours')
       }).toMatchInlineSnapshot(`
         {
           "ariaLabel": "Открыть место «Буржуйка», Строится, сейчас закрыто",

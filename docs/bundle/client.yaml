@@ -63,14 +63,14 @@ static/MapPreview.astro_astro_type_script_index_0_lang.XXXXXXXX.js:
 static/PlaceMap.XXXXXXXX.js:
   apps/www/src/components/places/marker-images.ts:
     rendered: 352
-  apps/www/src/components/places/place-closure.css:
-    rendered: 0
   apps/www/src/components/places/place-map-geometry.ts:
     rendered: 2912
   apps/www/src/components/places/place-map-url.ts:
     rendered: 1387
+  apps/www/src/components/places/place-marker-badge.css:
+    rendered: 0
   apps/www/src/components/places/PlaceMap.svelte:
-    rendered: 60595
+    rendered: 60527
   apps/www/src/components/places/PlaceMap.svelte?svelte&type=style&lang.css:
     rendered: 0
   apps/www/src/lib/parcels/parcel-url.ts:

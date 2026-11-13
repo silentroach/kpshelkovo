@@ -32,7 +32,7 @@
 
   import { PLACE_MARKER_IMAGES } from './marker-images';
 
-  import './place-closure.css';
+  import './place-marker-badge.css';
   import type { ParcelLayer, ParcelMapItem, ParcelMapPayload } from './parcel-layer-types';
   import {
     createMapFeatures,
@@ -343,17 +343,13 @@
       visual.append(point);
     }
 
-    if (place.openingHours) {
-      const closedIndicator = document.createElement('span');
-
-      closedIndicator.className = 'place-map-marker-closed-indicator';
-      visual.append(closedIndicator);
-    }
-
-    if (place.availability === 'closed') {
-      const closedIndicator = document.createElement('span');
-      closedIndicator.className = 'place-closure-indicator';
-      visual.append(closedIndicator);
+    const badgeKind =
+      place.availability === 'closed' ? 'closed' : place.openingHours ? 'hours' : undefined;
+    if (badgeKind) {
+      const badge = document.createElement('span');
+      badge.className = `place-marker-badge place-marker-badge--${badgeKind}`;
+      badge.setAttribute('aria-hidden', 'true');
+      visual.append(badge);
     }
 
     visual.setAttribute('aria-hidden', 'true');
@@ -2269,51 +2265,6 @@
 
   :global(.place-map-marker[data-open='false'] .place-map-marker-image) {
     --place-map-marker-state-filter: grayscale(1);
-  }
-
-  :global(.place-map-marker-closed-indicator) {
-    position: absolute;
-    top: -0.375rem;
-    right: -0.375rem;
-    z-index: 1;
-    display: none;
-    box-sizing: border-box;
-    width: 0.75rem;
-    height: 0.75rem;
-    border: 0.09375rem solid currentColor;
-    border-radius: 999px;
-    background: var(--color-accent);
-    box-shadow: 0 0 0 0.0625rem var(--color-surface-raised);
-    color: var(--color-text);
-    pointer-events: none;
-  }
-
-  :global(.place-map-marker-closed-indicator::before),
-  :global(.place-map-marker-closed-indicator::after) {
-    position: absolute;
-    left: 50%;
-    border-radius: 999px;
-    background: currentColor;
-    content: '';
-    transform-origin: left center;
-  }
-
-  :global(.place-map-marker-closed-indicator::before) {
-    top: 0.125rem;
-    width: 0.09375rem;
-    height: 0.25rem;
-    transform: translateX(-50%);
-  }
-
-  :global(.place-map-marker-closed-indicator::after) {
-    top: calc(50% - 0.046875rem);
-    width: 0.21875rem;
-    height: 0.09375rem;
-    transform: rotate(30deg);
-  }
-
-  :global(.place-map-marker[data-open='false'] .place-map-marker-closed-indicator) {
-    display: block;
   }
 
   :global(.place-map-marker[data-status='planned'] .place-map-marker-point-surface) {

@@ -191,7 +191,7 @@ describe('place preview marker', () => {
         height: PLACE_MARKER_IMAGES.fish.height,
         alt: ''
       });
-      expect(marker?.querySelector('.place-preview__closed-indicator')).toBeTruthy();
+      expect(marker?.querySelector('.place-marker-badge--hours')).toBeTruthy();
       expect(JSON.parse(preview?.getAttribute('data-preview') ?? '{}')).toMatchObject({
         coordinates: place.coordinates,
         geometry: place.geometry,
@@ -215,7 +215,7 @@ describe('/map/[slug]/', () => {
     expect({
       label: document.querySelector('.place-availability')?.textContent?.trim(),
       hours: Boolean(document.querySelector('place-opening-hours')),
-      cross: Boolean(marker?.querySelector('.place-closure-indicator')),
+      cross: Boolean(marker?.querySelector('.place-marker-badge--closed')),
       link: marker?.getAttribute('href'),
       accessibleName: marker?.getAttribute('aria-label')
     }).toMatchInlineSnapshot(`
