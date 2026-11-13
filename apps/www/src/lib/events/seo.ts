@@ -1,6 +1,7 @@
 import { extractMarkdownText } from '@shelkovo/markdown';
 import type { SchemaDoc } from '@shelkovo/seo';
 
+import { eventExportEnd } from './end';
 import { toPublicEventCoordinates } from './public-coordinates';
 import type { EventParticipant, EventRecord } from './types';
 
@@ -34,7 +35,10 @@ export const buildEventJsonLd = (event: EventRecord, siteUrl: string): SchemaDoc
       .join(' '),
     inLanguage: 'ru-RU',
     startDate: event.timePrecision === 'date' ? event.startsDate : event.startsIso,
-    endDate: event.through ?? event.endsIso,
+    endDate:
+      event.through ??
+      event.endsIso ??
+      (event.startsAt ? eventExportEnd(event.startsAt).toISOString() : undefined),
     eventStatus:
       event.status === 'conditional'
         ? undefined

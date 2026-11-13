@@ -1,8 +1,10 @@
+import { z } from 'astro/zod';
 import { describe, expect, it } from 'vitest';
 
 import { preprocessSiteMarkdown } from '@/lib/markdown/render';
 
 import { buildEventCalendar } from '../calendar-projection';
+import { buildEventIcs } from '../ics';
 import { mapRawEvent } from '../mapper';
 import {
   buildEventMarkdown,
@@ -313,7 +315,7 @@ describe('shared Event JSON-LD', () => {
     `);
   });
 
-  it('keeps conditional uncertainty and never exports the ICS fallback into JSON-LD', () => {
+  it('keeps conditional uncertainty while using the shared export end in JSON-LD', () => {
     const record = event('conditional', '01.01.2027 18:00', {
       status: 'conditional',
       price: '600 / 800 / 1000 ₽'
@@ -326,7 +328,7 @@ describe('shared Event JSON-LD', () => {
       location: doc.location
     }).toMatchInlineSnapshot(`
       {
-        "end": undefined,
+        "end": "2027-01-01T17:00:00.000Z",
         "location": undefined,
         "offers": undefined,
         "status": undefined,
@@ -334,6 +336,41 @@ describe('shared Event JSON-LD', () => {
     `);
     expect(doc.description).toContain('При наборе группы.');
     expect(doc.description).toContain('Нужна группа от пяти человек.');
-    expect(buildEventJsonLd(event('date', '01.01.2027'), site).startDate).toBe('2027-01-01');
+  });
+
+  it('omits the end when only a single date is known', () => {
+    expect(buildEventJsonLd(event('date', '01.01.2027'), site)).toMatchObject({
+      startDate: '2027-01-01',
+      endDate: undefined
+    });
+  });
+
+  it.each([
+    { starts: '01.01.2027 20:00', end: '2027-01-01T22:00:00+03:00' },
+    { starts: '31.12.2026 23:30', end: '2027-01-01T01:30:00+03:00' }
+  ])('uses the same two-hour interval in JSON-LD and ICS from $starts', ({ starts, end }) => {
+    const record = {
+      ...event('timed', starts),
+      body: preprocessSiteMarkdown('Примерная длительность: четыре часа.').markdown
+    };
+    const before = JSON.stringify(record);
+    const endDate = z.string().parse(buildEventJsonLd(record, site).endDate);
+    expect(new Date(endDate).toISOString()).toBe(new Date(end).toISOString());
+    expect(Date.parse(endDate) - Date.parse(record.startsIso)).toBe(7_200_000);
+    const icsEnd = new Date(endDate).toISOString().replace(/[-:]|\.\d{3}/g, '');
+    expect(buildEventIcs(record, site, new Date('2026-01-01T00:00:00Z'))).toContain(
+      `DTEND:${icsEnd}\r\n`
+    );
+    expect(JSON.stringify(record)).toBe(before);
+    expect(toEventPublic(record, site)).toMatchObject({
+      timePrecision: 'datetime',
+      endsAt: undefined
+    });
+  });
+
+  it('prefers an explicit short interval over the two-hour fallback', () => {
+    const record = event('short', '13.11.2026 12:00', { ends_at: '13.11.2026 12:30' });
+    const doc = JSON.parse(JSON.stringify(buildEventJsonLd(record, site)));
+    expect(doc.endDate).toBe('2026-11-13T12:30:00+03:00');
   });
 });

@@ -1,10 +1,10 @@
 import { renderEventIcs } from '@shelkovo/ical';
 import { extractMarkdownText } from '@shelkovo/markdown';
 
+import { eventExportEnd } from './end';
 import { toPublicEventCoordinates } from './public-coordinates';
 import type { EventRecord } from './types';
 
-const DEFAULT_EVENT_DURATION_MS = 2 * 60 * 60 * 1000;
 const DAY_MS = 86_400_000;
 
 export const buildEventIcs = (
@@ -57,7 +57,7 @@ export const buildEventIcs = (
     return renderEventIcs({
       ...fields,
       startsAt: event.startsAt,
-      endsAt: event.endsAt ?? new Date(event.startsAt.valueOf() + DEFAULT_EVENT_DURATION_MS)
+      endsAt: eventExportEnd(event.startsAt, event.endsAt)
     });
   }
   // ICS DATE has a four-digit year; duration preserves the final supported day.

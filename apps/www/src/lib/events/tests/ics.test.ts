@@ -51,6 +51,17 @@ describe('event ICS', () => {
     expect(JSON.stringify(item)).toBe(before);
   });
 
+  it('preserves an explicit half-hour interval without a fallback explanation', () => {
+    const ics = unfold(exportIcs(event({ ends_at: '05.01.2026 21:30' })));
+    expect(ics.match(/DT(?:START|END):[^\r]+/g)).toMatchInlineSnapshot(`
+      [
+        "DTSTART:20260105T180000Z",
+        "DTEND:20260105T183000Z",
+      ]
+    `);
+    expect(ics).not.toContain('Два часа выделены условно');
+  });
+
   it('exports an inclusive period with exclusive end across the year', () => {
     const item = event({ starts_at: '30.12.2026', through: '03.01.2027' });
     expect(exportIcs(item).match(/DT(?:START|END)[^\r]+/g)).toMatchInlineSnapshot(`

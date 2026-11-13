@@ -315,7 +315,32 @@ describe('shared events in news', () => {
       'STATUS:CANCELLED'
     );
     expect(event.endsIso).toBeUndefined();
-    expect(jsonLd.find((item) => item['@type'] === 'Event')?.endDate).toBeUndefined();
+    expect(jsonLd.find((item) => item['@type'] === 'Event')?.endDate).toBe(
+      '2026-06-13T15:00:00.000Z'
+    );
+  });
+
+  it('adds the shared two-hour fallback end to event JSON-LD while keeping the domain record unchanged', () => {
+    const data = linkedDataset(newsEventRecord({ starts_at: '31.12.2026 23:30' }));
+    const article = data.articles[0]!;
+    const event = article.events[0]!;
+    const jsonLd = newsArticleSchema({
+      name: article.title,
+      description: article.summary,
+      url: article.url,
+      events: article.events
+    });
+    expect({
+      endDate: jsonLd.find((item) => item['@type'] === 'Event')?.endDate,
+      domainEnd: event.endsIso,
+      newsJsonEnd: toNewsPublicPayload(data).articles[0]?.events?.[0]?.ends_at
+    }).toMatchInlineSnapshot(`
+      {
+        "domainEnd": undefined,
+        "endDate": "2026-12-31T22:30:00.000Z",
+        "newsJsonEnd": undefined,
+      }
+    `);
   });
 
   it.each([undefined, '03.06.2026'])(
