@@ -27,5 +27,5 @@ Google Search Console сообщает об отсутствующем `endDate`
 
 - Генераторы `/apps/www/src/lib/events/seo.ts` и `/apps/www/src/lib/events/ics.ts`, их тесты и новостные интеграционные тесты.
 - Запись `/apps/www/src/data/events/2026/11/dam-opening-2026.md` и редакторские инструкции мероприятий.
-- JSON-LD будет передавать расчётное окончание как обычный `endDate`; это осознанное изменение прежнего контракта неизвестности. Компромисс описан в [design](/openspec/changes/event-jsonld-default-end/design.md).
+- JSON-LD будет передавать расчётное окончание как обычный `endDate`; это осознанное изменение прежнего контракта неизвестности. Компромисс описан в [design](/openspec/changes/archive/2026-11-13-event-jsonld-default-end/design.md).
 - Приёмка локальная: тесты поведения и проверка собранных страниц и ICS. Исчезновение предупреждения после обхода Google не является условием завершения change.

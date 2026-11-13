@@ -3,7 +3,11 @@ slug: dam-opening
 title: Торжественное открытие дамбы
 category: celebrations
 starts_at: 13.11.2026 12:00
+ends_at: 13.11.2026 12:30
 source_url: https://t.me/shelkovoecoclub/20423/59478
+organizer:
+  name: ОК Комфорт
+  type: organization
 location: У дамбы в Шелково Ривер
 coordinates:
   lat: 55.059459

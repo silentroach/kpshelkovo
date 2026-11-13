@@ -2,7 +2,7 @@
 
 ## Context
 
-Причина изменения описана в [proposal](/openspec/changes/event-jsonld-default-end/proposal.md). Сейчас `buildEventIcs` подставляет два часа только при точном начале; `buildEventJsonLd` выводит `through ?? endsIso`. Новостной JSON-LD уже использует общий генератор мероприятий.
+Причина изменения описана в [proposal](/openspec/changes/archive/2026-11-13-event-jsonld-default-end/proposal.md). Сейчас `buildEventIcs` подставляет два часа только при точном начале; `buildEventJsonLd` выводит `through ?? endsIso`. Новостной JSON-LD уже использует общий генератор мероприятий.
 
 [events-calendar](/openspec/specs/events-calendar/spec.md) и тесты прямо запрещают перенос условного окончания ICS в JSON-LD. Требуется изменить этот контракт, сохранив неизвестность в редакторской записи и остальных представлениях. [ADR-013](/docs/decisions/013-raw-domain-public-data-boundary.md) оставляет такие преобразования публичным адаптерам; новая граница данных или ADR не нужны.
 
