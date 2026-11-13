@@ -42,6 +42,57 @@ vi.mock(import('@/lib/yandex-maps/runtime'), async (importOriginal) => {
 describe('PlaceMap', () => {
   registerPlaceMapSetup();
 
+  it.each([undefined, 'kpp', 'construction'] as const)(
+    'keeps editorial closure on the %s marker across a working-hours boundary',
+    async (markerType) => {
+      vi.setSystemTime(new Date('2026-08-17T06:59:00Z'));
+      vi.stubGlobal('matchMedia', () => ({ matches: false }));
+      vi.stubGlobal(
+        'fetch',
+        vi.fn(async () =>
+          Response.json({
+            places: [
+              {
+                ...publicPlace,
+                marker: markerType,
+                status: 'planned',
+                status_label: 'Планируется',
+                availability: 'closed',
+                opening_hours: undefined
+              }
+            ]
+          })
+        )
+      );
+      render(PlaceMap, { props: { dataUrl: '/map/data/places.json' } });
+      await waitFor(() => expect(markerElements).toHaveLength(1));
+      const marker = markerElements[0]!;
+      vi.setSystemTime(new Date('2026-08-17T07:01:00Z'));
+      window.dispatchEvent(new Event('focus'));
+      expect({
+        href: marker.getAttribute('href'),
+        aria: marker.getAttribute('aria-label'),
+        title: marker.title,
+        open: marker.dataset.open,
+        cross: Boolean(marker.querySelector('.place-marker-badge--closed')),
+        clock: Boolean(marker.querySelector('.place-marker-badge--hours'))
+      }).toMatchInlineSnapshot(`
+        {
+          "aria": "Открыть место «Буржуйка», Планируется, Закрыто",
+          "clock": false,
+          "cross": true,
+          "href": "/map/burzhuyka/",
+          "open": undefined,
+          "title": "Буржуйка, Планируется
+        Закрыто",
+        }
+      `);
+      const click = vi.spyOn(marker, 'click').mockImplementation(() => {});
+      await fireEvent.keyDown(marker, { key: ' ' });
+      expect(click).toHaveBeenCalledOnce();
+    }
+  );
+
   it('renders the place as an accessible detail link and fits its coordinates', async () => {
     vi.stubGlobal('matchMedia', () => ({ matches: false }));
 
@@ -67,7 +118,8 @@ describe('PlaceMap', () => {
             class="place-map-marker-point-surface ui-map-marker"
           />
           <span
-            class="place-map-marker-closed-indicator"
+            aria-hidden="true"
+            class="place-marker-badge place-marker-badge--hours"
           />
         </span>
       </a>
@@ -245,7 +297,7 @@ describe('PlaceMap', () => {
         open: marker.dataset.open,
         ariaLabel: marker.getAttribute('aria-label'),
         title: marker.title,
-        hasClosedIndicator: !!marker.querySelector('.place-map-marker-closed-indicator')
+        hasClosedIndicator: !!marker.querySelector('.place-marker-badge--hours')
       }).toMatchInlineSnapshot(`
         {
           "ariaLabel": "Открыть место «Буржуйка», Строится, сейчас закрыто",

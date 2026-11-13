@@ -15,3 +15,5 @@ opening_hours:
       opens_at: '07:00'
       closes_at: '23:00'
 ---
+
+С **15 ноября 2026 года** КПП [временно закроют](/news/2026/11/checkpoint-closures/). Для въезда и выезда используйте [КПП Фореста](@forest-checkpoint) или [КПП Ривера](@river-checkpoint).

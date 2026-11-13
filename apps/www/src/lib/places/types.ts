@@ -76,6 +76,8 @@ export interface Place {
   readonly category: PlaceCategory;
   readonly marker?: PlaceMarker;
   readonly status: PlaceStatus;
+  /** Editorial access closure, independent of lifecycle; absence does not mean “open”. */
+  readonly availability?: 'closed';
   readonly summary: string;
   readonly searchAliases?: readonly string[];
   readonly body: PreprocessedSiteMarkdownBody;
@@ -84,6 +86,7 @@ export interface Place {
   readonly coordinates: PlaceCoordinates;
   readonly geometry?: PlaceGeometry;
   readonly mapUrl: string;
+  /** Effective schedule; withheld during editorial closure. Source hours stay in YAML. */
   readonly openingHours?: PlaceOpeningHours;
   readonly contact?: PlaceContact;
   readonly url: string;

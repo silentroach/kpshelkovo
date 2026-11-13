@@ -57,6 +57,29 @@ const place: Place = {
 };
 
 describe('place map public DTO', () => {
+  it('publishes closure independently and rejects hours for a closed place', () => {
+    const closed = buildPlaceMapPublicPayload([
+      { ...place, availability: 'closed', openingHours: undefined }
+    ]).places[0]!;
+    expect({
+      availability: closed.availability,
+      status: closed.status,
+      hours: closed.opening_hours
+    }).toMatchInlineSnapshot(`
+      {
+        "availability": "closed",
+        "hours": undefined,
+        "status": "existing",
+      }
+    `);
+    const hours = buildPlaceMapPublicPayload([place]).places[0]?.opening_hours;
+    expect(
+      PlaceMapPublicPayloadSchema.safeParse({
+        places: [{ ...closed, opening_hours: hours }]
+      }).success
+    ).toBe(false);
+    expect(JSON.stringify(buildPlaceMapPublicPayload([place]))).not.toContain('availability');
+  });
   it('rejects the retired infrastructure layer in the public format', () => {
     const payload = buildPlaceMapPublicPayload([place]);
     expect(
@@ -179,6 +202,7 @@ describe('place map public DTO', () => {
     expect(geometry?.type).toBe('FeatureCollection');
     expect(item).toMatchInlineSnapshot(`
       {
+        "availability": undefined,
         "coordinates": {
           "lat": 55.05717,
           "lng": 37.744987,

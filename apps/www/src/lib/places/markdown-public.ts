@@ -14,6 +14,7 @@ export const toPlaceMarkdownPublic = (place: Place): PlaceMarkdownPublicDto => {
     title: place.name,
     category: place.category,
     status: place.status,
+    availability: place.availability,
     address: place.address,
     map: {
       url: absoluteUrl(place.mapUrl),

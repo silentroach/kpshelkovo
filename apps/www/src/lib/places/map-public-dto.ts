@@ -19,6 +19,7 @@ export interface PlaceMapPublicItemDto {
   readonly name: string;
   readonly marker?: PlaceMarker;
   readonly status: PlaceStatus;
+  readonly availability?: 'closed';
   /** Display label for non-existing places, prepared alongside the map data. */
   readonly status_label?: string;
   readonly coordinates: {
