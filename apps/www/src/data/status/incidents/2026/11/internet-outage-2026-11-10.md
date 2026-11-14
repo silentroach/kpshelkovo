@@ -1,5 +1,5 @@
 ---
-title: Перебой подключения MKS Telecom
+title: Перебой подключения МКС Телеком
 service: internet
 kind: incident
 started_at: 10.11.2026 04:54
