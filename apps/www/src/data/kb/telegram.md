@@ -14,6 +14,7 @@ sources:
 - [Грин Ривер](https://t.me/GreenRiverKP)
 - [Панорама Ривер](https://t.me/panoramariver)
 - [Бекетово Парк](https://t.me/+GWASqY7XnA45Njhi)
+- [Ривер Парк](https://t.me/kp_river_park)
 
 ## 📚 По интересам
 
