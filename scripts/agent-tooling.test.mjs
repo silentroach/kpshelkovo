@@ -86,13 +86,16 @@ test('generated skills coexist with pinned skills without accepting unknown work
       mkdirSync(join(directory, name), { recursive: true });
       writeFileSync(join(directory, name, 'SKILL.md'), 'Generated\n');
     }
-    writeFileSync(join(directory, '.openspec-target'), 'opencode\n');
+    writeFileSync(join(directory, '.openspec-target'), 'agents\n');
     const external = join(directory, 'example');
     mkdirSync(external);
     writeFileSync(join(external, 'SKILL.md'), 'Upstream\n');
     const skills = { example: { computedHash: hashSkill(external) } };
     const allowed = new Set([...generatedSkillNames, '.openspec-target']);
     verifyGeneratedSkills(directory);
+    writeFileSync(join(directory, '.openspec-target'), 'opencode\n');
+    assert.throws(() => verifyGeneratedSkills(directory), /Unexpected OpenSpec target/);
+    writeFileSync(join(directory, '.openspec-target'), 'agents\n');
     verifySkillHashes(directory, skills, allowed);
     mkdirSync(join(directory, 'openspec-unknown'));
     assert.throws(() => verifySkillHashes(directory, skills, allowed), /Unexpected skills/);

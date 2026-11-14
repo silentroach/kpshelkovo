@@ -34,7 +34,7 @@ export function generateOpenSpec(destination) {
         'openspec',
         'init',
         '--tools',
-        'opencode',
+        'agents',
         '--profile',
         'core',
         '--no-animation',

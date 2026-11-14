@@ -36,7 +36,7 @@ pnpm agents:setup
 
 - Собственные skills хранятся в Git под `.agents/skills/`.
 - Внешние skills восстанавливаются в тот же каталог из `skills-lock.json` в исходном upstream-виде. Их версии задаются полными Git SHA в `ref`, содержимое — `computedHash`.
-- Штатные OpenSpec skills хранятся в `.agents/skills/openspec-*/`, регистрация OpenCode — в `.agents/skills/.openspec-target`. OpenSpec 2 не создаёт отдельные `/opsx:*` команды: вызывай соответствующий skill или описывай задачу обычным запросом.
+- Штатные OpenSpec skills хранятся в `.agents/skills/openspec-*/`; универсальная цель `agents` зарегистрирована в `.agents/skills/.openspec-target`.
 - Личные глобальные skills и их lock-файлы не участвуют в восстановлении. Установщик запускается с временным домашним каталогом, а генератор OpenSpec — с временным профилем.
 
 Ревью, согласование объёма, ведение глоссария и ADR и упрощение собственной реализации выполняются по `AGENTS.md`. По решению владельца все методы, для которых готовились проектные patches, исключены из набора. Установка не изменяет исходники внешних skills.
@@ -185,7 +185,7 @@ Infostyle установлен в исходном upstream-виде, но пр�
 pnpm openspec:generate
 ```
 
-Генератор запускает один штатный `pnpm exec openspec init --tools opencode --profile core --no-animation` из локального пакета; параметры закреплены в `scripts/openspec.mjs`. Он создаёт skills со штатной схемой `spec-driven` во временном проекте и переносит их вместе с регистрацией инструмента в `.agents/skills/`. Прежние сгенерированные копии в `.opencode/skills/` и команды `.opencode/commands/opsx-*.md` удаляются. Временные `XDG_CONFIG_HOME` и `XDG_DATA_HOME` исключают влияние личного профиля, а после запуска удаляются.
+Генератор запускает один штатный `pnpm exec openspec init --tools agents --profile core --no-animation` из локального пакета; параметры закреплены в `scripts/openspec.mjs`. Он создаёт skills со штатной схемой `spec-driven` во временном проекте и переносит их вместе с регистрацией универсальной цели в `.agents/skills/`. Временные `XDG_CONFIG_HOME` и `XDG_DATA_HOME` исключают влияние личного профиля, а после запуска удаляются.
 
 Собственной схемы проекта нет. Сгенерированные файлы сохраняются без ручных правок и исключены из форматирования, включая обработку явно перечисленных staged-файлов. Дополнения живут в `AGENTS.md` и `openspec/config.yaml`.
 

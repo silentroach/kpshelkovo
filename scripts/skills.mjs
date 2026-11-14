@@ -83,7 +83,7 @@ export function verifyGeneratedSkills(directory) {
     if (!existsSync(join(directory, name, 'SKILL.md')))
       throw new Error(`Missing generated skill: ${name}`);
   }
-  if (readFileSync(join(directory, '.openspec-target'), 'utf8').trim() !== 'opencode')
+  if (readFileSync(join(directory, '.openspec-target'), 'utf8').trim() !== 'agents')
     throw new Error('Unexpected OpenSpec target');
 }
 
