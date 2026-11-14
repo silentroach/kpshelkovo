@@ -105,7 +105,7 @@ describe('news authorship', () => {
       expect({
         visibleAuthor: meta.textContent.includes(article.author.name),
         date: meta.querySelector('time')?.getAttribute('datetime'),
-        area: meta.querySelector('[role="img"]')?.getAttribute('aria-label'),
+        area: meta.querySelector('.shelkovo-area')?.textContent.trim(),
         source: meta.querySelector('a[href="https://example.com/source"]')?.getAttribute('href'),
         emptyElements: [...meta.children].filter(
           (element) => !element.textContent.trim() && !element.children.length
@@ -114,7 +114,7 @@ describe('news authorship', () => {
         schemaAuthor: schema.author
       }).toMatchInlineSnapshot(`
       {
-        "area": "Шелково Форест",
+        "area": "Форест",
         "date": "2026-10-02T00:00:00+03:00",
         "emptyElements": 0,
         "schemaAuthor": undefined,

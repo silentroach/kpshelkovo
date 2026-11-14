@@ -1,10 +1,13 @@
 /// <reference types="astro/client" />
 
+import { Window } from 'happy-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { StatusIncident, StatusServiceSummary } from '@/lib/status/types';
 import { createAstroContainer } from '@/test/astro-container';
 
+// @ts-expect-error Astro component modules are resolved by Astro/Vitest at test time.
+import StatusIncidentMeta from './StatusIncidentMeta.astro';
 // @ts-expect-error Astro component modules are resolved by Astro/Vitest at test time.
 import StatusServiceCard from './StatusServiceCard.astro';
 
@@ -57,6 +60,43 @@ beforeEach(() => {
 afterEach(() => {
   vi.useRealTimers();
   vi.restoreAllMocks();
+});
+
+describe('status area metadata', () => {
+  it.each([false, true])(
+    'keeps selected areas with appliesToAllAreas=%s in incident and latest record',
+    async (appliesToAllAreas) => {
+      const container = await createAstroContainer();
+      const record: StatusIncident = {
+        ...incident(),
+        appliesToAllAreas,
+        areas: ['park', 'river', 'forest', 'village']
+      };
+      const serviceSummary: StatusServiceSummary = { ...summary(), incidents: [record] };
+      const window = new Window();
+      try {
+        const meta = await container.renderToString(StatusIncidentMeta, {
+          props: { incident: record }
+        });
+        const card = await container.renderToString(StatusServiceCard, {
+          props: { summary: serviceSummary }
+        });
+        window.document.body.innerHTML = meta + card;
+        const labels = (selector: string) =>
+          [...window.document.querySelectorAll(selector)].map((pair) => pair.textContent.trim());
+
+        expect({
+          incident: labels('.status-incident-meta .shelkovo-area'),
+          latest: labels('.status-service-row__latest .shelkovo-area')
+        }).toEqual({
+          incident: appliesToAllAreas ? [] : ['Парк', 'Ривер', 'Форест', 'Вилладж'],
+          latest: appliesToAllAreas ? [] : ['Парк', 'Ривер', 'Форест', 'Вилладж']
+        });
+      } finally {
+        await window.happyDOM.close();
+      }
+    }
+  );
 });
 
 describe('StatusServiceCard', () => {

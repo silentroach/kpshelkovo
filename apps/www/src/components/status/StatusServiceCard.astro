@@ -6,16 +6,16 @@ import {
   WaterDropIcon,
 } from '@shelkovo/ui/icons';
 
-import ShelkovoAreaIcon from '@/components/ShelkovoAreaIcon.astro';
+import ShelkovoArea from '@/components/ShelkovoArea.astro';
 import { toStatusTimelineIncidentInput } from '@/lib/status/timeline';
 import StatusServiceState from './StatusServiceState.astro';
 import StatusServiceTimeline from './StatusServiceTimeline.astro';
-import type { StatusServiceSummary } from '../../lib/status/types';
+import type { StatusServiceSummary } from '@/lib/status/types';
 import {
   formatStatusDate,
   formatStatusDuration,
   formatStatusService,
-} from '../../lib/status/view';
+} from '@/lib/status/view';
 
 interface Props {
   readonly summary: StatusServiceSummary;
@@ -116,7 +116,7 @@ const ServiceIcon = serviceIcons[summary.service];
             <div class="status-service-row__latest-meta">
               {latestMoment && <span>{latestMoment}</span>}
               {latestAreas.map((area) => (
-                <ShelkovoAreaIcon area={area} />
+                <ShelkovoArea area={area} />
               ))}
             </div>
           )}

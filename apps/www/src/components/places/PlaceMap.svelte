@@ -1595,9 +1595,13 @@
             Участки
           </label>
           {#each PARCEL_PARTS as part (part)}
+            {@const area =
+              part === 'shf' ? forest : part === 'shv' ? village : part === 'shp' ? park : river}
             <label
-              class="parcel-map-layer parcel-map-layer--part"
-              class:parcel-map-layer--error={failedParts.includes(part)}
+              class={[
+                'parcel-map-layer parcel-map-layer--part',
+                { 'parcel-map-layer--error': failedParts.includes(part) }
+              ]}
             >
               <input
                 type="checkbox"
@@ -1608,10 +1612,11 @@
                   : undefined}
                 onchange={(event) => toggleParcelPart(part, event.currentTarget.checked)}
               />
-              <span class="parcel-map-part-icon" aria-hidden="true">
-                {#if part === 'shf'}{@render forest?.()}{:else if part === 'shv'}{@render village?.()}{:else if part === 'shp'}{@render park?.()}{:else}{@render river?.()}{/if}
-              </span>
-              {PARCEL_PART_NAMES[part]}
+              {#if area}
+                {@render area()}
+              {:else}
+                {PARCEL_PART_NAMES[part]}
+              {/if}
               {#if failedParts.includes(part)}<span class="parcel-map-error-icon" aria-hidden="true"
                   >!</span
                 >{/if}
@@ -1837,19 +1842,6 @@
     height: 1.375rem;
     flex: none;
     color: var(--color-text-muted);
-  }
-
-  .parcel-map-part-icon {
-    display: flex;
-    width: 1.375rem;
-    height: 1.375rem;
-    flex: none;
-    align-items: center;
-  }
-
-  .parcel-map-part-icon :global(svg) {
-    width: 100%;
-    height: auto;
   }
 
   .parcel-map-controls button {

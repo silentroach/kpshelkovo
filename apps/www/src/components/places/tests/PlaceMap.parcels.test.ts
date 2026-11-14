@@ -245,39 +245,66 @@ describe('PlaceMap', () => {
     for (const feature of areaFeatures) expect(map.removeChild).toHaveBeenCalledWith(feature);
   });
 
-  it('renders the four decorative area icons and toggles every checkbox with its label', async () => {
-    const icons = Object.fromEntries(
-      ['forest', 'village', 'park', 'river'].map((name) => [
-        name,
-        createRawSnippet(() => ({ render: () => `<svg data-area="${name}"></svg>` }))
-      ])
-    );
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(async () => Response.json([]))
-    );
-    render(PlaceMap, { props: { places: [place], ...icons } });
-    await waitFor(() => expect(mapUpdateHandlers).toHaveLength(1));
-    await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
-    const checkboxes = ['Участки', 'Форест', 'Вилладж', 'Парк', 'Ривер'].map(
-      (name) => screen.getByRole('checkbox', { name }) as HTMLInputElement
-    );
-    const all = checkboxes[0]!;
-    expect(checkboxes.map((checkbox) => checkbox.checked)).toEqual([
-      false,
-      false,
-      false,
-      false,
-      false
-    ]);
-    expect(
-      checkboxes.slice(1).map((checkbox) => ({
-        icon: checkbox.parentElement?.querySelector('svg')?.getAttribute('data-area'),
-        decorative: checkbox.parentElement
-          ?.querySelector('[aria-hidden]')
-          ?.getAttribute('aria-hidden')
-      }))
-    ).toMatchInlineSnapshot(`
+  it.each([true, false])(
+    'names each area once and toggles every checkbox with its label (snippets=%s)',
+    async (withSnippets) => {
+      const icons = Object.fromEntries(
+        [
+          ['forest', 'Форест'],
+          ['village', 'Вилладж'],
+          ['park', 'Парк'],
+          ['river', 'Ривер']
+        ].map(([name, label]) => [
+          name,
+          createRawSnippet(() => ({
+            render: () =>
+              `<span class="shelkovo-area"><svg aria-hidden="true" data-area="${name}"></svg><span>${label}</span></span>`
+          }))
+        ])
+      );
+      vi.stubGlobal(
+        'fetch',
+        vi.fn(async () => Response.json([]))
+      );
+      render(PlaceMap, {
+        props: withSnippets ? { places: [place], ...icons } : { places: [place] }
+      });
+      await waitFor(() => expect(mapUpdateHandlers).toHaveLength(1));
+      await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
+      const checkboxes = ['Участки', 'Форест', 'Вилладж', 'Парк', 'Ривер'].map(
+        (name) => screen.getByRole('checkbox', { name }) as HTMLInputElement
+      );
+      const all = checkboxes[0]!;
+      expect(checkboxes.map((checkbox) => checkbox.checked)).toEqual([
+        false,
+        false,
+        false,
+        false,
+        false
+      ]);
+      expect(checkboxes.slice(1).map((checkbox) => checkbox.parentElement?.textContent?.trim()))
+        .toMatchInlineSnapshot(`
+      [
+        "Форест",
+        "Вилладж",
+        "Парк",
+        "Ривер",
+      ]
+    `);
+      if (withSnippets) {
+        for (const checkbox of checkboxes.slice(1)) {
+          expect(
+            checkbox.parentElement?.querySelector('.shelkovo-area')?.closest('[aria-hidden="true"]')
+          ).toBeNull();
+        }
+        expect(
+          checkboxes.slice(1).map((checkbox) => ({
+            icon: checkbox.parentElement?.querySelector('svg')?.getAttribute('data-area'),
+            decorative: checkbox.parentElement
+              ?.querySelector('[aria-hidden]')
+              ?.getAttribute('aria-hidden')
+          }))
+        ).toMatchInlineSnapshot(`
       [
         {
           "decorative": "true",
@@ -297,22 +324,26 @@ describe('PlaceMap', () => {
         },
       ]
     `);
-    for (const checkbox of checkboxes.slice(1)) {
-      await fireEvent.click(checkbox.parentElement!);
-      expect(checkbox.checked).toBe(true);
+      }
+      for (const checkbox of checkboxes.slice(1)) {
+        await fireEvent.click(checkbox.parentElement!);
+        expect(checkbox.checked).toBe(true);
+      }
+      expect(all.checked).toBe(true);
+      expect(all.indeterminate).toBe(false);
+      await fireEvent.click(all.parentElement!);
+      expect(checkboxes.map((checkbox) => checkbox.checked)).toEqual([
+        false,
+        false,
+        false,
+        false,
+        false
+      ]);
+      expect(screen.getByRole('button', { name: 'Слои' }).getAttribute('aria-expanded')).toBe(
+        'true'
+      );
     }
-    expect(all.checked).toBe(true);
-    expect(all.indeterminate).toBe(false);
-    await fireEvent.click(all.parentElement!);
-    expect(checkboxes.map((checkbox) => checkbox.checked)).toEqual([
-      false,
-      false,
-      false,
-      false,
-      false
-    ]);
-    expect(screen.getByRole('button', { name: 'Слои' }).getAttribute('aria-expanded')).toBe('true');
-  });
+  );
 
   it('keeps a non-numeric selection marker on the layers trigger while any part is selected', async () => {
     vi.stubGlobal(

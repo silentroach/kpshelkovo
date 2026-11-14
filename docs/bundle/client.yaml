@@ -49,7 +49,7 @@ static/HomeServiceSummary.astro_astro_type_script_index_0_lang.XXXXXXXX.js:
   apps/www/src/lib/home/service-summary.dom.ts:
     rendered: 1722
   apps/www/src/lib/home/service-summary.ts:
-    rendered: 1551
+    rendered: 1564
   apps/www/src/lib/status/schema.ts:
     rendered: 101
 static/InfrastructureTable.XXXXXXXX.js:
@@ -70,7 +70,7 @@ static/PlaceMap.XXXXXXXX.js:
   apps/www/src/components/places/place-marker-badge.css:
     rendered: 0
   apps/www/src/components/places/PlaceMap.svelte:
-    rendered: 60527
+    rendered: 59851
   apps/www/src/components/places/PlaceMap.svelte?svelte&type=style&lang.css:
     rendered: 0
   apps/www/src/lib/parcels/parcel-url.ts:

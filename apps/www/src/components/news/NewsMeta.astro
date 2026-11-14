@@ -1,9 +1,9 @@
 ---
-import ShelkovoAreaIcon from '../ShelkovoAreaIcon.astro';
+import ShelkovoArea from '@/components/ShelkovoArea.astro';
 import LinkWithIcon from '@shelkovo/ui/LinkWithIcon.astro';
-import type { NewsArea } from '../../lib/news/schema';
-import type { NewsAuthor } from '../../lib/news/types';
-import { formatNewsAuthor, formatNewsDate } from '../../lib/news/view';
+import type { NewsArea } from '@/lib/news/schema';
+import type { NewsAuthor } from '@/lib/news/types';
+import { formatNewsAuthor, formatNewsDate } from '@/lib/news/view';
 
 interface Props {
   readonly publishedIso: string;
@@ -42,7 +42,7 @@ const visibleAreas = appliesToAllAreas ? [] : areas;
       <span>{formatNewsAuthor(author, { short: !fullAuthorName })}</span>
     ))}
   {visibleAreas.map((area) => (
-    <ShelkovoAreaIcon area={area} />
+    <ShelkovoArea area={area} />
   ))}
   {sourceUrl && <LinkWithIcon href={sourceUrl} ariaLabelPrefix="Источник" />}
 </div>

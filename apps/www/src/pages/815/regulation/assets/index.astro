@@ -1,17 +1,13 @@
 ---
 import PageHeading from '@/components/PageHeading.astro';
+import ShelkovoArea from '@/components/ShelkovoArea.astro';
 import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
 import ResourceLink from '@shelkovo/ui/ResourceLink.astro';
-import {
-  ForestIcon,
-  ParkIcon,
-  RiverIcon,
-  VillageIcon,
-} from '@shelkovo/ui/icons';
 
 import StickyTableScript from '@/components/common/StickyTableScript.astro';
 import { fullReglamentDataset2026 } from '@/data/reglament/full-2026';
 import BaseLayout from '@/layouts/BaseLayout.astro';
+import type { Area } from '@/lib/areas';
 import { collectionPageSchema } from '@/lib/json-ld';
 import type {
   FullReglamentCommonAsset,
@@ -114,12 +110,12 @@ const assetSearchText = (
     .filter((part): part is string => Boolean(part))
     .join(' ');
 };
-const villageIcons = {
-  'shelkovo-village': VillageIcon,
-  'shelkovo-forest': ForestIcon,
-  'shelkovo-park': ParkIcon,
-  'shelkovo-river': RiverIcon,
-} as const satisfies Record<FullReglamentVillageId, typeof VillageIcon>;
+const villageAreas = {
+  'shelkovo-village': 'village',
+  'shelkovo-forest': 'forest',
+  'shelkovo-park': 'park',
+  'shelkovo-river': 'river',
+} as const satisfies Readonly<Record<FullReglamentVillageId, Area>>;
 ---
 
 <BaseLayout
@@ -194,18 +190,11 @@ const villageIcons = {
                       Объект
                     </th>
                     <th class="assets-table-heading">Ед. изм.</th>
-                    {fullReglamentDataset2026.villages.map((village) => {
-                      const AreaIcon = villageIcons[village.id];
-
-                      return (
-                        <th class="assets-table-heading assets-table-number">
-                          <span class="assets-village">
-                            <AreaIcon class="assets-village-icon" />
-                            <span>{village.title.replace('Шелково ', '')}</span>
-                          </span>
-                        </th>
-                      );
-                    })}
+                    {fullReglamentDataset2026.villages.map((village) => (
+                      <th class="assets-table-heading assets-table-number">
+                        <ShelkovoArea area={villageAreas[village.id]} />
+                      </th>
+                    ))}
                     <th class="assets-table-heading assets-table-number assets-table-total-heading">
                       Всего
                     </th>
@@ -347,19 +336,6 @@ const villageIcons = {
 
     .assets-table-number {
       text-align: right;
-    }
-
-    .assets-village {
-      display: inline-flex;
-      align-items: baseline;
-      justify-content: flex-end;
-      gap: 0.375rem;
-    }
-
-    .assets-village :global(.assets-village-icon) {
-      width: 1.75rem;
-      height: 0.875rem;
-      flex-shrink: 0;
     }
 
     .assets-table-cell {

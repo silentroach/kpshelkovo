@@ -1,7 +1,6 @@
 ---
 import { AlertCircleIcon, CheckCircleIcon } from '@shelkovo/ui/icons';
-import ShelkovoAreaIcon from '@/components/ShelkovoAreaIcon.astro';
-import { formatArea } from '@/lib/areas';
+import ShelkovoArea from '@/components/ShelkovoArea.astro';
 import { STATUS_AREAS, type StatusService } from '@/lib/status/schema';
 import {
   buildStatusTimelineDays,
@@ -130,10 +129,7 @@ const views = [
     </span>
     {STATUS_AREAS.map((area) => (
       <span data-area-icon={area}>
-        <span aria-hidden="true">
-          <ShelkovoAreaIcon area={area} />
-        </span>
-        <span>{formatArea(area).replace(/^Шелково /u, '')}</span>
+        <ShelkovoArea area={area} />
       </span>
     ))}
   </template>
@@ -318,15 +314,6 @@ const views = [
   }
   .status-service-timeline__event [data-phase-icon='check'] {
     color: var(--color-success);
-  }
-  .status-service-timeline__event [data-area-icon] {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.375rem;
-  }
-  .status-service-timeline__event [data-area-icon] > [aria-hidden='true'] {
-    position: relative;
-    top: 1px;
   }
   @media (min-width: 64rem) {
     .status-service-timeline [data-timeline-view='mobile'] {
