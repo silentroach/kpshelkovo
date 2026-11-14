@@ -1,5 +1,8 @@
 ---
 title: Полезные Telegram-чаты и каналы
+sources:
+  - url: https://t.me/MainChatGreenwood/46369/83672
+    description: Ссылка на чат жителей Грин Ривер.
 ---
 
 **Наш поселок:** [чат жителей Шелково](https://t.me/shelkovoecoclub).
@@ -8,6 +11,7 @@ title: Полезные Telegram-чаты и каналы
 
 - [Гринвуд](https://t.me/MainChatGreenwood)
 - [Грин Форест](https://t.me/greenforestclub)
+- [Грин Ривер](https://t.me/GreenRiverKP)
 - [Панорама Ривер](https://t.me/panoramariver)
 - [Бекетово Парк](https://t.me/+GWASqY7XnA45Njhi)
 
