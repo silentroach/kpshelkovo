@@ -30,9 +30,8 @@ describe('ReviewMeta', () => {
       expect(children.map((child) => child.tagName)).toEqual(expected);
       expect(children[authorFirst ? 0 : 1]?.textContent).toBe(author ?? 'Анонимный собственник');
       expect(document.querySelector('time')?.getAttribute('datetime')).toBe('2026-06-25');
-      expect(document.querySelector('[role="img"]')?.getAttribute('aria-label')).toBe(
-        'Шелково Форест'
-      );
+      expect(document.querySelector('.shelkovo-area')?.textContent.trim()).toBe('Форест');
+      expect(document.querySelector('[role="img"]')).toBeFalsy();
     }
   );
 

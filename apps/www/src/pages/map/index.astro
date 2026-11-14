@@ -1,13 +1,8 @@
 ---
 import PageHeading from '@/components/PageHeading.astro';
+import ShelkovoArea from '@/components/ShelkovoArea.astro';
 import PlaceMap from '@/components/places/PlaceMap.svelte';
 import { getPlaceBounds } from '@/components/places/place-map-geometry';
-import {
-  ForestIcon,
-  ParkIcon,
-  RiverIcon,
-  VillageIcon,
-} from '@shelkovo/ui/icons/areas';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import { loadPlaces } from '@/lib/places/load';
 import { isPlaceLayerVisible } from '@/lib/places/map-layers';
@@ -63,10 +58,18 @@ const schema = {
       {initialBounds}
       client:load
     >
-      <ForestIcon slot="forest" />
-      <VillageIcon slot="village" />
-      <ParkIcon slot="park" />
-      <RiverIcon slot="river" />
+      <Fragment slot="forest">
+        <ShelkovoArea area="forest" />
+      </Fragment>
+      <Fragment slot="village">
+        <ShelkovoArea area="village" />
+      </Fragment>
+      <Fragment slot="park">
+        <ShelkovoArea area="park" />
+      </Fragment>
+      <Fragment slot="river">
+        <ShelkovoArea area="river" />
+      </Fragment>
     </PlaceMap>
 
     <noscript>

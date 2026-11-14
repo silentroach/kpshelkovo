@@ -301,18 +301,24 @@ it('keeps both SSR windows readable, encodes titles once and opens all records w
       labels: [...territories.querySelectorAll('[data-area-icon]')].map((area) =>
         area.textContent?.trim()
       ),
-      hiddenSymbols: territories.querySelectorAll('[data-area-icon] > [aria-hidden="true"]').length
+      hiddenSymbols: territories.querySelectorAll('svg[aria-hidden="true"]').length,
+      hiddenLabels: [...territories.querySelectorAll('[data-area-icon]')].filter((area) =>
+        area.closest('[aria-hidden="true"]')
+      ).length,
+      tooltipCount: territories.querySelectorAll('[title]').length
     }).toMatchInlineSnapshot(`
       {
+        "hiddenLabels": 0,
         "hiddenSymbols": 2,
         "labels": [
           "Ривер",
           "Форест",
         ],
+        "tooltipCount": 0,
       }
     `);
     expect(shell.textContent?.replaceAll('\u00a0', '·')).toMatchInlineSnapshot(
-      `"9 мая 2026 г.×List onlyРаботы продолжаются. Начиная с·8·мая, 10:00<img src=x onerror=alert(1)>Инцидент продолжается. Начиная с·8·мая, 10:00OpenИнцидент завершён. 10:00·— 11:30 (1·ч. 30·мин.)Ривер Форест "`
+      `"9 мая 2026 г.×List onlyРаботы продолжаются. Начиная с·8·мая, 10:00<img src=x onerror=alert(1)>Инцидент продолжается. Начиная с·8·мая, 10:00OpenИнцидент завершён. 10:00·— 11:30 (1·ч. 30·мин.) Ривер   Форест  "`
     );
     const close = shell.querySelector<HTMLButtonElement>('button')!;
     close.focus();

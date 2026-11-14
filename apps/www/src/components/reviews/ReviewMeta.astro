@@ -1,7 +1,7 @@
 ---
 import { CheckCircleIcon } from '@shelkovo/ui/icons';
 
-import ShelkovoAreaIcon from '@/components/ShelkovoAreaIcon.astro';
+import ShelkovoArea from '@/components/ShelkovoArea.astro';
 import type { Review } from '@/lib/reviews/types';
 import { formatReviewAuthor, formatReviewDate } from '@/lib/reviews/view';
 
@@ -27,7 +27,7 @@ const {
     {formatReviewDate(review)}
   </time>
   {!authorFirst && <span>{formatReviewAuthor(review)}</span>}
-  <ShelkovoAreaIcon area={review.area} />
+  <ShelkovoArea area={review.area} />
   {showVerified && (
     <span class="review-meta-verified">
       <CheckCircleIcon />

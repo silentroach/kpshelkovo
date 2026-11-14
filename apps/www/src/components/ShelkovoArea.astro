@@ -6,11 +6,8 @@ import {
   VillageIcon,
 } from '@shelkovo/ui/icons';
 
-import { formatArea, type Area } from '@/lib/areas';
-
-interface Props {
-  readonly area: Area;
-}
+import { formatShortArea } from '@/lib/areas';
+import type { ShelkovoAreaProps as Props } from './shelkovo-area.types';
 
 const { area }: Props = Astro.props;
 
@@ -21,32 +18,29 @@ const AREA_ICONS = {
   village: VillageIcon,
 } as const;
 
-const label = formatArea(area);
+const label = formatShortArea(area);
 const Icon = AREA_ICONS[area];
 ---
 
-<span
-  title={label}
-  aria-label={label}
-  data-pagefind-index-attrs="aria-label"
-  role="img"
-  class="area-icon"
->
+<span class="shelkovo-area">
+  {' '}
   <Icon />
+  <span>{label}</span>{' '}
 </span>
 
 <style>
-  .area-icon {
+  .shelkovo-area {
     display: inline-flex;
     flex-shrink: 0;
     align-items: center;
-    justify-content: center;
-    line-height: 1;
+    gap: 0.375em;
+    white-space: nowrap;
   }
 
-  .area-icon > :global(svg) {
+  .shelkovo-area > :global(svg) {
     display: block;
-    width: auto;
-    height: 1rem;
+    width: 2em;
+    height: 1em;
+    flex-shrink: 0;
   }
 </style>

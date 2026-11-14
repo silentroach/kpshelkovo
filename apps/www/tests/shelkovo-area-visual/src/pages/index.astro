@@ -1,0 +1,43 @@
+---
+import '../../../config/visual-foundation.css';
+import '@/styles/site.css';
+
+import Fonts from '@shelkovo/ui/Fonts.astro';
+import ShelkovoArea from '@/components/ShelkovoArea.astro';
+---
+
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <Fonts />
+    <title>ShelkovoArea visual fixture</title>
+  </head>
+  <body class="ui-root-site">
+    <main>
+      <div class="fixture-areas">
+        <ShelkovoArea area="park" />
+        <ShelkovoArea area="river" />
+        <ShelkovoArea area="forest" />
+        <ShelkovoArea area="village" />
+      </div>
+    </main>
+  </body>
+</html>
+
+<style>
+  main {
+    padding: 1.5rem;
+  }
+
+  .fixture-areas {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.625em 1em;
+    color: var(--color-text-muted);
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+</style>
