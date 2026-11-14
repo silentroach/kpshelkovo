@@ -21,6 +21,14 @@ for (const width of [320, 390]) {
       expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(width);
       const pairs = page.locator('.shelkovo-area');
       await expect(pairs).toHaveCount(4);
+      const labelOffsets = await pairs.evaluateAll((elements) =>
+        elements.map((element) => {
+          const label = element.querySelector('span');
+          if (!label) throw new Error('Area must contain a visible label');
+          return label.getBoundingClientRect().left - element.getBoundingClientRect().left;
+        })
+      );
+      expect(new Set(labelOffsets).size).toBe(1);
       for (const pair of await pairs.all()) {
         await expect(pair).toBeVisible();
         const layout = await pair.evaluate((element) => {

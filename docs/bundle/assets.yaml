@@ -131,9 +131,9 @@
   brotli: 478
   gzip: 563
 - file: static/ShelkovoArea.XXXXXXXX.css
-  bytes: 218
-  brotli: 125
-  gzip: 157
+  bytes: 217
+  brotli: 126
+  gzip: 159
 - file: static/StatusCalendarDayMarker.XXXXXXXX.css
   bytes: 519
   brotli: 186
