@@ -8,6 +8,9 @@ apps/*/.astro/
 .cache/pagefind/
 .cache/bundle/
 .agents/skills/*
+!.agents/skills/openspec-*/
+!.agents/skills/openspec-*/**
+!.agents/skills/.openspec-target
 !.agents/skills/backlog/
 !.agents/skills/backlog/**
 !.agents/skills/news-maker/

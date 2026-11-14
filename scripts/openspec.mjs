@@ -1,15 +1,28 @@
 import { execFileSync } from 'node:child_process';
-import { cpSync, globSync, mkdirSync, mkdtempSync, rmSync } from 'node:fs';
+import { cpSync, globSync, lstatSync, mkdirSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
+export const generatedSkillNames = [
+  'openspec-apply-change',
+  'openspec-archive-change',
+  'openspec-explore',
+  'openspec-propose',
+  'openspec-sync-specs',
+  'openspec-update-change'
+];
 const generatedPatterns = [
+  '.agents/skills/openspec-*/**/*',
+  '.agents/skills/.openspec-target',
   '.opencode/skills/openspec-*/**/SKILL.md',
   '.opencode/commands/opsx-*.md'
 ];
-const generatedFiles = (directory) => globSync(generatedPatterns, { cwd: directory }).sort();
+const generatedFiles = (directory) =>
+  globSync(generatedPatterns, { cwd: directory })
+    .filter((path) => lstatSync(join(directory, path)).isFile())
+    .sort();
 
 export function generateOpenSpec(destination) {
   const temp = mkdtempSync(join(tmpdir(), 'shelkovo-openspec-'));
@@ -21,7 +34,7 @@ export function generateOpenSpec(destination) {
         'openspec',
         'init',
         '--tools',
-        'opencode',
+        'agents',
         '--profile',
         'core',
         '--no-animation',

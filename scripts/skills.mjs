@@ -16,6 +16,8 @@ import { fileURLToPath } from 'node:url';
 
 import { z } from 'zod';
 
+import { generatedSkillNames } from './openspec.mjs';
+
 const root = fileURLToPath(new URL('..', import.meta.url));
 const skillName = z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
 const lockSchema = z.strictObject({
@@ -68,13 +70,21 @@ export function verifySkillHashes(directory, skills, owned = new Set()) {
   if (extras.length) throw new Error(`Unexpected skills: ${extras.join(', ')}`);
 }
 
-export function verifyOpenCodeSkills(directory, projectSkills) {
-  for (const path of globSync('.opencode/skills/*/SKILL.md', { cwd: directory })) {
-    const name = path.split('/')[2];
-    if (!name.startsWith('openspec-') || projectSkills.has(name)) {
-      throw new Error(`Unexpected or duplicate OpenCode skill: ${path}`);
-    }
+export function verifyOpenCodeSkills(directory) {
+  for (const path of globSync(['.opencode/skills/*/SKILL.md', '.opencode/commands/opsx-*.md'], {
+    cwd: directory
+  })) {
+    throw new Error(`Unexpected or duplicate OpenCode workflow: ${path}`);
   }
+}
+
+export function verifyGeneratedSkills(directory) {
+  for (const name of generatedSkillNames) {
+    if (!existsSync(join(directory, name, 'SKILL.md')))
+      throw new Error(`Missing generated skill: ${name}`);
+  }
+  if (readFileSync(join(directory, '.openspec-target'), 'utf8').trim() !== 'agents')
+    throw new Error('Unexpected OpenSpec target');
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
@@ -92,6 +102,7 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
       .split('\0')
       .filter(Boolean)
       .map((path) => path.split('/')[2])
+      .filter((name) => !generatedSkillNames.includes(name) && name !== '.openspec-target')
   );
   for (const name of names)
     if (owned.has(name)) throw new Error(`Skill is both project-owned and external: ${name}`);
@@ -100,10 +111,12 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
     if (!existsSync(join(local, name, 'SKILL.md')))
       throw new Error(`Missing project-owned skill: ${name}`);
   }
-  const extras = readdirSync(local).filter((name) => !owned.has(name) && !names.includes(name));
+  verifyGeneratedSkills(local);
+  const allowed = new Set([...owned, ...generatedSkillNames, '.openspec-target']);
+  const extras = readdirSync(local).filter((name) => !allowed.has(name) && !names.includes(name));
   if (extras.length)
     throw new Error(`Remove unconfigured project skills first: ${extras.join(', ')}`);
-  verifyOpenCodeSkills(root, new Set([...owned, ...names]));
+  verifyOpenCodeSkills(root);
   if (mode === 'install') {
     const temp = mkdtempSync(join(tmpdir(), 'shelkovo-skills-'));
     try {
@@ -155,7 +168,7 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
       rmSync(temp, { recursive: true, force: true });
     }
   }
-  verifySkillHashes(local, lock.skills, owned);
+  verifySkillHashes(local, lock.skills, allowed);
   console.log(
     `Skills ${mode}: ${names.length} pinned external skills and ${owned.size} project-owned skills verified.`
   );
