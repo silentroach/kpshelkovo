@@ -4,8 +4,13 @@ import { tmpdir } from 'node:os';
 import { join, relative } from 'node:path';
 import { test } from 'node:test';
 
-import { generateOpenSpec } from './openspec.mjs';
-import { hashSkill, verifyOpenCodeSkills, verifySkillHashes } from './skills.mjs';
+import { generatedSkillNames, generateOpenSpec } from './openspec.mjs';
+import {
+  hashSkill,
+  verifyGeneratedSkills,
+  verifyOpenCodeSkills,
+  verifySkillHashes
+} from './skills.mjs';
 
 const tree = (directory) =>
   readdirSync(directory, { recursive: true, withFileTypes: true })
@@ -26,6 +31,8 @@ test('generation ignores the caller profile and leaves it untouched', () => {
     const profile = '{"profile":"custom","workflows":["onboard"],"delivery":"commands"}';
     writeFileSync(join(temp, 'profile/openspec/config.json'), profile);
     generateOpenSpec(expected);
+    verifyGeneratedSkills(join(expected, '.agents/skills'));
+    verifyOpenCodeSkills(expected);
     process.env.XDG_CONFIG_HOME = join(temp, 'profile');
     generateOpenSpec(actual);
     assert.deepEqual(tree(actual), tree(expected));
@@ -61,7 +68,36 @@ test('skill verification detects altered, missing and unexpected skills alongsid
     const stale = join(temp, '.opencode/skills/ask-matt');
     mkdirSync(stale, { recursive: true });
     writeFileSync(join(stale, 'SKILL.md'), 'Old process');
-    assert.throws(() => verifyOpenCodeSkills(temp, new Set()), /Unexpected or duplicate/);
+    assert.throws(() => verifyOpenCodeSkills(temp), /Unexpected or duplicate/);
+    rmSync(join(temp, '.opencode/skills'), { recursive: true });
+    mkdirSync(join(temp, '.opencode/commands'));
+    writeFileSync(join(temp, '.opencode/commands/opsx-apply.md'), 'Old command');
+    assert.throws(() => verifyOpenCodeSkills(temp), /Unexpected or duplicate/);
+  } finally {
+    rmSync(temp, { recursive: true, force: true });
+  }
+});
+
+test('generated skills coexist with pinned skills without accepting unknown workflows', () => {
+  const temp = mkdtempSync(join(tmpdir(), 'shared-skills-test-'));
+  try {
+    const directory = join(temp, '.agents/skills');
+    for (const name of generatedSkillNames) {
+      mkdirSync(join(directory, name), { recursive: true });
+      writeFileSync(join(directory, name, 'SKILL.md'), 'Generated\n');
+    }
+    writeFileSync(join(directory, '.openspec-target'), 'opencode\n');
+    const external = join(directory, 'example');
+    mkdirSync(external);
+    writeFileSync(join(external, 'SKILL.md'), 'Upstream\n');
+    const skills = { example: { computedHash: hashSkill(external) } };
+    const allowed = new Set([...generatedSkillNames, '.openspec-target']);
+    verifyGeneratedSkills(directory);
+    verifySkillHashes(directory, skills, allowed);
+    mkdirSync(join(directory, 'openspec-unknown'));
+    assert.throws(() => verifySkillHashes(directory, skills, allowed), /Unexpected skills/);
+    rmSync(join(directory, generatedSkillNames[0], 'SKILL.md'));
+    assert.throws(() => verifyGeneratedSkills(directory), /Missing generated skill/);
   } finally {
     rmSync(temp, { recursive: true, force: true });
   }

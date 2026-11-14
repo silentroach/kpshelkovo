@@ -10,24 +10,24 @@
     },
     "agent-browser": {
       "source": "vercel-labs/agent-browser",
-      "ref": "0207911f1bd4d0393eddaa90f2e50f96e0fb8974",
+      "ref": "f18b8bb5275ea2be22fca5e6856886827468f41e",
       "sourceType": "github",
       "skillPath": "skills/agent-browser/SKILL.md",
-      "computedHash": "dd491d53824ad9286ec950aee667098446332429a6d41fe28b4ba11f1959264c"
+      "computedHash": "13d4c36e4147478e4749ece397f7a37c7ed04cd2697d81f37ba3c241431e085f"
     },
     "animate": {
       "source": "emilkowalski/skills",
-      "ref": "5206a950b715e0cabe7043ea0b2304332b91494e",
+      "ref": "0f2e23b32bb1265e84cff8d3e75785fec953fb1b",
       "sourceType": "github",
       "skillPath": "skills/animate/SKILL.md",
-      "computedHash": "f76ddd3d4446c3c56a143ea98650c370b3e8f88e6203d1e22082d2082bf1eed7"
+      "computedHash": "e0199f58d8defdebaf36a507165e4da0b6a45ee7f54c7c77376c87cd2c3df78a"
     },
     "apple-design": {
       "source": "emilkowalski/skills",
-      "ref": "e8a175de22ae1e49370fc144c1f3bb9aeedf988d",
+      "ref": "0f2e23b32bb1265e84cff8d3e75785fec953fb1b",
       "sourceType": "github",
       "skillPath": "skills/apple-design/SKILL.md",
-      "computedHash": "0190417d092a0df447b000154e39733ea6d97efad6d3bec8a6ce3845aeb88914"
+      "computedHash": "cb864bd97f86d9ca5578274fb77dfc70d9ab278a22e3788b23e0b2d951f4e5b5"
     },
     "astro": {
       "source": "astrolicious/agent-skills",
@@ -52,31 +52,31 @@
     },
     "design-taste-frontend": {
       "source": "Leonxlnx/taste-skill",
-      "ref": "18dfc928b135629e0eddfdd445a06400d04ed439",
+      "ref": "f6b76575f949707b4e3c37cd86cb44b0b98643e8",
       "sourceType": "github",
       "skillPath": "skills/taste-skill/SKILL.md",
-      "computedHash": "6d838b246d0e35d0b53f4f23f98ba7a1dd561937e64f7d0c7553b0928e376c3e"
+      "computedHash": "acda6bf83f200405aa200eb245448fdc11cfce43d97bc2d9b8bf13a27f362d95"
     },
     "domain-modeling": {
       "source": "mattpocock/skills",
-      "ref": "49dd158d1076134a641b33efb035946536778336",
+      "ref": "5863806dd4e15c63174bee4e7515a4256792ecfa",
       "sourceType": "github",
       "skillPath": "skills/engineering/domain-modeling/SKILL.md",
       "computedHash": "b3eb40152b81f0c98fd2095a023c019452dbdce56f7540cc67fece2972db8369"
     },
     "grilling": {
       "source": "mattpocock/skills",
-      "ref": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+      "ref": "5863806dd4e15c63174bee4e7515a4256792ecfa",
       "sourceType": "github",
       "skillPath": "skills/productivity/grilling/SKILL.md",
       "computedHash": "e40cc1d348f6d935e28f1e24474302d7368f0a400429271a43b35fe154891dc5"
     },
     "humanizer-ru": {
       "source": "ilyautov/humanizer-ru",
-      "ref": "f2fe1f364d1a968e6f0f842c68ecd8c9c0dcc485",
+      "ref": "20842fe5b219ad56f79e91aa68179cf7c3710f81",
       "sourceType": "github",
       "skillPath": "skills/humanizer-ru/SKILL.md",
-      "computedHash": "8a439a48c8bf73c035dafc581cc063cfabd46b46ff6b0dca8410703c8152d1bb"
+      "computedHash": "e0859389447bbcdb093ae184d760665706155eb243d79543be6d787bc07624df"
     },
     "infostyle": {
       "source": "artgas1/infostyle-skill",
@@ -101,21 +101,21 @@
     },
     "ponytail-audit": {
       "source": "dietrichgebert/ponytail",
-      "ref": "9cc65d03aa2da1db7121b912d03596409ee340b8",
+      "ref": "96608e078b2d5ea607c5c3b8b5a54d1c1fba6846",
       "sourceType": "github",
       "skillPath": "skills/ponytail-audit/SKILL.md",
       "computedHash": "1d718f893dabc01caad0dacef86444b5b4b3e1e59409527d66e8b5dd0cd85ae0"
     },
     "ponytail-review": {
       "source": "dietrichgebert/ponytail",
-      "ref": "9cc65d03aa2da1db7121b912d03596409ee340b8",
+      "ref": "96608e078b2d5ea607c5c3b8b5a54d1c1fba6846",
       "sourceType": "github",
       "skillPath": "skills/ponytail-review/SKILL.md",
       "computedHash": "800dc0c86402978e12359f701b9e0c81ba4607a0cd0027f4596d0f835a67eadc"
     },
     "research": {
       "source": "mattpocock/skills",
-      "ref": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+      "ref": "5863806dd4e15c63174bee4e7515a4256792ecfa",
       "sourceType": "github",
       "skillPath": "skills/engineering/research/SKILL.md",
       "computedHash": "5d85b64ecceed6b3f6d5996dc8af07180be8d1ff11ef3d26eda2acff078fbd39"
@@ -136,14 +136,14 @@
     },
     "svelte-core-bestpractices": {
       "source": "sveltejs/ai-tools",
-      "ref": "6b5d0dab3c9c083387247ab20dc684573481076b",
+      "ref": "d3e755be770277d8c75fe61109b103b801b12775",
       "sourceType": "github",
-      "skillPath": "plugins/claude/svelte/skills/svelte-core-bestpractices/SKILL.md",
+      "skillPath": "tools/skills/svelte-core-bestpractices/SKILL.md",
       "computedHash": "3cd6c1f1a92b8bf52af8120e5cb3a93b5512f83b905fd902b895adafb7225456"
     },
     "wayfinder": {
       "source": "mattpocock/skills",
-      "ref": "4ae2317ddb22b046e26455e4f9c9b3aaaf62212d",
+      "ref": "5863806dd4e15c63174bee4e7515a4256792ecfa",
       "sourceType": "github",
       "skillPath": "skills/engineering/wayfinder/SKILL.md",
       "computedHash": "22338d9356ef84430c5ca916f2632f226583d9d7366433f62bfde5b1b6781e9e"
@@ -157,7 +157,7 @@
     },
     "writing-for-agents": {
       "source": "mattpocock/skills",
-      "ref": "49dd158d1076134a641b33efb035946536778336",
+      "ref": "5863806dd4e15c63174bee4e7515a4256792ecfa",
       "sourceType": "github",
       "skillPath": "skills/productivity/writing-for-agents/SKILL.md",
       "computedHash": "95da47fc97af998e85b7d7e6d57b3ac76727c1e290cfe9ea09005aacb826959f"

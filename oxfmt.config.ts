@@ -33,7 +33,6 @@ export default defineConfig({
     '.agents/skills/wayfinder/**',
     '.agents/skills/web-quality-audit/**',
     '.agents/skills/writing-for-agents/**',
-    '.opencode/skills/openspec-*/**',
-    '.opencode/commands/opsx-*.md'
+    '.agents/skills/openspec-*/**'
   ]
 });

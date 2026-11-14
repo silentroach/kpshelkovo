@@ -23,8 +23,7 @@
     ".agents/skills/wayfinder/**",
     ".agents/skills/web-quality-audit/**",
     ".agents/skills/writing-for-agents/**",
-    ".opencode/skills/**",
-    ".opencode/commands/opsx-*.md"
+    ".agents/skills/openspec-*/**"
   ],
   "jsPlugins": [{ "name": "local", "specifier": "./tools/oxlint/index.ts" }],
   "rules": {
