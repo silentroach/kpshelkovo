@@ -54,10 +54,10 @@ export const getHomeServiceMessages = (
       return [];
     }
 
-    let label = window.kind === 'incident' ? 'Перебой' : 'Идут работы';
+    let label = window.kind === 'incident' ? 'Есть проблемы' : 'Идут работы';
     if (phase === 'scheduled') {
       const date = formatDate(new Date(window.start).toISOString(), now);
-      label = `${window.kind === 'incident' ? 'Перебой' : 'Работы'} с ${date}`;
+      label = `${window.kind === 'incident' ? 'Проблемы' : 'Работы'} с ${date}`;
     }
 
     return [{ service, phase, kind: window.kind, label, start: window.start }];

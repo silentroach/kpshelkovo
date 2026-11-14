@@ -275,7 +275,7 @@ describe('homepage server HTML', () => {
             "hidden": false,
             "href": "/status/electricity/",
             "kind": "incident",
-            "label": "Перебой",
+            "label": "Есть проблемы",
             "phase": "active",
             "service": "electricity",
           },

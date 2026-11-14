@@ -140,7 +140,7 @@ describe('getHomeServiceMessages', () => {
           [
             "active",
             "incident",
-            "Перебой",
+            "Есть проблемы",
           ],
         ],
         [
@@ -177,7 +177,7 @@ describe('getHomeServiceMessages', () => {
         [
           {
             "kind": "incident",
-            "label": "Перебой с 8 октября",
+            "label": "Проблемы с 8 октября",
             "phase": "scheduled",
             "service": "dam",
             "start": 1791442800000,

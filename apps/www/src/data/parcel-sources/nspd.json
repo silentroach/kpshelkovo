@@ -2,8 +2,8 @@
   "source": "https://nspd.gov.ru/map",
   "endpoint": "https://nspd.gov.ru/api/geoportal/v1/intersects?typeIntersect=fullObject",
   "method": "POST",
-  "capturedOn": "2026-11-05",
-  "savedAt": "2026-11-05T20:11:50.979Z",
+  "capturedOn": "2026-11-14",
+  "savedAt": "2026-11-14T16:29:34.704Z",
   "geometryCrs": "EPSG:3857",
   "queryCrs": "EPSG:4326",
   "queryRing4326": [

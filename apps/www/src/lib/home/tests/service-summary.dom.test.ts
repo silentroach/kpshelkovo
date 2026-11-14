@@ -85,7 +85,7 @@ describe('hydrateHomeServiceSummary', () => {
         },
         {
           "kind": "incident",
-          "label": "Перебой с 7 октября",
+          "label": "Проблемы с 7 октября",
           "phase": "scheduled",
           "service": "water",
         },
@@ -97,7 +97,7 @@ describe('hydrateHomeServiceSummary', () => {
       [
         {
           "kind": "incident",
-          "label": "Перебой",
+          "label": "Есть проблемы",
           "phase": "active",
           "service": "water",
         },
@@ -192,7 +192,7 @@ describe('hydrateHomeServiceSummary', () => {
       [
         {
           "kind": "incident",
-          "label": "Перебой",
+          "label": "Есть проблемы",
           "phase": "active",
           "service": "internet",
         },
@@ -204,7 +204,7 @@ describe('hydrateHomeServiceSummary', () => {
         },
         {
           "kind": "incident",
-          "label": "Перебой с 7 октября",
+          "label": "Проблемы с 7 октября",
           "phase": "scheduled",
           "service": "dam",
         },
