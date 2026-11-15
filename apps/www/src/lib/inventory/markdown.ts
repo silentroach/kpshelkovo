@@ -91,10 +91,10 @@ const ownerContacts = (owner: InventoryOwner): InventoryMarkdownNode =>
     )
   );
 
-const offerFacts = (offer: InventoryOffer): readonly InventoryMarkdownNode[] => [
-  md.paragraph(offer.summary),
-  md.paragraph(formatInventoryPrice(offer.price))
-];
+const offerFacts = (offer: InventoryOffer): readonly InventoryMarkdownNode[] => {
+  const price = formatInventoryPrice(offer.price);
+  return [md.paragraph(offer.summary), ...(price ? [md.paragraph(price)] : [])];
+};
 
 const offerNodes = (
   offer: InventoryOffer,

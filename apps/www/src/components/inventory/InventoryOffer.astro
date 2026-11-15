@@ -10,6 +10,7 @@ interface Props {
 }
 const { offer, showOwner = true, kind } = Astro.props;
 const photo = offer.photos[0];
+const price = formatInventoryPrice(offer.price);
 ---
 
 <article
@@ -47,13 +48,17 @@ const photo = offer.photos[0];
       />
     </h2>
   </header>
-  <div class="inventory-offer__visual">
-    {photo && <InventoryPreview photo={photo} href={offer.url} />}
-    <p
-      class="inventory-offer__price ui-num"
-      set:html={formatTextHtml(formatInventoryPrice(offer.price))}
-    />
-  </div>
+  {(photo || price) && (
+    <div class="inventory-offer__visual">
+      {photo && <InventoryPreview photo={photo} href={offer.url} />}
+      {price && (
+        <p
+          class="inventory-offer__price ui-num"
+          set:html={formatTextHtml(price)}
+        />
+      )}
+    </div>
+  )}
   <p
     class="inventory-offer__summary"
     set:html={formatTextHtml(offer.summary)}
@@ -85,6 +90,12 @@ const photo = offer.photos[0];
   }
   .inventory-offer--owner {
     grid-template-areas: 'heading' 'visual' 'summary' 'owner';
+  }
+  .inventory-offer:not(:has(.inventory-offer__visual)) {
+    grid-template-areas: 'heading' 'summary';
+  }
+  .inventory-offer--owner:not(:has(.inventory-offer__visual)) {
+    grid-template-areas: 'heading' 'summary' 'owner';
   }
   .inventory-offer + .inventory-offer {
     padding-block-start: 1.25rem;
@@ -164,6 +175,22 @@ const photo = offer.photos[0];
     .inventory-offer--photo.inventory-offer--owner {
       grid-template-areas: 'photo heading' 'photo price' 'photo summary' 'photo owner';
       grid-template-rows: min-content min-content min-content 1fr;
+    }
+    .inventory-offer:not(:has(.inventory-offer__price)) {
+      grid-template-areas: 'heading' 'summary';
+    }
+    .inventory-offer--owner:not(:has(.inventory-offer__price)) {
+      grid-template-areas: 'heading' 'summary' 'owner';
+    }
+    .inventory-offer--photo:not(:has(.inventory-offer__price)) {
+      grid-template-areas: 'photo heading' 'photo summary';
+      grid-template-rows: min-content 1fr;
+    }
+    .inventory-offer--photo.inventory-offer--owner:not(
+        :has(.inventory-offer__price)
+      ) {
+      grid-template-areas: 'photo heading' 'photo summary' 'photo owner';
+      grid-template-rows: min-content min-content 1fr;
     }
   }
 </style>

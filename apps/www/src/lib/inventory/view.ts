@@ -13,12 +13,11 @@ export const inventoryOwnerOffers = (
     .filter((offer) => offer.owner.id === ownerId)
     .sort((a, b) => compareRuText(a.title, b.title) || compareRuText(a.id, b.id));
 
-export const formatInventoryPrice = (price: InventoryPrice): string => {
+export const formatInventoryPrice = (price: InventoryPrice): string | undefined => {
   switch (price.type) {
     case 'free':
-      return 'Бесплатно';
     case 'negotiable':
-      return 'Цена по договорённости';
+      return;
     case 'fixed': {
       const amount = formatNumberUnitRu(price.value, '₽', { maximumFractionDigits: 2 });
       switch (price.period) {

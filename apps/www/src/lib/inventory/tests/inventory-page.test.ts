@@ -72,7 +72,7 @@ describe('inventory HTML pages', () => {
     expect(page.querySelector('h2 a')?.getAttribute('href')).toBe(offer.url);
   });
 
-  it('renders owners, canonical parcels and all prices without contact actions in listings', async () => {
+  it('renders owners, canonical parcels and only fixed prices without contact actions in listings', async () => {
     const page = await renderKind();
     const offers = [...page.querySelectorAll('article')];
     expect(
@@ -87,13 +87,13 @@ describe('inventory HTML pages', () => {
         {
           "id": "offer-free",
           "parcel": "/map/?p=SHP-A2",
-          "price": "Бесплатно",
+          "price": undefined,
           "title": "Дрель Model 200",
         },
         {
           "id": "offer-negotiable",
           "parcel": "/map/?p=SHP-A1",
-          "price": "Цена по·договорённости",
+          "price": undefined,
           "title": "Дрель Model 300",
         },
         {
@@ -265,7 +265,7 @@ describe('inventory HTML pages', () => {
         },
         {
           "offerId": "free",
-          "price": "Бесплатно",
+          "price": undefined,
           "sequence": [
             "contact",
             "body",
@@ -273,7 +273,7 @@ describe('inventory HTML pages', () => {
         },
         {
           "offerId": "negotiable",
-          "price": "Цена по·договорённости",
+          "price": undefined,
           "sequence": [
             "contact",
             "photo",
@@ -366,7 +366,6 @@ describe('inventory HTML pages', () => {
         expect(card?.querySelector('.inventory-offer__summary')?.textContent).toBe(
           formatText(offer.summary)
         );
-        expect(card?.querySelector('.inventory-offer__price')?.textContent.trim()).toBeTruthy();
         expect(card?.querySelector('img')?.getAttribute('alt')).toBe(
           offer.photos[0] ? formatText(offer.photos[0].alt) : undefined
         );

@@ -232,9 +232,7 @@ describe('inventory Markdown companions', () => {
     const markdown = buildInventoryKindMarkdown(kind);
     document.body.innerHTML = render(markdown);
     const text = document.body.textContent.replace(/[\u00a0\u202f]/gu, ' ');
-    expect(
-      ['Бесплатно', '350 ₽/сутки', 'Цена по договорённости'].every((price) => text.includes(price))
-    ).toBe(true);
+    expect(text).toContain('350 ₽/сутки');
     expect([...document.querySelectorAll('a[href^="tel:"]')]).toHaveLength(0);
     expect(document.body.textContent).not.toContain('123 доб. 4');
     expect(document.body.textContent).toContain(`Владелец: ${kind.offers[0]!.owner.name}`);
@@ -265,11 +263,6 @@ describe('inventory Markdown companions', () => {
         markdown.includes(`https://kpshelkovo.online${offer.markdownUrl}`)
       )
     ).toBe(true);
-    const expectedPrices = new Map([
-      ['free', 'Бесплатно'],
-      ['fixed', '350 ₽/сутки'],
-      ['negotiable', 'Цена по договорённости']
-    ]);
     for (const offer of kind.offers) {
       const detail = buildInventoryOfferMarkdown(offer);
       document.body.innerHTML = render(detail);
@@ -279,7 +272,6 @@ describe('inventory Markdown companions', () => {
         document.querySelector('a[href="https://kpshelkovo.online/ukogo/owners/anna/index.md"]')
           ?.textContent
       ).toBe(offer.owner.name);
-      expect(detailText).toContain(expectedPrices.get(offer.id)!);
       expect(
         document.querySelector('a[href="https://kpshelkovo.online/map/?p=SHR-L43"]')
       ).toBeTruthy();
@@ -415,7 +407,6 @@ describe('inventory Markdown companions', () => {
         .filter((offer) => offer.owner.id === owner.id)
         .every((offer) => text.includes(offer.summary))
     ).toBe(true);
-    expect(document.body.textContent).toContain('Бесплатно');
     expect(document.querySelector(`a[href="${owner.canonical}"]`)).toBeTruthy();
     expect(markdown).toContain('/ukogo/index.md');
   });
