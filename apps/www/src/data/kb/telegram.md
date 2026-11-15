@@ -3,6 +3,8 @@ title: Полезные Telegram-чаты и каналы
 sources:
   - url: https://t.me/MainChatGreenwood/46369/83672
     description: Ссылка на чат жителей Грин Ривер.
+  - url: https://t.me/+lGcG2MkY25E2NDli
+    description: Название и тематика музыкального канала.
 ---
 
 **Наш поселок:** [чат жителей Шелково](https://t.me/shelkovoecoclub).
@@ -19,6 +21,7 @@ sources:
 ## 📚 По интересам
 
 - **Чат для детей и подростков** доступен только по приглашению. Чтобы добавить ребенка, напишите [@iq_genius](https://t.me/iq_genius).
+- [Музыкальная группа для детей](https://t.me/+lGcG2MkY25E2NDli)
 - [Книжный клуб соседей](https://t.me/neighborsbookclub)
 
 ## 🛒 Покупки и быт
