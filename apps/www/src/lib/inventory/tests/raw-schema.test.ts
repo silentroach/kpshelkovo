@@ -74,7 +74,7 @@ describe('inventory publication boundary', () => {
           price
         });
         const mapped = mapRawInventoryPrice(raw.price);
-        return [mapped, formatInventoryPrice(mapped).replaceAll('\u00a0', '·')];
+        return [mapped, formatInventoryPrice(mapped)?.replaceAll('\u00a0', '·')];
       })
     ).toMatchInlineSnapshot(`
       [
@@ -82,13 +82,13 @@ describe('inventory publication boundary', () => {
           {
             "type": "negotiable",
           },
-          "Цена по договорённости",
+          undefined,
         ],
         [
           {
             "type": "free",
           },
-          "Бесплатно",
+          undefined,
         ],
         [
           {
@@ -148,7 +148,7 @@ describe('inventory publication boundary', () => {
           price: { value, period: 'day' }
         });
         const price = mapRawInventoryPrice(raw.price);
-        return [price, formatInventoryPrice(price).replaceAll('\u00a0', '·')];
+        return [price, formatInventoryPrice(price)?.replaceAll('\u00a0', '·')];
       })
     ).toMatchInlineSnapshot(`
       [

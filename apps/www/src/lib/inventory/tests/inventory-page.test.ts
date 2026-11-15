@@ -72,7 +72,7 @@ describe('inventory HTML pages', () => {
     expect(page.querySelector('h2 a')?.getAttribute('href')).toBe(offer.url);
   });
 
-  it('renders owners, canonical parcels and all prices without contact actions in listings', async () => {
+  it('renders owners, canonical parcels and only fixed prices without contact actions in listings', async () => {
     const page = await renderKind();
     const offers = [...page.querySelectorAll('article')];
     expect(
@@ -87,13 +87,13 @@ describe('inventory HTML pages', () => {
         {
           "id": "offer-free",
           "parcel": "/map/?p=SHP-A2",
-          "price": "Бесплатно",
+          "price": undefined,
           "title": "Дрель Model 200",
         },
         {
           "id": "offer-negotiable",
           "parcel": "/map/?p=SHP-A1",
-          "price": "Цена по·договорённости",
+          "price": undefined,
           "title": "Дрель Model 300",
         },
         {
@@ -104,6 +104,8 @@ describe('inventory HTML pages', () => {
         },
       ]
     `);
+    expect(page.querySelectorAll('.inventory-offer__price')).toHaveLength(1);
+    expect(page.body.textContent).not.toMatch(/Бесплатно|Цена по\u00a0договорённости/u);
     expect(offers.map((offer) => offer.querySelector('h2 a')?.getAttribute('href'))).toEqual(
       fixture.data?.byKind.get('drill')?.offers.map((offer) => offer.url)
     );
@@ -243,6 +245,9 @@ describe('inventory HTML pages', () => {
       );
       const offer = fixture.data?.offers.find((item) => item.id === offerId);
       expect(images).toEqual(offer?.photos.map((photo) => photo.url));
+      expect(main.querySelectorAll('.inventory-detail__price')).toHaveLength(
+        offerId === 'paid' ? 1 : 0
+      );
       observations.push({
         offerId,
         price: visibleWhitespace(
@@ -265,7 +270,7 @@ describe('inventory HTML pages', () => {
         },
         {
           "offerId": "free",
-          "price": "Бесплатно",
+          "price": undefined,
           "sequence": [
             "contact",
             "body",
@@ -273,7 +278,7 @@ describe('inventory HTML pages', () => {
         },
         {
           "offerId": "negotiable",
-          "price": "Цена по·договорённости",
+          "price": undefined,
           "sequence": [
             "contact",
             "photo",
@@ -366,7 +371,12 @@ describe('inventory HTML pages', () => {
         expect(card?.querySelector('.inventory-offer__summary')?.textContent).toBe(
           formatText(offer.summary)
         );
-        expect(card?.querySelector('.inventory-offer__price')?.textContent.trim()).toBeTruthy();
+        expect(card?.querySelectorAll('.inventory-offer__price')).toHaveLength(
+          offer.price.type === 'fixed' ? 1 : 0
+        );
+        expect(card?.querySelectorAll('.inventory-offer__visual')).toHaveLength(
+          offer.price.type === 'fixed' || offer.photos.length > 0 ? 1 : 0
+        );
         expect(card?.querySelector('img')?.getAttribute('alt')).toBe(
           offer.photos[0] ? formatText(offer.photos[0].alt) : undefined
         );
