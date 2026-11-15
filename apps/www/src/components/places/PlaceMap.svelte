@@ -435,7 +435,10 @@
     button.type = 'button';
     button.className = 'place-map-cluster';
     button.dataset.placeIds = features.map(({ id }) => String(id)).join(' ');
-    button.textContent = String(features.length);
+    const count = document.createElement('span');
+    count.className = 'place-map-cluster__count';
+    count.textContent = String(features.length);
+    button.append(count);
     button.title = label;
     button.setAttribute('aria-label', `${label}. Приблизить карту`);
     button.addEventListener('click', (event) => {
@@ -2274,24 +2277,35 @@
 
   :global(.place-map-cluster) {
     display: grid;
-    width: 2.75rem;
-    height: 2.75rem;
+    width: max-content;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    padding: 0;
     place-items: center;
-    border: 0.125rem solid var(--color-primary);
-    border-radius: 999px;
-    background: var(--color-surface-raised);
-    box-shadow:
-      0 0 0 0.125rem color-mix(in oklab, var(--color-surface) 88%, transparent),
-      0 0.2rem 0.45rem oklch(24% 0.04 145 / 0.28);
-    color: var(--color-text);
+    border: 0;
+    background: transparent;
     cursor: pointer;
-    font: inherit;
-    font-size: 1rem;
+    touch-action: manipulation;
+    transform: translate(-50%, -50%);
+  }
+
+  :global(.place-map-cluster__count) {
+    display: grid;
+    min-width: 1.5rem;
+    height: 1.5rem;
+    padding-inline: 0.25rem;
+    place-items: center;
+    border: 1px solid oklch(59.4824% 0.035315 150.7586);
+    border-radius: 0.4375rem;
+    background: oklch(99.6683% 0.005372 95.0974);
+    box-shadow: 0 1px 2px oklch(27.5613% 0.037221 150.0493 / 0.15);
+    color: oklch(33.8878% 0.033172 157.7376);
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
     font-variant-numeric: tabular-nums;
     font-weight: 600;
     line-height: 1;
-    touch-action: manipulation;
-    transform: translate(-50%, -50%);
+    white-space: nowrap;
     animation: place-map-cluster-enter 0.16s ease-out;
     transition:
       background-color 0.15s ease,
@@ -2300,27 +2314,34 @@
       transform 0.15s ease;
   }
 
-  :global(.place-map-cluster:hover) {
-    border-color: var(--color-primary-hover);
-    background: var(--color-primary-soft);
-    transform: translate(-50%, -50%) scale(1.08);
+  @media (hover: hover) and (pointer: fine) {
+    :global(.place-map-cluster:hover .place-map-cluster__count) {
+      border-color: var(--color-primary-hover);
+      background: var(--color-primary-soft);
+      transform: scale(1.08);
+    }
   }
 
-  :global(.place-map-cluster:focus-visible) {
+  .place-map__canvas :global(.place-map-cluster:focus-visible) {
+    outline: none;
+    box-shadow: none;
+  }
+
+  :global(.place-map-cluster:focus-visible .place-map-cluster__count) {
     outline: 0.1875rem solid var(--color-focus);
     outline-offset: 0.125rem;
     box-shadow: 0 0 0 0.4375rem var(--color-surface);
-    transform: translate(-50%, -50%) scale(1.08);
+    transform: scale(1.08);
   }
 
-  :global(.place-map-cluster:active) {
-    transform: translate(-50%, -50%) scale(0.96);
+  :global(.place-map-cluster:active .place-map-cluster__count) {
+    transform: scale(0.96);
   }
 
   @keyframes place-map-cluster-enter {
     from {
       opacity: 0;
-      transform: translate(-50%, -50%) scale(0.72);
+      transform: scale(0.72);
     }
   }
 
@@ -2336,9 +2357,13 @@
     :global(.place-map-marker-graphic),
     :global(.place-map-marker-image),
     :global(.place-map-marker[data-highlighted='true']::after),
-    :global(.place-map-cluster) {
+    :global(.place-map-cluster__count) {
       animation: none;
       transition: none;
+    }
+
+    :global(.place-map-cluster:is(:hover, :focus-visible, :active) .place-map-cluster__count) {
+      transform: none;
     }
   }
 </style>
