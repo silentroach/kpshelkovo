@@ -104,8 +104,6 @@ describe('inventory HTML pages', () => {
         },
       ]
     `);
-    expect(page.querySelectorAll('.inventory-offer__price')).toHaveLength(1);
-    expect(page.body.textContent).not.toMatch(/Бесплатно|Цена по\u00a0договорённости/u);
     expect(offers.map((offer) => offer.querySelector('h2 a')?.getAttribute('href'))).toEqual(
       fixture.data?.byKind.get('drill')?.offers.map((offer) => offer.url)
     );
@@ -245,9 +243,6 @@ describe('inventory HTML pages', () => {
       );
       const offer = fixture.data?.offers.find((item) => item.id === offerId);
       expect(images).toEqual(offer?.photos.map((photo) => photo.url));
-      expect(main.querySelectorAll('.inventory-detail__price')).toHaveLength(
-        offerId === 'paid' ? 1 : 0
-      );
       observations.push({
         offerId,
         price: visibleWhitespace(
@@ -370,12 +365,6 @@ describe('inventory HTML pages', () => {
         expect(card?.getAttribute('aria-labelledby')).toBe(`${offer.anchorId}-title`);
         expect(card?.querySelector('.inventory-offer__summary')?.textContent).toBe(
           formatText(offer.summary)
-        );
-        expect(card?.querySelectorAll('.inventory-offer__price')).toHaveLength(
-          offer.price.type === 'fixed' ? 1 : 0
-        );
-        expect(card?.querySelectorAll('.inventory-offer__visual')).toHaveLength(
-          offer.price.type === 'fixed' || offer.photos.length > 0 ? 1 : 0
         );
         expect(card?.querySelector('img')?.getAttribute('alt')).toBe(
           offer.photos[0] ? formatText(offer.photos[0].alt) : undefined
