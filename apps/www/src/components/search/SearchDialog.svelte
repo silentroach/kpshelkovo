@@ -680,7 +680,7 @@
                       </time>
                     {/if}
                   </span>
-                  <h3 class="result-title">
+                  <h3 class="ui-card-title result-title">
                     {row.result.title}
                   </h3>
                   {#if row.excerptHtml}
@@ -862,8 +862,7 @@
     line-height: 1.25rem;
   }
 
-  .result-section,
-  .result-title {
+  .result-section {
     font-weight: 600;
   }
 
