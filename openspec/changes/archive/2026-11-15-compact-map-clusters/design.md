@@ -2,7 +2,7 @@
 
 ## Context
 
-Причина изменения описана в [proposal](/openspec/changes/compact-map-clusters/proposal.md). В `PlaceMap.svelte` функция `createClusterContent` создаёт HTML-кнопку с текстовым числом. Сейчас сама кнопка размером 44 × 44 px служит круглой видимой поверхностью.
+Причина изменения описана в [proposal](/openspec/changes/archive/2026-11-15-compact-map-clusters/proposal.md). На момент подготовки изменения в `PlaceMap.svelte` функция `createClusterContent` создавала HTML-кнопку с текстовым числом. Сама кнопка размером 44 × 44 px служила круглой видимой поверхностью.
 
 Владелец выбрал последний вариант после примерок на настоящей `/map/` при ширине 390 px. Применяется [ADR-034](/docs/decisions/034-native-css-architecture.md): локальное оформление принадлежит компоненту. Новый ADR не нужен.
 

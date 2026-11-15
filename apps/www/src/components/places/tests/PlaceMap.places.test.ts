@@ -1001,7 +1001,11 @@ describe('PlaceMap', () => {
         title="2 места рядом"
         type="button"
       >
-        2
+        <span
+          class="place-map-cluster__count"
+        >
+          2
+        </span>
       </button>
     `);
 
