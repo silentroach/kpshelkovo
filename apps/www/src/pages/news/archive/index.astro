@@ -91,7 +91,7 @@ const schema = collectionPageSchema({
 
   .news-archive-content {
     margin-block-start: 2rem;
-    padding-inline: 1.25rem;
+    padding-inline: var(--page-content-inset);
   }
 
   .news-archive-container {
@@ -166,10 +166,6 @@ const schema = collectionPageSchema({
   @media (min-width: 48rem) {
     .news-archive-page {
       padding-block-end: 2.5rem;
-    }
-
-    .news-archive-content {
-      padding-inline: 1.5rem;
     }
   }
 

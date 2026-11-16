@@ -132,7 +132,7 @@ const schema = collectionPageSchema({
   .news-month-navigation {
     display: grid;
     gap: 0.75rem;
-    padding: 1.25rem;
+    padding: 1.25rem var(--page-content-inset);
     background: var(--color-primary-soft-2);
     font-size: 0.875rem;
     font-weight: 600;
@@ -169,10 +169,6 @@ const schema = collectionPageSchema({
   @media (min-width: 48rem) {
     .news-month-page {
       padding-block-end: 2.5rem;
-    }
-
-    .news-month-navigation {
-      padding-inline: 1.5rem;
     }
   }
 

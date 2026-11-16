@@ -150,6 +150,12 @@ const services = [
     outline-offset: 3px;
   }
 
+  @media screen and (width < 48rem) {
+    .home-services__list {
+      width: calc(100% - var(--page-padding) * 2);
+    }
+  }
+
   @media (min-width: 48rem) {
     .home-services {
       padding-block-end: 1.75rem;

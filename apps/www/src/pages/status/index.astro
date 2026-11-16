@@ -207,7 +207,7 @@ const schema = collectionPageSchema({
 
   .status-section {
     margin-block-start: 3rem;
-    padding-inline: 1.25rem;
+    padding-inline: var(--page-content-inset);
   }
 
   .status-section__content > * + * {
@@ -226,7 +226,7 @@ const schema = collectionPageSchema({
   }
 
   .status-rows {
-    margin-inline: -1.25rem;
+    margin-inline: calc(-1 * var(--page-content-inset));
   }
 
   .status-history-link {
@@ -234,28 +234,20 @@ const schema = collectionPageSchema({
   }
 
   .status-services__legend {
-    padding-inline: 1.25rem;
+    padding-inline: var(--page-content-inset);
   }
 
   @media (min-width: 48rem) {
-    .status-services__legend {
-      padding-inline: 1.5rem;
-    }
     .status-page {
       padding-block-end: 2.5rem;
     }
 
     .status-section {
       margin-block-start: 3.5rem;
-      padding-inline: 1.5rem;
     }
 
     .status-section__description {
       font-size: 0.9375rem;
-    }
-
-    .status-rows {
-      margin-inline: -1.5rem;
     }
   }
 
@@ -271,7 +263,7 @@ const schema = collectionPageSchema({
         minmax(0, 15rem) minmax(0, 1fr) minmax(0, 11rem)
         minmax(0, 21rem);
       gap: 1.25rem;
-      padding: 0.75rem 1.5rem;
+      padding: 0.75rem var(--page-content-inset);
     }
 
     .status-services__legend {

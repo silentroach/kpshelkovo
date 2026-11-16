@@ -66,7 +66,7 @@ const { article, featured = false } = Astro.props;
   }
 
   .news-card__content {
-    padding: 1.25rem;
+    padding: 1.25rem var(--page-content-inset);
   }
 
   .news-card__content > :global(* + *) {
@@ -121,9 +121,15 @@ const { article, featured = false } = Astro.props;
     color: var(--color-text-muted);
   }
 
+  @media screen and (width < 48rem) {
+    .news-card {
+      overflow: visible;
+    }
+  }
+
   @media (min-width: 48rem) {
     .news-card__content {
-      padding: 1.5rem;
+      padding-block: 1.5rem;
     }
   }
 </style>

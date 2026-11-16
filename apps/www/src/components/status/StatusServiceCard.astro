@@ -140,7 +140,7 @@ const ServiceIcon = serviceIcons[summary.service];
 
 <style>
   .status-service-row {
-    padding: 1rem 1.25rem;
+    padding: 1rem var(--page-content-inset);
   }
 
   .status-service-row:has(:global([data-status-service-state='amber'])) {
@@ -282,7 +282,7 @@ const ServiceIcon = serviceIcons[summary.service];
 
   @media (min-width: 48rem) {
     .status-service-row {
-      padding: 1.25rem 1.5rem;
+      padding-block: 1.25rem;
     }
 
     .status-service-row__icon {

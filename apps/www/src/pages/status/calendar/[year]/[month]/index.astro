@@ -123,7 +123,7 @@ const breadcrumbs = withHomeBreadcrumbs([
     scroll-margin-block-start: calc(var(--site-sticky-offset) + 1rem);
     align-items: center;
     gap: 0.75rem;
-    padding-inline: 1.25rem;
+    padding-inline: var(--page-content-inset);
   }
 
   .status-calendar-day-records {
@@ -146,10 +146,6 @@ const breadcrumbs = withHomeBreadcrumbs([
   @media (min-width: 48rem) {
     .status-calendar-month-page {
       padding-block-end: 2.5rem;
-    }
-
-    .status-calendar-day__heading {
-      padding-inline: 1.5rem;
     }
   }
 

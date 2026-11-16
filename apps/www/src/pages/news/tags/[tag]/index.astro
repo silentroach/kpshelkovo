@@ -95,7 +95,7 @@ const schema = collectionPageSchema({
   }
 
   .news-tag-feed__note {
-    padding-inline: 1.25rem;
+    padding-inline: var(--page-content-inset);
     color: var(--color-text-muted);
     font-size: 0.875rem;
     line-height: 1.75rem;
@@ -104,10 +104,6 @@ const schema = collectionPageSchema({
   @media (min-width: 48rem) {
     .news-tag-page {
       padding-block-end: 2.5rem;
-    }
-
-    .news-tag-feed__note {
-      padding-inline: 1.5rem;
     }
   }
 

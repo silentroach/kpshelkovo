@@ -126,7 +126,7 @@ const schema = reviewPageSchema({
 
   .review-body,
   .review-footer {
-    padding-inline: 1.25rem;
+    padding-inline: var(--page-content-inset);
   }
 
   .review-body > :global(:not(:last-child)) {
@@ -155,11 +155,6 @@ const schema = reviewPageSchema({
   @media (min-width: 48rem) {
     .review-page {
       padding-block-end: 3rem;
-    }
-
-    .review-body,
-    .review-footer {
-      padding-inline: 1.5rem;
     }
   }
 

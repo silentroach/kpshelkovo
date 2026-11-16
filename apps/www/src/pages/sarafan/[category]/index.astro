@@ -102,7 +102,7 @@ const schema = contactsCollectionPageSchema({
   }
 
   .sarafan-category-list {
-    padding-inline: 1.25rem;
+    padding-inline: var(--page-content-inset);
   }
 
   .sarafan-category-grid {
@@ -113,10 +113,6 @@ const schema = contactsCollectionPageSchema({
   @media (min-width: 48rem) {
     .sarafan-category-page {
       padding-block-end: 3rem;
-    }
-
-    .sarafan-category-list {
-      padding-inline: 1.5rem;
     }
 
     .sarafan-category-grid {

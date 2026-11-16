@@ -266,7 +266,7 @@ const villageAreas = {
     }
 
     .assets-content {
-      padding-inline: 1.25rem;
+      padding-inline: var(--page-content-inset);
     }
 
     .assets-groups {
@@ -296,7 +296,7 @@ const villageAreas = {
     }
 
     .assets-table-shell {
-      margin-inline: -1.25rem;
+      margin-inline: calc(-1 * var(--page-content-inset));
       border-block: 1px solid var(--color-border);
       background-color: var(--color-surface);
     }
@@ -396,10 +396,6 @@ const villageAreas = {
     @media (min-width: 48rem) {
       .assets-page {
         padding-block-end: 3rem;
-      }
-
-      .assets-content {
-        padding-inline: 1.5rem;
       }
 
       .assets-source {

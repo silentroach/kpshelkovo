@@ -135,7 +135,7 @@ const breadcrumbs = withHomeBreadcrumbs([
 
   .status-calendar-year-content {
     margin-block-start: 1rem;
-    padding-inline: 1.25rem;
+    padding-inline: var(--page-content-inset);
   }
 
   .status-calendar-year-grid {
@@ -175,10 +175,6 @@ const breadcrumbs = withHomeBreadcrumbs([
   @media (min-width: 48rem) {
     .status-calendar-year-page {
       padding-block-end: 3rem;
-    }
-
-    .status-calendar-year-content {
-      padding-inline: 1.5rem;
     }
 
     .status-calendar-year-grid {

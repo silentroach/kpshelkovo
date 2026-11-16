@@ -142,7 +142,7 @@ const breadcrumbs = withHomeBreadcrumbs(
 
 <style>
   .events-content {
-    padding: 0 1.25rem 3rem;
+    padding: 0 var(--page-content-inset) 3rem;
   }
   .month-controls {
     display: grid;
@@ -211,10 +211,5 @@ const breadcrumbs = withHomeBreadcrumbs(
   .month-navigation a:focus-visible {
     outline: 2px solid var(--color-accent-text);
     outline-offset: 2px;
-  }
-  @media (min-width: 48rem) {
-    .events-content {
-      padding-inline: 1.5rem;
-    }
   }
 </style>
