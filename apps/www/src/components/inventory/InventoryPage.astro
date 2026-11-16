@@ -50,14 +50,9 @@ const breadcrumbs = withHomeBreadcrumbs([
     padding-block-end: 1.5rem;
   }
   .inventory-page__content {
-    padding-inline: 1.25rem;
+    padding-inline: var(--page-content-inset);
   }
   .inventory-page__content > :global(:not(:last-child)) {
     margin-block-end: 2rem;
-  }
-  @media (min-width: 48rem) {
-    .inventory-page__content {
-      padding-inline: 1.5rem;
-    }
   }
 </style>

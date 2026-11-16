@@ -158,7 +158,7 @@ const schema = collectionPageSchema({
 
   .status-service-overview,
   .status-service-history {
-    padding-inline: 1.25rem;
+    padding-inline: var(--page-content-inset);
   }
 
   .status-service-overview {
@@ -191,7 +191,7 @@ const schema = collectionPageSchema({
   }
 
   .status-service-history__rows {
-    margin-inline: -1.25rem;
+    margin-inline: calc(-1 * var(--page-content-inset));
   }
 
   .status-service-history__empty {
@@ -205,17 +205,8 @@ const schema = collectionPageSchema({
       padding-block-end: 2.5rem;
     }
 
-    .status-service-overview,
-    .status-service-history {
-      padding-inline: 1.5rem;
-    }
-
     .status-service-history {
       margin-block-start: 3.5rem;
-    }
-
-    .status-service-history__rows {
-      margin-inline: -1.5rem;
     }
 
     .status-service-history__empty {

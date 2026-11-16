@@ -87,7 +87,7 @@
   }
 
   .news-article-layout .ui-prose > .ui-editorial-map {
-    margin-inline: calc(-1 * (var(--page-padding) + 1.25rem));
+    margin-inline: calc(-1 * (var(--page-padding) + var(--page-content-inset)));
   }
 
   .news-article-layout .ui-prose > .ui-editorial-map > editorial-map,

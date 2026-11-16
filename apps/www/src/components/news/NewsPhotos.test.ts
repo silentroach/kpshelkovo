@@ -86,7 +86,7 @@ describe('NewsPhotos', () => {
       {
         "fullWidthHref": "https://media.kpshelkovo.online/news/2026/08/retina-test/original.jpeg",
         "fullWidthIntrinsicWidth": "2560",
-        "fullWidthSizes": "(min-width: 1180px) 1132px, calc(100vw - 2.5rem)",
+        "fullWidthSizes": "(min-width: 1180px) 1132px, (min-width: 48rem) calc(100vw - 2.5rem), calc(100vw - 2rem)",
         "fullWidthSrcsetWidths": [
           480,
           768,

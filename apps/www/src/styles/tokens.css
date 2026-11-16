@@ -92,6 +92,20 @@
     --radius-full: 999px;
     --page-max: 1180px;
     --page-padding: clamp(1rem, 3vw, 2rem);
+    --page-content-inset: 1.25rem;
+  }
+
+  @media (min-width: 48rem) {
+    :root {
+      --page-content-inset: 1.5rem;
+    }
+  }
+
+  @media screen and (width < 48rem) {
+    :root {
+      --page-padding: 1rem;
+      --page-content-inset: 0px;
+    }
   }
 
   @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {

@@ -124,13 +124,13 @@ const hasEditorialMap = bodyHtml?.includes('<editorial-map') ?? false;
   }
 
   .kb-body {
-    padding-inline: 1.25rem;
+    padding-inline: var(--page-content-inset);
   }
 
   /* Keep the normal reading column while the generated TOC spans the page.
      Block flow preserves the existing prose's collapsing vertical margins. */
   .kb-page--document {
-    --kb-body-padding: 1.25rem;
+    --kb-body-padding: var(--page-content-inset);
     --kb-reading-width: 39.06rem;
     --kb-content-inset: calc(
       max(var(--page-padding), (100% - var(--page-max)) / 2) +
@@ -422,12 +422,7 @@ const hasEditorialMap = bodyHtml?.includes('<editorial-map') ?? false;
       padding-block-end: 3rem;
     }
 
-    .kb-body {
-      padding-inline: 1.5rem;
-    }
-
     .kb-page--document {
-      --kb-body-padding: 1.5rem;
       --kb-reading-width: 41.50125rem;
     }
 

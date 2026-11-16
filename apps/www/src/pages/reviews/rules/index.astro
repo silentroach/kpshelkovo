@@ -63,7 +63,7 @@ const schema = reviewsCollectionPageSchema({
   }
 
   .review-rules-body {
-    padding-inline: 1.25rem;
+    padding-inline: var(--page-content-inset);
   }
 
   .review-rules-prose {
@@ -73,10 +73,6 @@ const schema = reviewsCollectionPageSchema({
   @media (min-width: 48rem) {
     .review-rules-page {
       padding-block-end: 3rem;
-    }
-
-    .review-rules-body {
-      padding-inline: 1.5rem;
     }
   }
 

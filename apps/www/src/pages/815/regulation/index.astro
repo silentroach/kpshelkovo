@@ -1171,7 +1171,7 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
       position: sticky;
       top: var(--site-sticky-offset);
       z-index: 20;
-      padding: 0.25rem 1.25rem;
+      padding: 0.25rem var(--page-content-inset);
       border-block: 1px solid var(--color-border);
       background: var(--surface-glass-muted);
       -webkit-backdrop-filter: var(--surface-glass-filter);
@@ -1254,7 +1254,7 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
     }
 
     .reglament-sections {
-      padding-inline: 1.25rem;
+      padding-inline: var(--page-content-inset);
     }
 
     .reglament-sections__inner {
@@ -1322,7 +1322,7 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
     }
 
     .reglament-table-shell {
-      margin-inline: -1.25rem;
+      margin-inline: calc(-1 * var(--page-content-inset));
       border-block: 1px solid var(--color-border);
       background-color: var(--color-surface);
     }
@@ -1781,11 +1781,6 @@ const inputErrorId = (rowId: string, key: EditableFieldKey): string =>
       .reglament-total--divided {
         border-inline-end: 1px solid var(--color-border);
         border-block-end: 0;
-      }
-
-      .reglament-sticky-total,
-      .reglament-sections {
-        padding-inline: 1.5rem;
       }
 
       .reglament-sticky-total__inner,

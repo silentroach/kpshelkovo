@@ -643,6 +643,12 @@
     text-align: center;
   }
 
+  @media screen and (width < 48rem) {
+    .empty-state {
+      padding-inline: var(--page-content-inset);
+    }
+  }
+
   .empty-title {
     color: var(--color-text);
     font-size: 1.125rem;

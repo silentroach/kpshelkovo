@@ -191,6 +191,12 @@ const heroImage = heroMode === 'day' ? dayHeroImage : nightHeroImage;
     padding-block: 1.5rem 2rem;
   }
 
+  @media screen and (width < 48rem) {
+    .home-news {
+      width: calc(100% - var(--page-padding) * 2);
+    }
+  }
+
   .home-news__title {
     padding-block-end: 1rem;
     border-bottom: 1px solid var(--color-border);

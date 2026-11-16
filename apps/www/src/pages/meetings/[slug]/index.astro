@@ -266,7 +266,7 @@ const schema = techArticleSchema({
   }
 
   .meeting-content {
-    padding-inline: 1.25rem;
+    padding-inline: var(--page-content-inset);
   }
 
   .meeting-content__inner {
@@ -423,10 +423,6 @@ const schema = techArticleSchema({
   @media (min-width: 48rem) {
     .meeting-page {
       padding-block-end: 3rem;
-    }
-
-    .meeting-content {
-      padding-inline: 1.5rem;
     }
 
     .meeting-content__inner > :global(:not(:last-child)) {

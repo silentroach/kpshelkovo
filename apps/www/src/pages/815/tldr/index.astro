@@ -62,7 +62,7 @@ const schema = breadcrumbListSchema(tariffSchemaBreadcrumbs(breadcrumbs));
   }
 
   .tariff-tldr-body {
-    padding-inline: 1.25rem;
+    padding-inline: var(--page-content-inset);
   }
 
   .tariff-tldr-prose :global(> .ui-callout--note) {
@@ -99,10 +99,6 @@ const schema = breadcrumbListSchema(tariffSchemaBreadcrumbs(breadcrumbs));
   @media (min-width: 48rem) {
     .tariff-tldr-page {
       padding-block-end: 3rem;
-    }
-
-    .tariff-tldr-body {
-      padding-inline: 1.5rem;
     }
   }
 

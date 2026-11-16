@@ -908,7 +908,7 @@
   }
 
   .ui-page-header {
-    padding: 0.75rem 1.25rem 1.5rem;
+    padding: 0.75rem var(--page-content-inset) 1.5rem;
   }
 
   .ui-page-header-stack {
@@ -921,9 +921,13 @@
     /* The app owns the strip; Breadcrumbs owns its list and visibility. */
     .site-page-content .breadcrumbs:not(.breadcrumbs--desktop-only) {
       margin-block-start: -0.75rem;
-      margin-inline: calc(-1 * (var(--page-padding) + var(--ui-breadcrumb-inset, 1.25rem)));
+      margin-inline: calc(
+        -1 * (var(--page-padding) + var(--ui-breadcrumb-inset, var(--page-content-inset)))
+      );
       padding-block: 0.75rem;
-      padding-inline: calc(var(--page-padding) + var(--ui-breadcrumb-inset, 1.25rem));
+      padding-inline: calc(
+        var(--page-padding) + var(--ui-breadcrumb-inset, var(--page-content-inset))
+      );
       background: var(--color-breadcrumb-surface);
     }
   }
@@ -999,7 +1003,7 @@
 
   @media (min-width: 48rem) {
     .ui-page-header {
-      padding: 1.25rem 1.5rem 2rem;
+      padding-block: 1.25rem 2rem;
     }
 
     .ui-page-title {

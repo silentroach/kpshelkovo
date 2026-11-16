@@ -140,7 +140,7 @@ const schema = contactPageSchema({
   }
 
   .sarafan-contact-content {
-    padding-inline: 1.25rem;
+    padding-inline: var(--page-content-inset);
   }
 
   .sarafan-contact-content > :global(:not(:last-child)) {
@@ -159,10 +159,6 @@ const schema = contactPageSchema({
   @media (min-width: 48rem) {
     .sarafan-contact-page {
       padding-block-end: 3rem;
-    }
-
-    .sarafan-contact-content {
-      padding-inline: 1.5rem;
     }
   }
 

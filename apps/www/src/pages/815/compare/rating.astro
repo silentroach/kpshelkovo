@@ -695,7 +695,7 @@ const distanceFloor = `После ${formatNumberUnitRu(lastDistancePoint.ringKm,
     display: grid;
     gap: 1.5rem;
     margin-block-start: 1.5rem;
-    padding-inline: 1.25rem;
+    padding-inline: var(--page-content-inset);
   }
 
   .rating-sections {
@@ -864,10 +864,6 @@ const distanceFloor = `После ${formatNumberUnitRu(lastDistancePoint.ringKm,
 
     .rating-panel--responsive {
       padding: 1.25rem;
-    }
-
-    .rating-content {
-      padding-inline: 1.5rem;
     }
 
     .rating-section {
