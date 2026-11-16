@@ -2,7 +2,7 @@
 
 ## Context
 
-Мотивация и согласованный объём — в [proposal](/openspec/changes/unify-mobile-page-gutters/proposal.md). Исследование выполнено 16 ноября 2026 года на опубликованном сайте; исходники сверены с `bf8e033e6d7666281e42cfb9ad45a2bb66326e4f`.
+Мотивация и согласованный объём — в [proposal](/openspec/changes/archive/2026-11-16-unify-mobile-page-gutters/proposal.md). Исследование выполнено 16 ноября 2026 года на опубликованном сайте; исходники сверены с `bf8e033e6d7666281e42cfb9ad45a2bb66326e4f`.
 
 - В [tokens.css](/apps/www/src/styles/tokens.css) `--page-padding` равен `clamp(1rem, 3vw, 2rem)`. [global.css](/apps/www/src/styles/global.css) уменьшает ширину `.ui-page` на два таких поля, а `.ui-page-header` добавляет ещё `1.25rem` с каждой стороны.
 - Тот же дополнительный отступ повторяется в `SiteHeader`, телах материалов, оболочках каталогов и содержимом плоских записей. На главной собственная формула `.home-news` даёт суммарные 20 px.
