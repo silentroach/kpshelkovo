@@ -2,7 +2,8 @@ import {
   createMarkdownDocument,
   md,
   parseMarkdownFragment,
-  serializeMarkdownDocument
+  serializeMarkdownDocument,
+  tablesToLists
 } from '@shelkovo/markdown';
 
 import { transformContentEmphasis } from '@/lib/markdown/content-emphasis';
@@ -49,7 +50,7 @@ const kbMarkdownBody = (
   editorialMapResolver?: EditorialMapSelectionResolver
 ) => {
   const nodes = appendEditorialMapCaptions(
-    transformContentEmphasis(parseMarkdownFragment(markdown), 'markdown'),
+    transformContentEmphasis(tablesToLists(parseMarkdownFragment(markdown)), 'markdown'),
     source,
     editorialMapResolver
   );

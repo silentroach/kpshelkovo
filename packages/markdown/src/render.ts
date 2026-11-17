@@ -4,6 +4,7 @@ import remarkGfm from 'remark-gfm';
 import remarkParse from 'remark-parse';
 import remarkRehype from 'remark-rehype';
 import { unified, type Plugin } from 'unified';
+import { visit } from 'unist-util-visit';
 
 import { assignAuthoredHeadingIds } from './heading-ids';
 import { uniqueHeadingSlug } from './heading-slugs';
@@ -17,8 +18,20 @@ import { expandTableOfContents } from './toc';
 import { prepareTocAnnotations, remarkTocSyntax } from './toc-annotations';
 import { rehypeTypograf } from './typography';
 
-const remarkNoMarkdownTables: Plugin<[], Root> = () => (tree) => {
-  assertNoMarkdownTables(tree);
+const remarkTables: Plugin<[{ readonly allowTables?: boolean }], Root> = (options) => (tree) => {
+  if (!options.allowTables) {
+    assertNoMarkdownTables(tree);
+    return;
+  }
+
+  visit(tree, 'table', (table) => {
+    for (const cell of table.children[0]?.children ?? []) {
+      cell.data = {
+        ...cell.data,
+        hProperties: { ...cell.data?.hProperties, scope: 'col' }
+      };
+    }
+  });
 };
 
 const remarkDocument: Plugin<
@@ -112,7 +125,7 @@ const createProcessor = (localIds: Map<string, string>, options?: RenderOptions)
     .use(remarkGfm)
     .use(remarkTocSyntax)
     .use(remarkDocument, options?.transform, options?.reservedIds)
-    .use(remarkNoMarkdownTables)
+    .use(remarkTables, { allowTables: options?.allowTables })
     // Raw HTML is not passed through, so markdown content cannot inject markup.
     .use(remarkRehype)
     .use(rehypeHeadingIds, options?.reservedIds)

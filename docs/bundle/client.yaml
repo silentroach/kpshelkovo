@@ -70,7 +70,7 @@ static/PlaceMap.XXXXXXXX.js:
   apps/www/src/components/places/place-marker-badge.css:
     rendered: 0
   apps/www/src/components/places/PlaceMap.svelte:
-    rendered: 59851
+    rendered: 59970
   apps/www/src/components/places/PlaceMap.svelte?svelte&type=style&lang.css:
     rendered: 0
   apps/www/src/lib/parcels/parcel-url.ts:
@@ -457,7 +457,7 @@ static/lazy.XXXXXXXX.js:
   apps/www/src/components/search/search-dialog.events.ts:
     rendered: 100
   apps/www/src/components/search/SearchDialog.svelte:
-    rendered: 25562
+    rendered: 25576
   apps/www/src/components/search/SearchDialog.svelte?svelte&type=style&lang.css:
     rendered: 0
   apps/www/src/lib/search/client.ts:
