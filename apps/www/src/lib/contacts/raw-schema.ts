@@ -67,6 +67,7 @@ const review = z
     sentiment: z.enum(CONTACT_REVIEW_SENTIMENTS),
     summary: nonBlankText,
     published_at: contactDate('reviews.published_at'),
+    source_label: nonBlankText.optional(),
     url: contactUrl
   })
   .strict();

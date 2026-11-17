@@ -205,6 +205,7 @@ describe('buildContactsDataset', () => {
           "publishedAt": 2026-04-07T00:00:00.000Z,
           "publishedIso": "2026-04-07",
           "sentiment": "positive",
+          "sourceLabel": undefined,
           "summary": "Помог с **электричеством**.",
           "url": "https://t.me/example/1",
         },
@@ -229,12 +230,50 @@ describe('buildContactsDataset', () => {
     const after = anchors([
       { ...first, url: 'https://t.me/example/3', published_at: '2026-10-01' },
       second,
-      { ...first, summary: 'Лестницу сделали аккуратно.' }
+      { ...first, summary: 'Лестницу сделали аккуратно.', source_label: 'чат Гринвуда' }
     ]);
 
     expect(before[0]?.anchorId).toBe('contact-review-e04fdc091950367e');
     expect(new Set(before.map(({ anchorId }) => anchorId)).size).toBe(2);
     expect(after.slice(1)).toEqual([...before].reverse());
+  });
+
+  it('maps an editorial source label without inventing one for other reviews', () => {
+    const reviews = buildContactsDataset([
+      entry({
+        id: 'fence/sources',
+        data: {
+          reviews: [
+            {
+              sentiment: 'positive',
+              summary: 'Помог с ремонтом.',
+              published_at: '2026-04-07',
+              url: 'https://t.me/example/1',
+              source_label: 'чат Гринвуда'
+            },
+            {
+              sentiment: 'neutral',
+              summary: 'Работу завершил.',
+              published_at: '2026-04-07',
+              url: 'https://t.me/example/2'
+            }
+          ]
+        }
+      })
+    ]).contacts[0]?.reviews;
+
+    expect(reviews?.map(({ sourceLabel, url }) => ({ sourceLabel, url }))).toMatchInlineSnapshot(`
+        [
+          {
+            "sourceLabel": "чат Гринвуда",
+            "url": "https://t.me/example/1",
+          },
+          {
+            "sourceLabel": undefined,
+            "url": "https://t.me/example/2",
+          },
+        ]
+      `);
   });
 
   it('sorts reviews newest first, preserving ties and source order', () => {

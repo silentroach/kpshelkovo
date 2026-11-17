@@ -24,6 +24,7 @@ export interface ContactReview {
   readonly summary: string;
   readonly publishedAt: Date;
   readonly publishedIso: string;
+  readonly sourceLabel?: string;
   readonly url: string;
 }
 
