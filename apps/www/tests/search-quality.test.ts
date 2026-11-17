@@ -192,6 +192,54 @@ test('#154 search result highlighting', async () => {
   await page.close();
 });
 
+test('adaptive KB copies share search highlights while only one is displayed', async () => {
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  await page.goto(`${baseURL}/kb/ok/service-list/`, { waitUntil: 'domcontentloaded' });
+  const title = await page.locator('.ui-adaptive__mobile li > p').first().textContent();
+  const term = title?.match(/[а-яё]{3,}/iu)?.[0];
+  if (!term) throw new Error('Expected an adaptive entry title');
+  await page.goto(`${baseURL}/kb/ok/service-list/?h=${encodeURIComponent(term)}`);
+  const mobile = page.locator('.ui-adaptive__mobile').first();
+  const wide = page.locator('.ui-adaptive__wide').first();
+  await expectPage(mobile.locator(`mark.${SEARCH_HIGHLIGHT_CLASS}`).first()).toBeVisible();
+  await expectPage(wide.locator(`mark.${SEARCH_HIGHLIGHT_CLASS}`).first()).toBeAttached();
+  await expectPage(wide).not.toBeVisible();
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await expectPage(wide.locator(`mark.${SEARCH_HIGHLIGHT_CLASS}`).first()).toBeVisible();
+  await expectPage(mobile).not.toBeVisible();
+  await page.close();
+});
+
+test('adaptive KB content and print work without JavaScript', async () => {
+  const page = await browser.newPage({
+    viewport: { width: 390, height: 844 },
+    javaScriptEnabled: false
+  });
+  await page.goto(`${baseURL}/kb/ok/service-list/`);
+  const mobile = page.locator('.ui-adaptive__mobile').first();
+  const wide = page.locator('.ui-adaptive__wide').first();
+  await expectPage(mobile).toBeVisible();
+  await expectPage(wide).not.toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(390);
+
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await expectPage(wide).toBeVisible();
+  await expectPage(mobile).not.toBeVisible();
+  const firstHeadingAnchor = page.locator('.kb-prose > h2 .ui-heading-anchor').first();
+  await firstHeadingAnchor.focus();
+  await page.keyboard.press('Tab');
+  await expectPage(wide.locator('[data-ui-sticky-table-shell]')).toBeFocused();
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.emulateMedia({ media: 'print' });
+  await expectPage(wide).toBeVisible();
+  await expectPage(mobile).not.toBeVisible();
+  await expectPage(wide.locator('table')).toHaveCSS('min-width', '0px');
+  await expectPage(wide.locator('th').first()).toHaveCSS('position', 'static');
+  await expectPage(wide.locator('[data-ui-sticky-table-shell]')).toHaveCSS('overflow', 'visible');
+  await page.close();
+});
+
 test('#355 preserves results and pagination across ClientRouter navigations', async () => {
   const page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
   try {

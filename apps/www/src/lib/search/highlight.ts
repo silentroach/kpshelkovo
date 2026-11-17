@@ -55,7 +55,12 @@ export const highlightSearchTerms = async (
     addStyles: false,
     highlightParam: SEARCH_HIGHLIGHT_PARAM,
     markOptions: {
-      className: SEARCH_HIGHLIGHT_CLASS
+      className: SEARCH_HIGHLIGHT_CLASS,
+      // Alternate authored views are excluded from indexing, not highlighting.
+      exclude: [
+        '[data-pagefind-ignore]:not([data-search-adaptive-copy])',
+        '[data-pagefind-ignore]:not([data-search-adaptive-copy]) *'
+      ]
     }
   });
 };

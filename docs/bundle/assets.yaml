@@ -7,9 +7,9 @@
   brotli: 9242
   gzip: 10352
 - file: static/BaseLayout.astro_astro_type_script_index_0_lang.XXXXXXXX.js
-  bytes: 11149
-  brotli: 3525
-  gzip: 4064
+  bytes: 11277
+  brotli: 3566
+  gzip: 4110
 - file: static/Breadcrumbs.XXXXXXXX.css
   bytes: 2418
   brotli: 534
@@ -163,9 +163,9 @@
   brotli: 424
   gzip: 499
 - file: static/_..XXXXXXXX.css
-  bytes: 8403
-  brotli: 1388
-  gzip: 1599
+  bytes: 8939
+  brotli: 1464
+  gzip: 1688
 - file: static/_entry_.XXXXXXXX.css
   bytes: 1589
   brotli: 453
@@ -372,8 +372,8 @@
   gzip: 765
 - file: static/lazy.XXXXXXXX.js
   bytes: 18640
-  brotli: 6715
-  gzip: 7615
+  brotli: 6708
+  gzip: 7614
 - file: static/lifecycle.XXXXXXXX.js
   bytes: 631
   brotli: 296

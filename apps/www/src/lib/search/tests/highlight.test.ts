@@ -58,6 +58,10 @@ describe('Pagefind result highlighting', () => {
               "highlightParam": "h",
               "markOptions": {
                 "className": "search-highlight",
+                "exclude": [
+                  "[data-pagefind-ignore]:not([data-search-adaptive-copy])",
+                  "[data-pagefind-ignore]:not([data-search-adaptive-copy]) *",
+                ],
               },
             },
           ],
@@ -87,5 +91,31 @@ describe('Pagefind result highlighting', () => {
     await highlighting;
 
     expect(construct).not.toHaveBeenCalled();
+  });
+
+  it('allows the alternate view but still excludes nested and unrelated ignored text', async () => {
+    document.body.innerHTML = `
+      <div data-pagefind-ignore="all" data-search-adaptive-copy>
+        <span id="wide">Газ</span>
+        <span data-pagefind-ignore><b id="nested">Газ</b></span>
+      </div>
+      <div><span id="mobile">Газ</span></div>
+      <div data-pagefind-ignore><span id="other">Газ</span></div>`;
+    const excluded: string[] = [];
+    class PagefindHighlight {
+      constructor(options: PagefindHighlightOptions) {
+        for (const node of document.querySelectorAll(options.markOptions.exclude.join(','))) {
+          if (node.id) excluded.push(node.id);
+        }
+      }
+    }
+    history.replaceState({}, '', '/?h=Газ');
+    await highlightSearchTerms(location.href, async () => PagefindHighlight);
+    expect(excluded.sort()).toMatchInlineSnapshot(`
+      [
+        "nested",
+        "other",
+      ]
+    `);
   });
 });

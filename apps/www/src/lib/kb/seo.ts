@@ -3,9 +3,9 @@ import type { SchemaDoc } from '@shelkovo/seo';
 import type { BreadcrumbItem } from '@/lib/breadcrumbs';
 import { collectionPageSchema } from '@/lib/json-ld';
 import type { BreadcrumbLink } from '@/lib/json-ld-types';
-import { extractFirstContentText } from '@/lib/markdown/content-emphasis';
 import { techArticleSchema } from '@/lib/news/seo';
 
+import { extractFirstKbText } from './text';
 import type { KbPage } from './types';
 
 const KB_DESCRIPTION =
@@ -42,7 +42,7 @@ export const kbPageDescription = (page: KbPage): string => {
     return KB_DESCRIPTION;
   }
 
-  const text = extractFirstContentText(page.body);
+  const text = extractFirstKbText(page.body, page.canonical);
 
   if (!text || text.length < MIN_EXTRACTED_DESCRIPTION_LENGTH) {
     return fallbackArticleDescription(page);
