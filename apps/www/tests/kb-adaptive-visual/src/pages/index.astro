@@ -1,0 +1,49 @@
+---
+import '../../../config/visual-foundation.css';
+import '@/lib/kb/tables.css';
+import Fonts from '@shelkovo/ui/Fonts.astro';
+import { renderMarkdown } from '@/lib/markdown/render';
+
+const markdown = String.raw`:::adaptive
+
+| № | Работа | Периодичность |
+| - | ------ | ------------- |
+| 3 | Уборка площадки | ежедневно |
+| 7 | Обслуживание оборудования после ввода в эксплуатацию | по необходимости |
+
+::mobile
+
+- 3\. Уборка площадки
+
+  Периодичность: ежедневно
+
+- 7\. Обслуживание оборудования после ввода в эксплуатацию
+
+  Периодичность: по необходимости
+
+:::`;
+const html = renderMarkdown(markdown, { adaptive: true, allowTables: true });
+---
+
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <Fonts />
+    <title>Адаптивный блок KB</title>
+  </head>
+  <body class="ui-root-site">
+    <main class="fixture-canvas">
+      <div class="ui-prose kb-prose" data-testid="adaptive" set:html={html} />
+    </main>
+  </body>
+</html>
+
+<style>
+  .fixture-canvas {
+    width: min(calc(100% - 2rem), 41.5rem);
+    margin-inline: auto;
+    padding-block: 1rem;
+  }
+</style>

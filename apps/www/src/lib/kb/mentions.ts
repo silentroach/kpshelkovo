@@ -1,7 +1,7 @@
-import { extractFirstContentText } from '@/lib/markdown/content-emphasis';
 import { createEntityMentionSourceRefs, type EntityMentionSourceRef } from '@/lib/mentions';
 
 import { kbDetailMarkdownUrl, kbMarkdownUrl } from './routes';
+import { extractFirstKbText } from './text';
 import type { KbPage } from './types';
 
 export const createKbPageMentionRefs = (page: KbPage): readonly EntityMentionSourceRef[] =>
@@ -12,6 +12,6 @@ export const createKbPageMentionRefs = (page: KbPage): readonly EntityMentionSou
       title: page.title,
       htmlUrl: page.url,
       markdownUrl: page.routeSlug ? kbDetailMarkdownUrl(page.routeSlug) : kbMarkdownUrl(),
-      excerpt: extractFirstContentText(page.body)
+      excerpt: extractFirstKbText(page.body, page.canonical)
     }
   );

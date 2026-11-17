@@ -2,6 +2,7 @@ import { renderWithMetadata, type RenderedMarkdown } from '@shelkovo/markdown';
 
 import { normalizeEntityMentions } from '../mentions';
 import type { EntityMentionSourceEntity, SiteMentionRegistry } from '../mentions';
+import { transformAdaptive } from './adaptive';
 import { normalizeContentDiffMarkdown, renderContentDiffBlocks } from './content-diff';
 import { transformContentEmphasis } from './content-emphasis';
 import { transformEditorialMaps } from './editorial-maps-html';
@@ -269,6 +270,13 @@ export const renderMarkdownWithMetadata = (
     idPrefix: options?.idPrefix,
     transform: (document, reserveId) => {
       transformContentEmphasis(document.children, 'html');
+      if (options?.adaptive) {
+        document.children = transformAdaptive(
+          document.children,
+          'html',
+          options.mentions?.context ?? options.editorialMapSource
+        );
+      }
       transformTelegramLinks(document, reserveId);
       transformNavigatorLinks(document, reserveId);
       if (options?.allowTables) {

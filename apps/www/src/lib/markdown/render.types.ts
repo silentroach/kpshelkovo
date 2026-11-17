@@ -18,6 +18,8 @@ export interface RenderSiteMarkdownOptions {
   readonly eagerImages?: boolean;
   /** Enable for KB bodies whose template provides table styling. */
   readonly allowTables?: boolean;
+  /** Enable author-written wide/mobile alternatives in KB. */
+  readonly adaptive?: boolean;
   /** Enable only for news/KB bodies whose templates load editorial map assets. */
   readonly editorialMaps?: boolean;
   readonly editorialMapResolver?: EditorialMapSelectionResolver;

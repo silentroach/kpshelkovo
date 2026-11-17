@@ -3,6 +3,7 @@ export interface PagefindHighlightOptions {
   readonly highlightParam: string;
   readonly markOptions: {
     readonly className: string;
+    readonly exclude: readonly string[];
   };
 }
 

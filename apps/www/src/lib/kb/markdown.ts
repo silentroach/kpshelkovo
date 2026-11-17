@@ -6,6 +6,7 @@ import {
   tablesToLists
 } from '@shelkovo/markdown';
 
+import { transformAdaptive } from '@/lib/markdown/adaptive';
 import { transformContentEmphasis } from '@/lib/markdown/content-emphasis';
 import { appendEditorialMapCaptions } from '@/lib/markdown/editorial-maps-companion';
 import type { EditorialMapSelectionResolver } from '@/lib/markdown/editorial-maps.types';
@@ -50,7 +51,10 @@ const kbMarkdownBody = (
   editorialMapResolver?: EditorialMapSelectionResolver
 ) => {
   const nodes = appendEditorialMapCaptions(
-    transformContentEmphasis(tablesToLists(parseMarkdownFragment(markdown)), 'markdown'),
+    transformContentEmphasis(
+      tablesToLists(transformAdaptive(parseMarkdownFragment(markdown), 'mobile', source)),
+      'markdown'
+    ),
     source,
     editorialMapResolver
   );

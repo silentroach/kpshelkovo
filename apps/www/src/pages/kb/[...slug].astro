@@ -12,6 +12,7 @@ import { kbBreadcrumbs } from '@/lib/kb/breadcrumbs';
 import { loadKbPages } from '@/lib/kb/load';
 import { isKbPageSearchable } from '@/lib/kb/search';
 import { kbPageDescription, kbPageSchema } from '@/lib/kb/seo';
+import '@/lib/kb/tables.css';
 import type { KbPage } from '@/lib/kb/types';
 import { renderMarkdown } from '@/lib/markdown/render';
 import { loadEditorialMapResolverForMarkdown } from '@/lib/markdown/editorial-map-resolver-load';
@@ -70,6 +71,7 @@ const bodyHtml = page.body
   ? renderMarkdown(page.body, {
       eagerImages: true,
       allowTables: true,
+      adaptive: true,
       editorialMaps: true,
       editorialMapResolver,
       editorialMapSource: page.canonical,
@@ -155,42 +157,6 @@ const hasMarkdownTable =
 
   .kb-prose {
     max-width: none;
-  }
-
-  .kb-prose :global(.ui-markdown-table-scroll) {
-    --ui-sticky-table-min-width: 34rem;
-    margin-block: 1.5rem;
-  }
-
-  .kb-prose :global(.ui-markdown-table-scroll table) {
-    display: table;
-    width: 100%;
-    margin: 0;
-    min-width: var(--ui-sticky-table-min-width);
-    overflow: visible;
-    background: transparent;
-    border-collapse: separate;
-    border-spacing: 0;
-    font-size: 1rem;
-    line-height: 1.5;
-  }
-
-  .kb-prose :global(.ui-markdown-table-scroll :is(th, td)) {
-    padding: 0.75rem;
-    text-align: start;
-    vertical-align: top;
-    border-block-end: 1px solid var(--color-border);
-  }
-
-  .kb-prose :global(.ui-markdown-table-scroll th) {
-    background: var(--color-surface-muted);
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-  }
-
-  .kb-prose :global(.ui-markdown-table-scroll tbody tr:last-child td) {
-    border-block-end: 0;
   }
 
   .kb-prose > :global(:not(.ui-markdown-toc)) {

@@ -40,6 +40,65 @@ const page = (input: {
 });
 
 describe('kb markdown companions', () => {
+  it('keeps manual alternatives through mentions, HTML and companion without duplicate backlinks', () => {
+    const [entry] = buildKbPages(
+      [
+        {
+          id: 'adaptive',
+          data: { title: 'Условия' },
+          body: `## Общий раздел
+
+:::adaptive
+
+| № | Место |
+| - | - |
+| 7 | @gate |
+
+::mobile
+
+- **7. @gate**
+
+  [Условия][guide]
+
+:::
+
+[guide]: /kb/ok/`
+        }
+      ],
+      {
+        mentionRegistry: new Map([
+          [
+            'gate',
+            {
+              type: 'place',
+              slug: 'gate',
+              label: 'КПП',
+              htmlUrl: '/map/gate/',
+              markdownUrl: '/map/gate/index.md'
+            }
+          ]
+        ])
+      }
+    );
+    if (!entry) throw new Error('Expected KB page');
+    const html = renderMarkdown(entry.body, { adaptive: true, allowTables: true });
+    expect(html.match(/href="\/map\/gate\/"/gu)).toHaveLength(2);
+    expect(entry.mentions).toHaveLength(1);
+    expect(buildKbPageMarkdown(entry)).toMatchInlineSnapshot(`
+      "---
+      title: Условия
+      ---
+
+      # Условия
+
+      ## Общий раздел
+
+      - **7. [КПП](/map/gate/)**
+
+        [Условия](https://example.com/kb/ok/index.md)
+      "
+    `);
+  });
   it('keeps table values through the loader, HTML rendering and companion links', () => {
     const [entry] = buildKbPages([
       {
