@@ -195,6 +195,43 @@ describe('authored TOC annotations', () => {
     expect(document.querySelectorAll('.ui-markdown-toc__group')).toHaveLength(count);
   });
 
+  it.each(['::toc-group[Named]', '::toc-group'])(
+    'marks each root list by its own hierarchy with %s',
+    (marker) => {
+      document.body.innerHTML = render(
+        `[TOC]\n\n## Intro\n\n### Details\n\n${marker}\n\n## Flat\n\n${marker}\n\n## Parent\n\n### Child\n\n## Sibling`
+      );
+      expect(
+        [...document.querySelectorAll('.ui-markdown-toc__list')].map((list) => ({
+          className: list.className,
+          entries: [...list.querySelectorAll(':scope > li > a')].map((link) => link.textContent)
+        }))
+      ).toMatchInlineSnapshot(`
+        [
+          {
+            "className": "ui-markdown-toc__list ui-markdown-toc__list--hierarchical",
+            "entries": [
+              "Intro",
+            ],
+          },
+          {
+            "className": "ui-markdown-toc__list",
+            "entries": [
+              "Flat",
+            ],
+          },
+          {
+            "className": "ui-markdown-toc__list ui-markdown-toc__list--hierarchical",
+            "entries": [
+              "Parent",
+              "Sibling",
+            ],
+          },
+        ]
+      `);
+    }
+  );
+
   it('keeps unnamed groups separate beside named groups and introductory branches', () => {
     const input =
       '[TOC]\n\n## Intro\n\n### Details\n\n  ::toc-group  \n\n## Alpha\n\n### Child\n\n::toc-group[Named]\n\n## Beta\n\n::toc-group\n\n## Gamma\n\n::toc-group';
