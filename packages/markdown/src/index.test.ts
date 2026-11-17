@@ -267,7 +267,7 @@ describe('@shelkovo/markdown', () => {
       "<nav class="ui-markdown-toc" aria-label="Содержание">
       <div class="ui-markdown-toc__inner">
       <p class="ui-markdown-toc__title"><strong>Содержание</strong></p>
-      <ul class="ui-markdown-toc__list">
+      <ul class="ui-markdown-toc__list ui-markdown-toc__list--hierarchical">
       <li><a href="#раздел"><span class="ui-markdown-toc__label">Раздел</span></a>
       <ul>
       <li><a href="#детали"><span class="ui-markdown-toc__label">Детали</span></a></li>

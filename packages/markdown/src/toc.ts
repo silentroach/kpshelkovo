@@ -77,7 +77,12 @@ const tocRootList = (children: readonly ListItem[]): List => ({
   ...tocList(children),
   data: {
     hProperties: {
-      className: ['ui-markdown-toc__list']
+      className: [
+        'ui-markdown-toc__list',
+        ...(children.some((item) => item.children.some((child) => child.type === 'list'))
+          ? ['ui-markdown-toc__list--hierarchical']
+          : [])
+      ]
     }
   }
 });
