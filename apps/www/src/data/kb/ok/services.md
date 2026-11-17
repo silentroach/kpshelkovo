@@ -1,5 +1,5 @@
 ---
-title: Подключения и услуги ОК
+title: Дополнительные платные услуги и подключения
 sources:
   - url: https://lk.domyland.ru/services/17081
     description: Стоимость и состав работ по подключению электричества.
@@ -20,6 +20,8 @@ sources:
   - url: https://lk.domyland.ru/services/113770
     description: Способ узнать статус заказанной услуги.
 ---
+
+[TOC]
 
 ## Подключение коммуникаций
 

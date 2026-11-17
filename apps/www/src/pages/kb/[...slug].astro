@@ -1,5 +1,6 @@
 ---
 import PageHeading from '@/components/PageHeading.astro';
+import StickyTableScript from '@/components/common/StickyTableScript.astro';
 import type { GetStaticPaths } from 'astro';
 
 import Breadcrumbs from '@shelkovo/ui/Breadcrumbs.astro';
@@ -75,6 +76,8 @@ const bodyHtml = page.body
     })
   : undefined;
 const hasEditorialMap = bodyHtml?.includes('<editorial-map') ?? false;
+const hasMarkdownTable =
+  bodyHtml?.includes('data-ui-sticky-table-shell') ?? false;
 ---
 
 <BaseLayout
@@ -113,6 +116,7 @@ const hasEditorialMap = bodyHtml?.includes('<editorial-map') ?? false;
     )}
   </main>
   {hasEditorialMap && <EditorialMapScript />}
+  {hasMarkdownTable && <StickyTableScript />}
 </BaseLayout>
 
 <style>
@@ -154,43 +158,19 @@ const hasEditorialMap = bodyHtml?.includes('<editorial-map') ?? false;
   }
 
   .kb-prose :global(.ui-markdown-table-scroll) {
-    overflow-x: auto;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-xl);
+    --ui-sticky-table-min-width: 34rem;
     margin-block: 1.5rem;
-    background:
-      linear-gradient(to right, var(--color-surface) 30%, transparent) left /
-        2rem 100% no-repeat local,
-      linear-gradient(to left, var(--color-surface) 30%, transparent) right /
-        2rem 100% no-repeat local,
-      radial-gradient(
-          farthest-side at 0 50%,
-          color-mix(in oklab, var(--color-text) 18%, transparent),
-          transparent
-        )
-        left / 0.75rem 100% no-repeat scroll,
-      radial-gradient(
-          farthest-side at 100% 50%,
-          color-mix(in oklab, var(--color-text) 18%, transparent),
-          transparent
-        )
-        right / 0.75rem 100% no-repeat scroll,
-      var(--color-surface);
-  }
-
-  .kb-prose :global(.ui-markdown-table-scroll:focus-visible) {
-    outline: 2px solid var(--color-focus);
-    outline-offset: 3px;
   }
 
   .kb-prose :global(.ui-markdown-table-scroll table) {
     display: table;
     width: 100%;
     margin: 0;
-    min-width: 34rem;
+    min-width: var(--ui-sticky-table-min-width);
     overflow: visible;
     background: transparent;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
     font-size: 1rem;
     line-height: 1.5;
   }
@@ -503,6 +483,13 @@ const hasEditorialMap = bodyHtml?.includes('<editorial-map') ?? false;
     }
   }
 
+  @media screen and (width < 64rem) {
+    .kb-prose :global(.ui-markdown-table-scroll thead th) {
+      position: static;
+      top: auto;
+    }
+  }
+
   @media (min-width: 48rem) {
     .kb-page {
       padding-block-end: 3rem;
@@ -542,6 +529,13 @@ const hasEditorialMap = bodyHtml?.includes('<editorial-map') ?? false;
 
     .kb-prose :global(.ui-markdown-table-scroll tr) {
       break-inside: avoid;
+    }
+
+    .kb-prose :global(.ui-markdown-table-scroll th) {
+      position: static;
+      top: auto;
+      z-index: auto;
+      border-radius: 0;
     }
 
     .kb-page--document > .ui-page-header {

@@ -51,7 +51,7 @@ describe('kb markdown companions', () => {
     expect(entry).toBeDefined();
     if (!entry) throw new Error('Expected KB page');
     const html = renderMarkdown(entry.body, { allowTables: true });
-    expect(html).toContain('class="ui-markdown-table-scroll"');
+    expect(html).toContain('data-ui-sticky-table-shell');
     expect(html).toContain('role="region"');
     expect(html).toContain('tabindex="0"');
     expect(buildKbPageMarkdown(entry)).toMatchInlineSnapshot(`
