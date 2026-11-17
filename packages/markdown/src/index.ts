@@ -14,6 +14,7 @@ export type {
 } from './generate-types';
 export { resolveMarkdownResourceReferences } from './references';
 export { expandTableOfContents } from './toc';
+export { tablesToLists } from './table-lists';
 export { extractFirstMarkdownText, extractMarkdownText } from './plain-text';
 export { render, renderWithMetadata } from './render';
 export type {

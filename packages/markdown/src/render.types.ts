@@ -17,6 +17,8 @@ export interface RenderOptions {
   /** Namespace every final HTML ID and references to targets inside this fragment. */
   readonly idPrefix?: string;
   readonly eagerImages?: boolean;
+  /** Opt in only for HTML surfaces that provide table layout and overflow styles. */
+  readonly allowTables?: boolean;
 }
 
 export interface RenderedMarkdown {

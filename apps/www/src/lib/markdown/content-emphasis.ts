@@ -3,7 +3,8 @@ import {
   extractFirstMarkdownText,
   md,
   parseMarkdownFragment,
-  serializeMarkdownDocument
+  serializeMarkdownDocument,
+  tablesToLists
 } from '@shelkovo/markdown';
 
 import type {
@@ -94,6 +95,9 @@ export const extractFirstContentText = (markdown: string): string | undefined =>
   if (!markdown.includes('[!NOTE]') && !markdown.includes('[!WARNING]')) {
     return extractFirstMarkdownText(markdown);
   }
-  const children = transformContentEmphasis(parseMarkdownFragment(markdown), 'markdown');
+  const children = transformContentEmphasis(
+    tablesToLists(parseMarkdownFragment(markdown)),
+    'markdown'
+  );
   return extractFirstMarkdownText(serializeMarkdownDocument(createMarkdownDocument({ children })));
 };

@@ -8,6 +8,7 @@ import { transformEditorialMaps } from './editorial-maps-html';
 import { renderFileLinks } from './file-links';
 import { transformNavigatorLinks } from './navigator-links';
 import type { PreprocessedSiteMarkdown, RenderSiteMarkdownOptions } from './render.types';
+import { wrapMarkdownTables } from './tables-html';
 import { transformTelegramLinks } from './telegram-links';
 
 const FENCED_CODE_BLOCK_LINE = /^[ \t]{0,3}(`{3,}|~{3,})/;
@@ -263,12 +264,16 @@ export const renderMarkdownWithMetadata = (
   const preprocessed = preprocessSiteMarkdown(markdown, options).markdown;
   const rendered = renderWithMetadata(normalizeContentDiffMarkdown(preprocessed), {
     eagerImages: options?.eagerImages,
+    allowTables: options?.allowTables,
     reservedIds: options?.reservedIds,
     idPrefix: options?.idPrefix,
     transform: (document, reserveId) => {
       transformContentEmphasis(document.children, 'html');
       transformTelegramLinks(document, reserveId);
       transformNavigatorLinks(document, reserveId);
+      if (options?.allowTables) {
+        wrapMarkdownTables(document);
+      }
       if (options?.editorialMaps) {
         transformEditorialMaps(
           options.editorialMapSource ?? options.mentions?.context ?? 'site markdown',

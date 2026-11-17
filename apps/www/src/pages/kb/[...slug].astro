@@ -68,6 +68,7 @@ const editorialMapResolver = await loadEditorialMapResolverForMarkdown(
 const bodyHtml = page.body
   ? renderMarkdown(page.body, {
       eagerImages: true,
+      allowTables: true,
       editorialMaps: true,
       editorialMapResolver,
       editorialMapSource: page.canonical,
@@ -150,6 +151,66 @@ const hasEditorialMap = bodyHtml?.includes('<editorial-map') ?? false;
 
   .kb-prose {
     max-width: none;
+  }
+
+  .kb-prose :global(.ui-markdown-table-scroll) {
+    overflow-x: auto;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-xl);
+    margin-block: 1.5rem;
+    background:
+      linear-gradient(to right, var(--color-surface) 30%, transparent) left /
+        2rem 100% no-repeat local,
+      linear-gradient(to left, var(--color-surface) 30%, transparent) right /
+        2rem 100% no-repeat local,
+      radial-gradient(
+          farthest-side at 0 50%,
+          color-mix(in oklab, var(--color-text) 18%, transparent),
+          transparent
+        )
+        left / 0.75rem 100% no-repeat scroll,
+      radial-gradient(
+          farthest-side at 100% 50%,
+          color-mix(in oklab, var(--color-text) 18%, transparent),
+          transparent
+        )
+        right / 0.75rem 100% no-repeat scroll,
+      var(--color-surface);
+  }
+
+  .kb-prose :global(.ui-markdown-table-scroll:focus-visible) {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 3px;
+  }
+
+  .kb-prose :global(.ui-markdown-table-scroll table) {
+    display: table;
+    width: 100%;
+    margin: 0;
+    min-width: 34rem;
+    overflow: visible;
+    background: transparent;
+    border-collapse: collapse;
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  .kb-prose :global(.ui-markdown-table-scroll :is(th, td)) {
+    padding: 0.75rem;
+    text-align: start;
+    vertical-align: top;
+    border-block-end: 1px solid var(--color-border);
+  }
+
+  .kb-prose :global(.ui-markdown-table-scroll th) {
+    background: var(--color-surface-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+  }
+
+  .kb-prose :global(.ui-markdown-table-scroll tbody tr:last-child td) {
+    border-block-end: 0;
   }
 
   .kb-prose > :global(:not(.ui-markdown-toc)) {
@@ -313,6 +374,43 @@ const hasEditorialMap = bodyHtml?.includes('<editorial-map') ?? false;
     text-underline-offset: 0.2em;
   }
 
+  /* Source notes describe a document rather than warning about an action. */
+  .kb-prose :global(.ui-callout--note:has(> .ui-callout__source)) {
+    padding: 0.75rem 1rem;
+    border-color: color-mix(
+      in oklab,
+      var(--color-warning-text) 10%,
+      var(--color-bg)
+    );
+    background: color-mix(
+      in oklab,
+      var(--color-warning-soft) 55%,
+      var(--color-bg)
+    );
+  }
+
+  .kb-prose
+    :global(.ui-callout--note:has(> .ui-callout__source) > .ui-callout__title) {
+    margin-block-end: 0;
+    color: var(--color-text);
+    font-weight: 400;
+    line-height: 1.5;
+  }
+
+  .kb-prose
+    :global(
+      .ui-callout--note:has(> .ui-callout__source) > .ui-callout__title > strong
+    ) {
+    font-weight: inherit;
+  }
+
+  .kb-prose
+    :global(.ui-callout--note > .ui-callout__title + .ui-callout__source) {
+    margin-block-start: 0.375rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
   /* A NOTE whose entire title is one file link is the original-file recipe. */
   .kb-prose
     :global(
@@ -432,6 +530,20 @@ const hasEditorialMap = bodyHtml?.includes('<editorial-map') ?? false;
   }
 
   @media print {
+    .kb-prose :global(.ui-markdown-table-scroll) {
+      overflow: visible;
+      border-radius: 0;
+      background: none;
+    }
+
+    .kb-prose :global(.ui-markdown-table-scroll table) {
+      min-width: 0;
+    }
+
+    .kb-prose :global(.ui-markdown-table-scroll tr) {
+      break-inside: avoid;
+    }
+
     .kb-page--document > .ui-page-header {
       width: 100%;
     }
