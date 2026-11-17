@@ -2,7 +2,7 @@
 
 ## Context
 
-Мотивация и объём описаны в [proposal](/openspec/changes/sarafan-review-sources/proposal.md), поведение в [delta spec](/openspec/changes/sarafan-review-sources/specs/contacts-catalog/spec.md).
+Мотивация и объём описаны в [proposal](/openspec/changes/archive/2026-11-17-sarafan-review-sources/proposal.md), поведение в [delta spec](/openspec/changes/archive/2026-11-17-sarafan-review-sources/specs/contacts-catalog/spec.md).
 
 Raw-схема уже принимает произвольный HTTPS-источник, но отзыв содержит только оценку, выжимку, дату и URL. `/apps/www/src/components/contacts/ContactReviews.astro` выводит иконку Telegram и дату под выжимкой; вся запись связана с исходным сообщением. Метастрока сейчас имеет размер `0.75rem`, вес 600 и цвет `text-muted`. Расчёт звезды не различает источники. Markdown-карточка передаёт отзывы во frontmatter через отдельный адаптер.
 

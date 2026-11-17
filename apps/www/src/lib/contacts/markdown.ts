@@ -32,6 +32,7 @@ interface ContactFrontmatterReview {
   readonly sentiment: Contact['reviews'][number]['sentiment'];
   readonly summary: string;
   readonly published_at: string;
+  readonly sourceLabel?: string;
   readonly url: string;
 }
 
@@ -188,6 +189,7 @@ const contactReviewFrontmatter = (
   sentiment: review.sentiment,
   summary: review.summary,
   published_at: review.publishedIso,
+  sourceLabel: review.sourceLabel,
   url: review.url
 });
 

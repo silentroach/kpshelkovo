@@ -2,7 +2,7 @@
 title: Илья
 slug: ilya
 category: construction
-updated_at: 2026-11-16
+updated_at: 2026-11-17
 summary: 'Сантехника, электрика, сборка мебели. Живёт и работает в посёлке.'
 contacts:
   phone: '+7 (926) 367-68-37'
@@ -16,6 +16,11 @@ reviews:
     summary: 'Привёл в порядок санузел, нашёл и устранил причину перебоев с водой на узле водоснабжения. Работой и скоростью довольны; после ремонта оставил порядок.'
     published_at: 2026-09-18
     url: https://t.me/shelkovoecoclub/15263/55891
+  - sentiment: positive
+    summary: 'Помог с сантехникой. Результатом работы довольны.'
+    published_at: 2026-11-12
+    source_label: чат Гринвуда
+    url: https://t.me/MainChatGreenwood/36671/130111
 seo:
   description: 'Илья | Сантехника, электрика, сборка мебели'
 ---

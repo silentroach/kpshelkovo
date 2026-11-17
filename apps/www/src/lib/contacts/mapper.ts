@@ -45,6 +45,7 @@ const mapReviews = (reviews: ContactEntry['data']['reviews']): readonly ContactR
       summary: review.summary,
       publishedAt: new Date(`${review.published_at}T00:00:00.000Z`),
       publishedIso: review.published_at,
+      sourceLabel: review.source_label,
       url: review.url
     }))
     .sort((a, b) => b.publishedAt.getTime() - a.publishedAt.getTime()) ?? [];

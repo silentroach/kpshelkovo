@@ -33,7 +33,7 @@ const sentimentEmoji = {
           <a
             href={review.url}
             class="contact-review__overlay"
-            aria-label={`Открыть отзыв от ${formatContactReviewDate(review)}`}
+            aria-label={`Открыть отзыв от ${formatContactReviewDate(review)}${review.sourceLabel ? `, ${review.sourceLabel}` : ''}`}
           />
           <span class="contact-review__emoji" aria-hidden="true">
             {sentimentEmoji[review.sentiment]}
@@ -54,7 +54,10 @@ const sentimentEmoji = {
               {isTelegramUrl(review.url) ? (
                 <TelegramIcon class="contact-review__telegram-icon" />
               ) : null}
-              <span>{formatContactReviewDate(review)}</span>
+              <span>
+                {formatContactReviewDate(review)}
+                {review.sourceLabel && ` ·\u00a0${review.sourceLabel}`}
+              </span>
             </span>
           </div>
         </div>
@@ -171,12 +174,12 @@ const sentimentEmoji = {
 
   .contact-review__meta {
     display: inline-flex;
-    align-items: center;
+    align-items: baseline;
     gap: 0.375rem;
     margin-block-start: 0.125rem;
     color: var(--color-text-muted);
     font-size: 0.75rem;
-    font-weight: 600;
+    font-weight: 400;
     line-height: 1.25rem;
     transition: color 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   }

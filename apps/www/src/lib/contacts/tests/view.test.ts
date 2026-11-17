@@ -96,6 +96,31 @@ describe('contact view helpers', () => {
     ).toBe(true);
   });
 
+  it('counts local and neighboring chat reviews equally, including negative ones', () => {
+    const mixed = reviewsOn('positive', '2026-07-01', 5).map((review, index) => ({
+      ...review,
+      sourceLabel: index % 2 ? 'чат Гринвуда' : undefined
+    }));
+    const withNegative = [
+      ...mixed,
+      { sentiment: 'negative' as const, publishedIso: '2026-08-01', sourceLabel: 'чат Гринвуда' }
+    ];
+    expect({
+      mixed: hasManyPositiveContactReviews(mixed),
+      negativeNeighbor: hasManyPositiveContactReviews(withNegative),
+      recovered: hasManyPositiveContactReviews([
+        ...withNegative,
+        ...reviewsOn('positive', '2026-09-01', 5)
+      ])
+    }).toMatchInlineSnapshot(`
+      {
+        "mixed": true,
+        "negativeNeighbor": false,
+        "recovered": true,
+      }
+    `);
+  });
+
   it.each([false, true])(
     'ignores same-day positives regardless of order (reversed: %s)',
     (reverse) => {

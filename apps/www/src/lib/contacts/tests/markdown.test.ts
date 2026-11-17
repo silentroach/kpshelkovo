@@ -1,5 +1,6 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 import { parse } from 'yaml';
+import { z } from 'zod';
 
 import type { Contact, ContactCategoryPage } from '../types';
 
@@ -86,6 +87,45 @@ const category = {
 } satisfies ContactCategoryPage;
 
 describe('contacts markdown companions', () => {
+  it('publishes optional review source labels without changing legacy fields', () => {
+    const review = contact.reviews[0]!;
+    const markdown = buildContactMarkdown({
+      ...contact,
+      reviews: [review, { ...review, sourceLabel: 'чат Гринвуда', url: 'https://t.me/neighbor/2' }]
+    });
+    const frontmatter = z
+      .object({
+        reviews: z.array(
+          z
+            .object({
+              sentiment: z.string(),
+              summary: z.string(),
+              published_at: z.string(),
+              url: z.string(),
+              sourceLabel: z.string().optional()
+            })
+            .strict()
+        )
+      })
+      .parse(parse(markdown.split('---')[1] ?? ''));
+    expect(frontmatter.reviews).toMatchInlineSnapshot(`
+      [
+        {
+          "published_at": "2026-04-07",
+          "sentiment": "positive",
+          "summary": "Помог с **электричеством**.",
+          "url": "https://t.me/example/1",
+        },
+        {
+          "published_at": "2026-04-07",
+          "sentiment": "positive",
+          "sourceLabel": "чат Гринвуда",
+          "summary": "Помог с **электричеством**.",
+          "url": "https://t.me/neighbor/2",
+        },
+      ]
+    `);
+  });
   it('renders empty launch index without internal paths', () => {
     const markdown = buildContactsHomeMarkdown({
       contacts: [],
@@ -97,7 +137,7 @@ describe('contacts markdown companions', () => {
     expect(markdown).toMatchInlineSnapshot(`
       "# Сарафан
 
-      Сарафан собирается из отзывов и самопрезентаций соседей в [чате жителей Шелково](https://t.me/shelkovoecoclub). Здесь можно найти исполнителей по опыту жителей и познакомиться с услугами самих соседей. Также есть [табличка из соседнего чата Гринвуда](https://docs.google.com/spreadsheets/d/1ckmDY1B54Mx9UB1chbybwdbPTF87R--uv2li7VhCfg8/edit?usp=drivesdk).
+      Сарафан собирается из отзывов и самопрезентаций соседей в [чате жителей Шелково](https://t.me/shelkovoecoclub) и отзывов из чатов соседних посёлков. Здесь можно найти исполнителей по опыту жителей и познакомиться с услугами самих соседей. Также есть [табличка из соседнего чата Гринвуда](https://docs.google.com/spreadsheets/d/1ckmDY1B54Mx9UB1chbybwdbPTF87R--uv2li7VhCfg8/edit?usp=drivesdk).
 
       ## Категории
 

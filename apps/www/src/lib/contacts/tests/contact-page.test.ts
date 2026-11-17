@@ -212,6 +212,7 @@ describe('/sarafan/[category]/[slug]/', () => {
         summary: `${sentiment} опыт.`,
         publishedAt: new Date('2026-09-19T00:00:00.000Z'),
         publishedIso: '2026-09-19',
+        sourceLabel: sentiment === 'positive' ? 'чат Гринвуда' : undefined,
         url: `https://t.me/example/${sentiment}`
       }))
     };
@@ -253,5 +254,33 @@ describe('/sarafan/[category]/[slug]/', () => {
         link.getAttribute('href')
       )
     ).toEqual(fixture.contact.reviews.map((review) => review.url));
+    expect(
+      Array.from(page.querySelectorAll('.contact-review'), (review) => ({
+        links: review.querySelectorAll('a').length,
+        name: review.querySelector('a')?.getAttribute('aria-label'),
+        meta: visibleWhitespace(
+          review.querySelector('.contact-review__meta')?.textContent.replace(/\s+/gu, ' ').trim() ??
+            ''
+        )
+      }))
+    ).toMatchInlineSnapshot(`
+      [
+        {
+          "links": 1,
+          "meta": "19 сентября · чат Гринвуда",
+          "name": "Открыть отзыв от 19 сентября, чат Гринвуда",
+        },
+        {
+          "links": 1,
+          "meta": "19 сентября",
+          "name": "Открыть отзыв от 19 сентября",
+        },
+        {
+          "links": 1,
+          "meta": "19 сентября",
+          "name": "Открыть отзыв от 19 сентября",
+        },
+      ]
+    `);
   });
 });

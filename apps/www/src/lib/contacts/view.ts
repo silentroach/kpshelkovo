@@ -49,7 +49,7 @@ export const CONTACTS_CHAT_URL = 'https://t.me/shelkovoecoclub';
 
 export const CONTACTS_INTRO_PREFIX = 'Сарафан собирается из отзывов и самопрезентаций соседей в ';
 export const CONTACTS_INTRO_SUFFIX =
-  '. Здесь можно найти исполнителей по опыту жителей и познакомиться с услугами самих соседей.';
+  ' и отзывов из чатов соседних посёлков. Здесь можно найти исполнителей по опыту жителей и познакомиться с услугами самих соседей.';
 export const CONTACTS_NEIGHBOR_TABLE_PREFIX = ' Также есть ';
 export const CONTACTS_NEIGHBOR_TABLE_LABEL = 'табличка из соседнего чата Гринвуда';
 export const CONTACTS_NEIGHBOR_TABLE_URL =
