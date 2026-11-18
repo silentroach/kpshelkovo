@@ -11,6 +11,7 @@ import { transformNavigatorLinks } from './navigator-links';
 import type { PreprocessedSiteMarkdown, RenderSiteMarkdownOptions } from './render.types';
 import { wrapMarkdownTables } from './tables-html';
 import { transformTelegramLinks } from './telegram-links';
+import { transformTocDisclosure } from './toc-disclosure';
 
 const FENCED_CODE_BLOCK_LINE = /^[ \t]{0,3}(`{3,}|~{3,})/;
 const HYPHENATED_ORDERED_LIST_ITEM_LINE = /^([ \t]*)-\s+(\d+)([.)])(\s+)/;
@@ -269,6 +270,9 @@ export const renderMarkdownWithMetadata = (
     reservedIds: options?.reservedIds,
     idPrefix: options?.idPrefix,
     transform: (document, reserveId) => {
+      if (options?.tocDisclosure) {
+        transformTocDisclosure(document.children);
+      }
       transformContentEmphasis(document.children, 'html');
       if (options?.adaptive) {
         document.children = transformAdaptive(

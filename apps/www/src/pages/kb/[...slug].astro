@@ -72,6 +72,7 @@ const bodyHtml = page.body
       eagerImages: true,
       allowTables: true,
       adaptive: true,
+      tocDisclosure: true,
       editorialMaps: true,
       editorialMapResolver,
       editorialMapSource: page.canonical,
@@ -185,6 +186,150 @@ const hasMarkdownTable =
     font-size: 1.0625rem;
     font-weight: 600;
     line-height: 1.5;
+  }
+
+  .kb-prose > :global(.ui-markdown-toc--disclosure) {
+    --kb-toc-duration: 200ms;
+    margin-inline: var(--kb-content-inset);
+    padding: 0.5rem 0;
+    border-block: 1px solid var(--color-border);
+    background: transparent;
+  }
+
+  .kb-prose :global(.ui-markdown-toc__summary) {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: 2.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    cursor: pointer;
+  }
+
+  .kb-prose :global(.ui-markdown-toc__summary::-webkit-details-marker) {
+    display: none;
+  }
+
+  .kb-prose :global(.ui-markdown-toc__summary-title) {
+    margin-inline-end: auto;
+    font-size: 1.0625rem;
+    font-weight: 600;
+    line-height: 1.5;
+  }
+
+  .kb-prose :global(.ui-markdown-toc__show),
+  .kb-prose :global(.ui-markdown-toc__hide) {
+    color: var(--color-primary);
+    font-size: 0.875rem;
+    line-height: 1.5;
+  }
+
+  .kb-prose :global(.ui-markdown-toc__summary::after) {
+    content: '';
+    flex-shrink: 0;
+    width: 0.4375rem;
+    height: 0.4375rem;
+    margin-inline-end: 0.1875rem;
+    border-right: 0.09375rem solid var(--color-primary);
+    border-bottom: 0.09375rem solid var(--color-primary);
+    transform: translateY(-0.125rem) rotate(45deg);
+  }
+
+  .kb-prose :global(.ui-markdown-toc__disclosure[open] > summary::after) {
+    transform: translateY(0.125rem) rotate(225deg);
+  }
+
+  .kb-prose :global(.ui-markdown-toc__hide),
+  .kb-prose :global(.ui-markdown-toc__disclosure[open] .ui-markdown-toc__show),
+  .kb-prose :global(.ui-markdown-toc--disclosure .ui-markdown-toc__title) {
+    display: none;
+  }
+
+  .kb-prose :global(.ui-markdown-toc__disclosure[open] .ui-markdown-toc__hide) {
+    display: inline;
+  }
+
+  .kb-prose :global(.ui-markdown-toc__summary:is(:hover, :focus-visible)) {
+    color: var(--color-primary);
+  }
+
+  .kb-prose :global(.ui-markdown-toc__summary:active) {
+    background: var(--color-primary-soft);
+  }
+
+  .kb-prose :global(.ui-markdown-toc__summary:focus-visible) {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 0.25rem;
+  }
+
+  .kb-prose :global(.ui-markdown-toc__disclosure .ui-markdown-toc__inner) {
+    padding-block: 0.75rem;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .kb-prose :global(.ui-markdown-toc__summary::after) {
+      transition: transform var(--kb-toc-duration) var(--site-menu-ease);
+    }
+
+    @supports selector(::details-content) {
+      @media (width < 48rem) {
+        .kb-prose :global(.ui-markdown-toc__disclosure::details-content) {
+          display: grid;
+          grid-template-rows: 0fr;
+          content-visibility: visible;
+          visibility: hidden;
+          opacity: 0;
+          transition:
+            grid-template-rows var(--kb-toc-duration) var(--site-menu-ease),
+            opacity var(--kb-toc-duration) var(--site-menu-ease),
+            visibility var(--kb-toc-duration);
+        }
+
+        .kb-prose :global(.ui-markdown-toc__disclosure[open]::details-content) {
+          grid-template-rows: 1fr;
+          visibility: visible;
+          opacity: 1;
+        }
+
+        .kb-prose :global(.ui-markdown-toc__clip) {
+          min-block-size: 0;
+          margin-inline: -0.5rem;
+          overflow: hidden;
+        }
+
+        .kb-prose :global(.ui-markdown-toc__clip > .ui-markdown-toc__inner) {
+          padding-inline: 0.5rem;
+        }
+      }
+    }
+  }
+
+  @supports selector(::details-content) {
+    @media (min-width: 48rem) {
+      .kb-prose > :global(.ui-markdown-toc--disclosure) {
+        margin-inline: 0;
+        padding: 1.5rem var(--kb-content-inset);
+        border: 0;
+        background: var(--color-breadcrumb-surface);
+      }
+
+      .kb-prose :global(.ui-markdown-toc__disclosure::details-content) {
+        content-visibility: visible;
+      }
+
+      .kb-prose :global(.ui-markdown-toc__summary) {
+        display: none;
+      }
+
+      .kb-prose :global(.ui-markdown-toc--disclosure .ui-markdown-toc__title) {
+        display: block;
+      }
+
+      .kb-prose :global(.ui-markdown-toc__disclosure .ui-markdown-toc__inner) {
+        padding-block: 0;
+      }
+    }
   }
 
   .kb-prose :global(.ui-markdown-toc--grouped .ui-markdown-toc__title) {

@@ -20,6 +20,8 @@ export interface RenderSiteMarkdownOptions {
   readonly allowTables?: boolean;
   /** Enable author-written wide/mobile alternatives in KB. */
   readonly adaptive?: boolean;
+  /** Enable native responsive contents disclosure on KB pages. */
+  readonly tocDisclosure?: boolean;
   /** Enable only for news/KB bodies whose templates load editorial map assets. */
   readonly editorialMaps?: boolean;
   readonly editorialMapResolver?: EditorialMapSelectionResolver;

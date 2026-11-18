@@ -2,8 +2,8 @@
 
 Снимки сделаны 18 ноября 2026 года в Chromium на опубликованной [оферте Шелково Парк](https://kpshelkovo.online/kb/ok/offer/shelkovo-park/) при viewport 390 × 844 CSS px.
 
-- [Текущая страница](/openspec/changes/compact-kb-mobile-toc/preview/current-390.png).
-- [Выбранный вариант](/openspec/changes/compact-kb-mobile-toc/preview/refined-390.png).
+- [Текущая страница](/openspec/changes/archive/2026-11-18-compact-kb-mobile-toc/preview/current-390.png).
+- [Выбранный вариант](/openspec/changes/archive/2026-11-18-compact-kb-mobile-toc/preview/refined-390.png).
 
 Второй снимок получен временной заменой оболочки оглавления в браузере. Содержимое страницы, шрифты и все ссылки сохранены. Это визуальный ориентир; production-реализация проходит отдельную проверку на собранном сайте.
 
