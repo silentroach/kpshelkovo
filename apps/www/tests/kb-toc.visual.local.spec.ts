@@ -16,11 +16,29 @@ for (const { name, path } of pages) {
       await expect(toc).toBeVisible();
       expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(width);
 
+      const expectContentsScreenshot = async (name: string): Promise<void> => {
+        await expect
+          .poll(() => toc.evaluate((element) => element.getAnimations({ subtree: true }).length))
+          .toBe(0);
+        const clip = await toc.evaluate((element) => {
+          const rect = element.getBoundingClientRect();
+          const y = Math.max(0, Math.floor(rect.top + window.scrollY) - 16);
+          return {
+            x: 0,
+            y,
+            width: window.innerWidth,
+            height: Math.ceil(rect.bottom + window.scrollY) + 16 - y
+          };
+        });
+        // Full-page coordinates retain real gutters and the focus outside the TOC.
+        await expect(page).toHaveScreenshot(name, { fullPage: true, clip });
+      };
+
       if (width < 768) {
         const summary = toc.locator('summary');
         await expect(toc.getByRole('link').first()).not.toBeVisible();
         await expect(summary).toHaveAccessibleName('Содержание Показать');
-        await expect(toc).toHaveScreenshot(`${name}-${width}-closed.png`);
+        await expectContentsScreenshot(`${name}-${width}-closed.png`);
         await summary.focus();
         await page.keyboard.press('Enter');
         await expect(summary).toHaveAccessibleName('Содержание Скрыть');
@@ -44,7 +62,7 @@ for (const { name, path } of pages) {
         ).toBeLessThanOrEqual(8);
       }
 
-      await expect(toc).toHaveScreenshot(`${name}-${width}.png`);
+      await expectContentsScreenshot(`${name}-${width}.png`);
 
       const link = toc.getByRole('link').last();
       const href = await link.getAttribute('href');
