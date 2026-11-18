@@ -23,6 +23,11 @@ export default defineConfig({
     colorScheme: 'light',
     javaScriptEnabled: false
   },
+  projects: [
+    { name: '' },
+    { name: 'firefox-motion', use: { browserName: 'firefox' }, grep: /contents motion/u },
+    { name: 'webkit-motion', use: { browserName: 'webkit' }, grep: /contents motion/u }
+  ],
   webServer: {
     command: 'pnpm run test:visual:kb-toc:serve',
     cwd: fileURLToPath(new URL('.', import.meta.url)),
