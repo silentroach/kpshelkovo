@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="ru">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Люди · Эскиз для Шелково Онлайн</title>
+  <link rel="stylesheet" href="./people-prototype-fonts.css" />
+  <link rel="stylesheet" href="./apps/www/src/styles/global.css" />
+  <style>
+    main {
+      padding-block: 1.5rem 4rem;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--color-border);
+      padding-bottom: 1rem;
+    }
+    header b,
+    .row strong {
+      color: var(--color-primary);
+    }
+    small,
+    .role,
+    .intro {
+      color: var(--color-text-muted);
+    }
+    section {
+      padding-inline: var(--page-content-inset);
+    }
+    .row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding-block: 0.5rem;
+      color: inherit;
+      text-decoration: none;
+    }
+    .row:hover strong {
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+    .face {
+      width: 48px;
+      height: 56px;
+      flex: none;
+      object-fit: cover;
+      object-position: center 30%;
+      border-radius: var(--radius-md);
+      background: var(--color-primary-soft);
+      color: var(--color-primary);
+      display: grid;
+      place-items: center;
+      font: 600 1rem var(--font-body);
+    }
+    strong,
+    .role {
+      display: block;
+    }
+    .row strong {
+      font: 700 1.25rem/1.3 var(--font-heading);
+    }
+    .role {
+      font-size: 15px;
+      margin-top: 3px;
+    }
+    .org {
+      margin-top: 1.75rem;
+      padding-top: 1.5rem;
+    }
+    .lead .face {
+      width: 66px;
+      height: 78px;
+    }
+    .lead strong {
+      font-size: 1.5rem;
+    }
+    .org .cards {
+      margin-top: 1rem;
+    }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 310px), 1fr));
+      gap: 8px 24px;
+    }
+    .cards .row {
+      align-items: flex-start;
+      padding-block: 8px;
+      height: 100%;
+      gap: 12px;
+    }
+  </style>
+  <main class="ui-page">
+    <header><b>Шелково Онлайн</b><small>Эскиз справочника</small></header>
+    <div class="ui-page-header">
+      <h1 class="ui-page-title">Люди</h1>
+      <p class="intro">Кто за что отвечает в Шелково</p>
+    </div>
+    <section class="lead" aria-label="Группа компаний «Земля МО»">
+      <a class="row" href="https://kpshelkovo.online/people/ykizilov/"
+        ><img class="face" alt="" src="https://media.kpshelkovo.online/people/ykizilov.jpeg" /><span
+          ><strong>Юрий Кизилов</strong
+          ><span class="role">Генеральный директор группы компаний «Земля МО»</span></span
+        ></a
+      >
+    </section>
+    <section class="org ui-shell">
+      <h2 class="ui-section-title">ОК «Комфорт»</h2>
+      <ul class="cards">
+        <li>
+          <a class="row" href="https://kpshelkovo.online/people/gmozgov/"
+            ><img
+              class="face"
+              alt=""
+              src="https://media.kpshelkovo.online/people/gmozgov.jpeg"
+            /><span
+              ><strong>Геннадий Мозгов</strong
+              ><span class="role">Управляющий КП Шелково</span></span
+            ></a
+          >
+        </li>
+        <li>
+          <a class="row" href="https://kpshelkovo.online/people/kschemelinin/"
+            ><img
+              class="face"
+              alt=""
+              src="https://media.kpshelkovo.online/people/kschemelinin.jpeg"
+            /><span
+              ><strong>Кирилл Щемелинин</strong
+              ><span class="role">Исполняющий обязанности директора по эксплуатации</span></span
+            ></a
+          >
+        </li>
+        <li>
+          <a class="row" href="https://kpshelkovo.online/people/dkochergin/">
+            <span class="face" aria-hidden="true">ДК</span
+            ><span
+              ><strong>Денис Кочергин</strong
+              ><span class="role">Руководитель отдела «Комфорт-Эксплуатация»</span></span
+            >
+          </a>
+        </li>
+        <li>
+          <a class="row" href="https://kpshelkovo.online/people/stkacheva/"
+            ><span class="face" aria-hidden="true">СТ</span
+            ><span
+              ><strong>Светлана Ткачёва</strong
+              ><span class="role">Менеджер отдела эксплуатации</span></span
+            ></a
+          >
+        </li>
+        <li>
+          <a class="row" href="https://kpshelkovo.online/people/akornyakov/"
+            ><img
+              class="face"
+              alt=""
+              src="https://media.kpshelkovo.online/people/akornyakov.jpeg"
+            /><span
+              ><strong>Андрей Корняков</strong
+              ><span class="role">Инженер по эксплуатации зданий и сооружений</span></span
+            ></a
+          >
+        </li>
+        <li>
+          <a class="row" href="https://kpshelkovo.online/people/msorochinsky/"
+            ><span class="face" aria-hidden="true">МС</span
+            ><span
+              ><strong>Максим Сорочинский</strong><span class="role">Главный энергетик</span></span
+            ></a
+          >
+        </li>
+        <li>
+          <a class="row" href="https://kpshelkovo.online/people/nmakhrova/"
+            ><img
+              class="face"
+              alt=""
+              src="https://media.kpshelkovo.online/people/nmakhrova.jpeg"
+            /><span
+              ><strong>Надежда Махрова</strong
+              ><span class="role">Менеджер отдела энергетики</span></span
+            ></a
+          >
+        </li>
+        <li>
+          <a class="row" href="https://kpshelkovo.online/people/ekurenkova/"
+            ><img
+              class="face"
+              alt=""
+              src="https://media.kpshelkovo.online/people/ekurenkova.jpeg"
+            /><span
+              ><strong>Екатерина Куренкова</strong
+              ><span class="role"
+                >Менеджер-бухгалтер · начисления и коммунальные платежи</span
+              ></span
+            ></a
+          >
+        </li>
+        <li>
+          <a class="row" href="https://kpshelkovo.online/people/ebakharueva/"
+            ><img
+              class="face"
+              alt=""
+              src="https://media.kpshelkovo.online/people/ebakharueva.jpeg"
+            /><span
+              ><strong>Елена Бахаруева</strong
+              ><span class="role">Менеджер отдела сопровождения</span></span
+            ></a
+          >
+        </li>
+        <li>
+          <a class="row" href="https://kpshelkovo.online/people/ykira/"
+            ><span class="face" aria-hidden="true">ЯК</span
+            ><span
+              ><strong>Ярослав Кира</strong
+              ><span class="role">Руководитель отдела «Комфорт-Сервис»</span></span
+            ></a
+          >
+        </li>
+      </ul>
+    </section>
+  </main>
+</html>
