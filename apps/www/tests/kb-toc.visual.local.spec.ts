@@ -75,6 +75,34 @@ for (const { name, path } of pages) {
   }
 }
 
+for (const width of [390, 767, 768, 1440]) {
+  test(`offer contents lands below the header only when it is sticky at ${width}px`, async ({
+    page
+  }) => {
+    await page.setViewportSize({ width, height: 844 });
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto(pages[0].path);
+    await expect.poll(() => page.evaluate(() => document.fonts.status)).toBe('loaded');
+
+    const toc = page.getByRole('navigation', { name: 'Содержание', exact: true });
+    const summary = toc.locator('summary');
+    if (width < 768) await summary.click();
+    await toc.getByRole('link', { name: /^5\. Стоимость услуг/u }).click();
+
+    const target = page.locator(':target');
+    await expect(target).toBeInViewport();
+    const targetTop = () => target.evaluate((heading) => heading.getBoundingClientRect().top);
+    if (width < 768) {
+      await expect.poll(async () => Math.abs(await targetTop())).toBeLessThanOrEqual(2);
+    } else {
+      const headerBottom = await page
+        .getByRole('banner')
+        .evaluate((header) => header.getBoundingClientRect().bottom);
+      await expect.poll(targetTop).toBeGreaterThanOrEqual(headerBottom);
+    }
+  });
+}
+
 test('ordinary contents opens, survives resizing and closes without JavaScript', async ({
   page
 }) => {

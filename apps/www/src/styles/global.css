@@ -657,7 +657,13 @@
 
   .ui-prose :is(h1, h2, h3, h4, h5, h6)[id] {
     position: relative;
-    scroll-margin-top: 5rem;
+  }
+
+  /* Match the breakpoint where SiteHeader becomes sticky. */
+  @media (min-width: 48rem) {
+    .ui-prose :is(h1, h2, h3, h4, h5, h6)[id] {
+      scroll-margin-top: 5rem;
+    }
   }
 
   .ui-prose .ui-editorial-map {
