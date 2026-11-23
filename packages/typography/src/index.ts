@@ -36,6 +36,23 @@ if (!Typograf.getRule(BEFORE_NUMBER_SIGN_RULE)) {
   });
 }
 
+const RUBLE_AMOUNT_RULE = 'ru/nbsp/rubleAmount';
+const RUBLE_AMOUNT =
+  /\b(\d{1,3}(?:[ \u00A0\u2009\u202F]\d{3})+|\d+)([.,]\d+)?[ \u00A0\u2009\u202F]*₽/gu;
+
+if (!Typograf.getRule(RUBLE_AMOUNT_RULE)) {
+  Typograf.addRule({
+    name: RUBLE_AMOUNT_RULE,
+    handler: (text) =>
+      text.replace(RUBLE_AMOUNT, (_, integer: string, fraction = '') => {
+        const digits = integer.replace(/\s/gu, '');
+        const firstGroup = digits.length % 3 || 3;
+        const thousands = digits.slice(firstGroup).replace(/\d{3}/gu, '\u00A0$&');
+        return `${digits.slice(0, firstGroup)}${thousands}${fraction}\u00A0₽`;
+      })
+  });
+}
+
 const DATE_RANGE = new RegExp(
   `(?<![\\p{L}\\p{N}_])([12]\\d|3[01]|0?[1-9])[-–]([12]\\d|3[01]|0?[1-9])[ \\u00A0](${Typograf.getData('ru/monthGenCase')})(?![\\p{L}\\p{N}_])`,
   'gu'
@@ -72,8 +89,13 @@ if (!Typograf.getRule(DATE_RANGE_HTML_RULE)) {
 const typograf = new Typograf({
   locale: ['ru', 'en-US'],
   processingSeparateParts: true,
-  // Keep the author's link boundaries, matching node-local AST processing.
-  disableRule: 'common/punctuation/quoteLink'
+  disableRule: [
+    // Keep the author's link boundaries, matching node-local AST processing.
+    'common/punctuation/quoteLink',
+    // Only ruble amounts need grouping here. The stock rules also split tax IDs and move $100 to 100 $.
+    'common/number/digitGrouping',
+    'ru/money/currency'
+  ]
 });
 
 for (const tag of TYPOGRAPHY_SKIP_TAGS) {

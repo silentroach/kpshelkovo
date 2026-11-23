@@ -1,7 +1,7 @@
 ---
 title: АкваЖилСервис (АЖС)
 slug: akvazhilservis
-category: construction
+category: plumbing
 updated_at: 2026-10-21
 summary: 'Установка септиков и дренажных колодцев из бетонных колец'
 contacts:

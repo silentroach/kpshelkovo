@@ -1,7 +1,7 @@
 ---
 title: 'Стройкомплект-С'
 slug: 'stroykomplekt-s'
-category: 'construction'
+category: 'houses'
 summary: 'Строительство домов из клеёного бруса собственного производства'
 contacts:
   website: 'https://komstroy-s.ru/'
