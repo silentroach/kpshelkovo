@@ -36,19 +36,6 @@ if (!Typograf.getRule(BEFORE_NUMBER_SIGN_RULE)) {
   });
 }
 
-const RUBLE_AMOUNT_RULE = 'ru/nbsp/rubleAmount';
-
-if (!Typograf.getRule(RUBLE_AMOUNT_RULE)) {
-  Typograf.addRule({
-    name: RUBLE_AMOUNT_RULE,
-    handler: (text) =>
-      text.replace(
-        /\b(\d+(?:[ \u00A0\u2009\u202F]\d{3})*(?:[.,]\d+)?)[ \u00A0\u2009\u202F]*₽/gu,
-        (_, amount: string) => `${amount.replace(/[ \u2009]/gu, '\u00A0')}\u00A0₽`
-      )
-  });
-}
-
 const DATE_RANGE = new RegExp(
   `(?<![\\p{L}\\p{N}_])([12]\\d|3[01]|0?[1-9])[-–]([12]\\d|3[01]|0?[1-9])[ \\u00A0](${Typograf.getData('ru/monthGenCase')})(?![\\p{L}\\p{N}_])`,
   'gu'
@@ -85,6 +72,7 @@ if (!Typograf.getRule(DATE_RANGE_HTML_RULE)) {
 const typograf = new Typograf({
   locale: ['ru', 'en-US'],
   processingSeparateParts: true,
+  enableRule: 'ru/money/currency',
   // Keep the author's link boundaries, matching node-local AST processing.
   disableRule: 'common/punctuation/quoteLink'
 });
