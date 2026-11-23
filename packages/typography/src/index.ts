@@ -36,6 +36,15 @@ if (!Typograf.getRule(BEFORE_NUMBER_SIGN_RULE)) {
   });
 }
 
+const RUBLE_SIGN_RULE = 'ru/nbsp/beforeRubleSign';
+
+if (!Typograf.getRule(RUBLE_SIGN_RULE)) {
+  Typograf.addRule({
+    name: RUBLE_SIGN_RULE,
+    handler: (text) => text.replace(/(\d) *₽/gu, '$1\u00A0₽')
+  });
+}
+
 const DATE_RANGE = new RegExp(
   `(?<![\\p{L}\\p{N}_])([12]\\d|3[01]|0?[1-9])[-–]([12]\\d|3[01]|0?[1-9])[ \\u00A0](${Typograf.getData('ru/monthGenCase')})(?![\\p{L}\\p{N}_])`,
   'gu'

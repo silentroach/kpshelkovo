@@ -174,4 +174,11 @@ describe('typography output contracts', () => {
     );
     expect(showNbsp(formatDynamicHtml('п. № 1'))).toMatchInlineSnapshot(`"п.·№·1"`);
   });
+
+  it('keeps a ruble sign with the amount in prose without changing code examples', () => {
+    const source = '<p>212 700 ₽, 500₽. <code>500 ₽</code></p>';
+    expect(showNbsp(formatDynamicHtml(source))).toMatchInlineSnapshot(
+      `"<p>212 700·₽, 500·₽. <code>500 ₽</code></p>"`
+    );
+  });
 });
