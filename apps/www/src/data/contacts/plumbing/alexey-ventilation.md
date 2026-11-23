@@ -1,7 +1,7 @@
 ---
 title: ГАЗПРОФФ
 slug: alexey-ventilation
-category: construction
+category: plumbing
 updated_at: 2026-10-08
 summary: 'Монтаж вентиляции котельной с оформлением актов для газовиков'
 contacts:

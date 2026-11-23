@@ -1,7 +1,7 @@
 ---
 title: Александр
 slug: alexander-manipulator
-category: construction
+category: garden
 updated_at: 2026-09-08
 summary: 'Услуги манипулятора'
 contacts:

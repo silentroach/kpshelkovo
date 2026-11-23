@@ -1,7 +1,7 @@
 ---
 title: 'ДубльДом'
 slug: 'dubldom'
-category: 'construction'
+category: 'houses'
 summary: 'Модульные дома с отделкой для жизни круглый год. В Шелково уже есть несколько таких домов.'
 contacts:
   website: 'https://dubldom.ru/'

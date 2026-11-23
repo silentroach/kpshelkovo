@@ -1,7 +1,7 @@
 ---
 title: Артур
 slug: artur-boiler-control
-category: construction
+category: plumbing
 updated_at: 2026-10-23
 summary: 'Подключение дистанционного управления котлами'
 contacts:

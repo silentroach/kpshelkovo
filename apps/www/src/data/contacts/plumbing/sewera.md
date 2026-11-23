@@ -1,7 +1,7 @@
 ---
 title: 'Sewera'
 slug: 'sewera'
-category: 'construction'
+category: 'plumbing'
 summary: 'Кессоны, септики и инженерные коммуникации'
 contacts:
   telegram: 'https://t.me/seweralab'
