@@ -36,12 +36,16 @@ if (!Typograf.getRule(BEFORE_NUMBER_SIGN_RULE)) {
   });
 }
 
-const RUBLE_SIGN_RULE = 'ru/nbsp/beforeRubleSign';
+const RUBLE_AMOUNT_RULE = 'ru/nbsp/rubleAmount';
 
-if (!Typograf.getRule(RUBLE_SIGN_RULE)) {
+if (!Typograf.getRule(RUBLE_AMOUNT_RULE)) {
   Typograf.addRule({
-    name: RUBLE_SIGN_RULE,
-    handler: (text) => text.replace(/(\d) *₽/gu, '$1\u00A0₽')
+    name: RUBLE_AMOUNT_RULE,
+    handler: (text) =>
+      text.replace(
+        /\b(\d+(?:[ \u00A0\u2009\u202F]\d{3})*(?:[.,]\d+)?)[ \u00A0\u2009\u202F]*₽/gu,
+        (_, amount: string) => `${amount.replace(/[ \u2009]/gu, '\u00A0')}\u00A0₽`
+      )
   });
 }
 

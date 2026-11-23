@@ -175,10 +175,10 @@ describe('typography output contracts', () => {
     expect(showNbsp(formatDynamicHtml('п. № 1'))).toMatchInlineSnapshot(`"п.·№·1"`);
   });
 
-  it('keeps a ruble sign with the amount in prose without changing code examples', () => {
-    const source = '<p>212 700 ₽, 500₽. <code>500 ₽</code></p>';
+  it('keeps a whole ruble amount together without changing code or unrelated numbers', () => {
+    const source = '<p>212 700 ₽, 1 234 567,89 ₽, 500₽. №12345. <code>5 000 ₽</code></p>';
     expect(showNbsp(formatDynamicHtml(source))).toMatchInlineSnapshot(
-      `"<p>212 700·₽, 500·₽. <code>500 ₽</code></p>"`
+      `"<p>212·700·₽, 1·234·567,89·₽, 500·₽.·№·12345. <code>5 000 ₽</code></p>"`
     );
   });
 });
