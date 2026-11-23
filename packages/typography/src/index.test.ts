@@ -175,10 +175,12 @@ describe('typography output contracts', () => {
     expect(showNbsp(formatDynamicHtml('п. № 1'))).toMatchInlineSnapshot(`"п.·№·1"`);
   });
 
-  it('formats currency amounts in prose and preserves code and reference numbers', () => {
-    const source = '<p>212\u202F700 ₽, 500₽, $100. №12345. <code>$100</code></p>';
-    expect(showNbsp(formatDynamicHtml(source))).toMatchInlineSnapshot(
-      `"<p>212·700·₽, 500·₽, 100·$.·№·12345. <code>$100</code></p>"`
+  it('keeps ruble amounts together without regrouping identifiers or moving other currency signs', () => {
+    const source = '<p>212 700 ₽, 1234567,05₽, $100. ИНН 5012345678. <code>5 000 ₽</code></p>';
+    const output = formatDynamicHtml(source);
+    expect(showNbsp(output)).toMatchInlineSnapshot(
+      `"<p>212·700·₽, 1·234·567,05·₽, $100. ИНН 5012345678. <code>5 000 ₽</code></p>"`
     );
+    expect(formatDynamicHtml(output)).toBe(output);
   });
 });
