@@ -9,7 +9,10 @@ import { getPlaceBounds, getSelectionSetBounds } from '../place-map-geometry';
 import PlaceMap from '../PlaceMap.svelte';
 import {
   areaFeatures,
+  baseLayerUrl,
   clustererProps,
+  clustererUpdates,
+  infrastructureLayerUrl,
   map,
   mapProps,
   markerElements,
@@ -18,8 +21,7 @@ import {
   place,
   publicPlace,
   registerPlaceMapSetup,
-  roadResponse,
-  roadsUrl
+  roads
 } from './support';
 
 vi.mock(import('@/lib/yandex-maps/runtime'), async (importOriginal) => ({
@@ -53,7 +55,6 @@ const ready = async () => {
 const checkbox = (name: string) => screen.getByRole<HTMLInputElement>('checkbox', { name });
 const fetchParts = () =>
   vi.fn(async (url: string) => {
-    if (url === roadsUrl) return roadResponse();
     const part = url.split('/').at(-1)?.replace('.json', '');
     return Response.json([{ ...parcel, code: `${part?.toUpperCase()}-M1`, aliases: [], part }]);
   });
@@ -73,7 +74,7 @@ describe('PlaceMap initial layers from URL', () => {
       window.history.replaceState({ source: 'layers' }, '', `/map/${query}#map`);
       render(PlaceMap, { props: { places: [place, infrastructure] } });
       await ready();
-      await waitFor(() => expect(areaFeatures).toHaveLength(5));
+      await waitFor(() => expect(areaFeatures).toHaveLength(4));
       expect(
         ['Участки', 'Форест', 'Вилладж', 'Парк', 'Ривер', 'Инфраструктура'].every(
           (name) => checkbox(name).checked
@@ -85,7 +86,6 @@ describe('PlaceMap initial layers from URL', () => {
           "/map/data/parcels/shp.json",
           "/map/data/parcels/shr.json",
           "/map/data/parcels/shv.json",
-          "/map/data/roads.json",
         ]
       `);
       expect(clustererProps[0]?.features.map(({ id }) => id)).toEqual([
@@ -114,37 +114,43 @@ describe('PlaceMap initial layers from URL', () => {
     }
   );
 
-  it('applies infrastructure after the public places arrive without a focus request', async () => {
+  it('applies an initially requested layer after the base arrives without moving the camera', async () => {
     const pending = Promise.withResolvers<Response>();
     const fetch = vi.fn((url: string) =>
-      url === roadsUrl ? Promise.resolve(roadResponse()) : pending.promise
+      url === infrastructureLayerUrl
+        ? Promise.resolve(
+            Response.json({
+              places: [{ ...publicPlace, slug: infrastructure.slug, mapLayer: 'infra' }],
+              roads
+            })
+          )
+        : pending.promise
     );
     vi.stubGlobal('fetch', fetch);
     window.history.replaceState({}, '', '/map/?l=infra');
     render(PlaceMap, {
-      props: { dataUrl: '/map/data/places.json', initialBounds: getPlaceBounds([place]) }
+      props: { dataUrl: baseLayerUrl, initialBounds: getPlaceBounds([place]) }
     });
     await waitFor(() => expect(mapProps).toHaveLength(1));
     pending.resolve(
       Response.json({
-        places: [publicPlace, { ...publicPlace, slug: infrastructure.slug, mapLayer: 'infra' }]
+        places: [publicPlace],
+        placeLayers: { [infrastructure.slug]: 'infra' }
       })
     );
     await ready();
     expect(checkbox('Инфраструктура').checked).toBe(true);
-    expect(clustererProps[0]?.features.map(({ id }) => id)).toEqual([
-      place.slug,
-      infrastructure.slug
-    ]);
-    expect(fetch.mock.calls.map(([url]) => url)).toEqual(['/map/data/places.json', roadsUrl]);
+    await screen.findByRole('link', { name: '© OpenStreetMap' });
+    expect(
+      clustererUpdates.mock.lastCall?.[0].features.map(({ id }: { readonly id: string }) => id)
+    ).toEqual([place.slug, infrastructure.slug]);
+    expect(fetch.mock.calls.map(([url]) => url)).toEqual([baseLayerUrl, infrastructureLayerUrl]);
     expect(map.update).not.toHaveBeenCalled();
   });
 
   it('combines extra layers with an alias p, suppresses h and preserves URL bytes on selection changes', async () => {
     const fetch = vi.fn(async (url: string) =>
-      url === roadsUrl
-        ? roadResponse()
-        : Response.json(url.endsWith('shf.json') ? [forest] : [parcel])
+      Response.json(url.endsWith('shf.json') ? [forest] : [parcel])
     );
     vi.stubGlobal('fetch', fetch);
     const state = { source: 'parcel' };
@@ -160,7 +166,6 @@ describe('PlaceMap initial layers from URL', () => {
       [
         "/map/data/parcels/shf.json",
         "/map/data/parcels/shr.json",
-        "/map/data/roads.json",
       ]
     `);
     expect(

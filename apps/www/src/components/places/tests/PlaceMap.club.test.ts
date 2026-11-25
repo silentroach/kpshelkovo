@@ -10,6 +10,9 @@ import PlaceMap from '../PlaceMap.svelte';
 import {
   clustererProps,
   clustererUpdates,
+  baseLayerUrl,
+  clubLayerUrl,
+  infrastructureLayerUrl,
   map,
   mapProps,
   mapElements,
@@ -19,9 +22,9 @@ import {
   place,
   parcel,
   pondsPlace,
+  publicPlace,
   registerPlaceMapSetup,
-  roadResponse,
-  roadsUrl
+  roads
 } from './support';
 
 const layerOptions = vi.hoisted(() => ({ club: { fit: true as boolean | undefined } }));
@@ -50,6 +53,18 @@ const definition = {
   parcels: [],
   outline: false
 };
+const clubDto = {
+  ...publicPlace,
+  slug: club.slug,
+  mapLayer: 'club',
+  coordinates: club.coordinates
+};
+const clubBase = () =>
+  Response.json({
+    places: [{ ...publicPlace, opening_hours: undefined }],
+    placeLayers: { [club.slug]: 'club', [infrastructure.slug]: 'infra' }
+  });
+const clubResponse = () => Response.json({ places: [clubDto] });
 const ready = async () => {
   await waitFor(() => expect(map.addChild).toHaveBeenCalledWith(nativeControl));
   await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
@@ -222,10 +237,7 @@ describe('club place layer', () => {
   it.each(['club', 'club,infra'])(
     'opens l=%s without fetching parcels or moving the initial camera',
     async (layers) => {
-      const fetch = vi.fn(async (url: string) => {
-        if (url !== roadsUrl) throw new Error(`Unexpected map request: ${url}`);
-        return roadResponse();
-      });
+      const fetch = vi.fn();
       vi.stubGlobal('fetch', fetch);
       window.history.replaceState({}, '', `/map/?l=${layers}`);
       render(PlaceMap, { props: { places: [place, club, infrastructure] } });
@@ -235,11 +247,155 @@ describe('club place layer', () => {
           ? [place.slug, club.slug, infrastructure.slug]
           : [place.slug, club.slug]
       );
-      expect(fetch.mock.calls.map(([url]) => url)).toEqual(
-        layers.includes('infra') ? [roadsUrl] : []
-      );
+      expect(fetch).not.toHaveBeenCalled();
       expect(mapProps[0]?.location.bounds).toEqual(getPlaceBounds([place]));
       expect(map.update.mock.calls.some(([update]) => update.location)).toBe(false);
+    }
+  );
+
+  it.each(['manual', 'highlight'])(
+    'keeps a late club layer hidden after disabling a %s request, then reuses it',
+    async (cause) => {
+      if (cause === 'highlight') window.history.replaceState({}, '', `/map/?h=${club.slug}`);
+      const pending = Promise.withResolvers<Response>();
+      const fetch = vi.fn((url: string) =>
+        url === baseLayerUrl ? Promise.resolve(clubBase()) : pending.promise
+      );
+      vi.stubGlobal('fetch', fetch);
+      const interval = vi.spyOn(window, 'setInterval');
+      render(PlaceMap, { props: { dataUrl: baseLayerUrl } });
+      const checkbox = await ready();
+      if (cause === 'manual') {
+        expect(fetch).toHaveBeenCalledExactlyOnceWith(baseLayerUrl);
+        await fireEvent.click(checkbox);
+      }
+      expect(checkbox.checked).toBe(true);
+      expect(fetch.mock.calls.map(([url]) => url)).toEqual([baseLayerUrl, clubLayerUrl]);
+      await fireEvent.click(checkbox);
+      const response = clubResponse();
+      const json = vi.spyOn(response, 'json');
+      pending.resolve(response);
+      await waitFor(() => expect(json).toHaveBeenCalledOnce());
+      expect(clusterIds()).toEqual([place.slug]);
+      expect(map.update).not.toHaveBeenCalled();
+      expect(window.location.search).toBe('');
+      await fireEvent.click(checkbox);
+      await waitFor(() => expect(clusterIds()).toEqual([place.slug, club.slug]));
+      expect(fetch).toHaveBeenCalledTimes(2);
+      expect(interval).toHaveBeenCalledWith(expect.any(Function), 60_000);
+      expect(map.update.mock.calls.map(([update]) => update.location)).toEqual([
+        { bounds: getPlaceBounds([place, club]), duration: 0 }
+      ]);
+    }
+  );
+
+  it.each(['h=unknown', `p=unknown&h=${club.slug}`])(
+    'does not request a layer for %s',
+    async (query) => {
+      window.history.replaceState({}, '', `/map/?${query}`);
+      const fetch = vi.fn(async () => clubBase());
+      vi.stubGlobal('fetch', fetch);
+      render(PlaceMap, { props: { dataUrl: baseLayerUrl } });
+      expect((await ready()).checked).toBe(false);
+      expect(fetch).toHaveBeenCalledExactlyOnceWith(baseLayerUrl);
+      expect(map.update).not.toHaveBeenCalled();
+    }
+  );
+
+  it('retries a failed l=club request without applying its initial camera fit', async () => {
+    const fetch = vi.fn(async (url: string) =>
+      url === baseLayerUrl ? clubBase() : new Response('', { status: 503 })
+    );
+    vi.stubGlobal('fetch', fetch);
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    window.history.replaceState({}, '', '/map/?l=club');
+    render(PlaceMap, { props: { dataUrl: baseLayerUrl, initialBounds: getPlaceBounds([place]) } });
+    const checkbox = await ready();
+    await waitFor(() => expect(checkbox.checked).toBe(false));
+    expect(map.update).not.toHaveBeenCalled();
+    fetch.mockImplementationOnce(async () => clubResponse());
+    await fireEvent.click(checkbox);
+    await waitFor(() => expect(clusterIds()).toEqual([place.slug, club.slug]));
+    expect(fetch.mock.calls.map(([url]) => url)).toEqual([
+      baseLayerUrl,
+      clubLayerUrl,
+      clubLayerUrl
+    ]);
+    expect(map.update.mock.lastCall?.[0].location.bounds).toEqual(getPlaceBounds([place, club]));
+  });
+
+  it.each(['fit', 'highlight', 'disable'])(
+    'deduplicates a layer shared by l and set and honors camera intent: %s',
+    async (intent) => {
+      const pending = Promise.withResolvers<Response>();
+      const fetch = vi.fn(async (url: string) => {
+        if (url === baseLayerUrl) return clubBase();
+        if (url === clubLayerUrl) return pending.promise;
+        if (url === infrastructureLayerUrl)
+          return Response.json({
+            places: [{ ...publicPlace, slug: infrastructure.slug, mapLayer: 'infra' }],
+            roads
+          });
+        if (url === '/map/data/selection-sets/mixed.json') return Response.json(definition);
+        throw new Error('Unexpected map request');
+      });
+      vi.stubGlobal('fetch', fetch);
+      window.history.replaceState(
+        {},
+        '',
+        `/map/?l=club&set=mixed${intent === 'highlight' ? `&h=${club.slug}` : ''}`
+      );
+      render(PlaceMap, {
+        props: { dataUrl: baseLayerUrl, initialBounds: getPlaceBounds([place]) }
+      });
+      const checkbox = await ready();
+      expect(checkbox.checked).toBe(true);
+      await screen.findByRole('link', { name: '© OpenStreetMap' });
+      expect(map.update).not.toHaveBeenCalled();
+      const response = clubResponse();
+      const json = vi.spyOn(response, 'json');
+      if (intent === 'disable') await fireEvent.click(checkbox);
+      pending.resolve(response);
+      if (intent === 'disable') {
+        await waitFor(() => expect(json).toHaveBeenCalledOnce());
+        expect(checkbox.checked).toBe(false);
+        expect(map.update).not.toHaveBeenCalled();
+        expect(markerElements.some((marker) => marker.getAttribute('href') === club.url)).toBe(
+          false
+        );
+        await fireEvent.click(checkbox);
+      }
+      await waitFor(() =>
+        expect(
+          markerElements.find((marker) => marker.getAttribute('href') === club.url)?.dataset
+            .selectionSet
+        ).toBe('true')
+      );
+      const cameraMoves = map.update.mock.calls.map(([update]) => update.location);
+      if (intent === 'disable') expect(cameraMoves).toHaveLength(0);
+      else if (intent === 'fit')
+        expect(cameraMoves).toEqual([
+          {
+            bounds: getSelectionSetBounds([], [{ ...club, geometry: undefined }, infrastructure]),
+            duration: 220,
+            easing: 'ease-in-out'
+          }
+        ]);
+      else
+        expect(cameraMoves).toEqual([
+          {
+            center: [club.coordinates.lng, club.coordinates.lat],
+            zoom: 16,
+            duration: 220,
+            easing: 'ease-in-out'
+          }
+        ]);
+      expect(fetch.mock.calls.map(([url]) => url)).toEqual([
+        baseLayerUrl,
+        clubLayerUrl,
+        '/map/data/selection-sets/mixed.json',
+        infrastructureLayerUrl
+      ]);
     }
   );
 

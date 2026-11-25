@@ -324,16 +324,17 @@ const installYandexMaps = (): void => {
   });
 };
 
-export const roadsUrl = '/map/data/roads.json';
-export const roadResponse = () =>
-  Response.json({
-    lines: [
-      [
-        [37.74, 55.06],
-        [37.75, 55.07]
-      ]
+export const baseLayerUrl = '/map/data/layers/base.json';
+export const infrastructureLayerUrl = '/map/data/layers/infra.json';
+export const clubLayerUrl = '/map/data/layers/club.json';
+export const roads = {
+  lines: [
+    [
+      [37.74, 55.06],
+      [37.75, 55.07]
     ]
-  });
+  ]
+};
 
 export const registerPlaceMapSetup = (): void => {
   beforeEach(() => {
@@ -375,7 +376,6 @@ export const registerPlaceMapSetup = (): void => {
     vi.stubGlobal(
       'fetch',
       vi.fn(async (url: string) => {
-        if (url === roadsUrl) return roadResponse();
         throw new Error(`Unexpected map request: ${url}`);
       })
     );

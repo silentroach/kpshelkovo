@@ -20,7 +20,7 @@ export const toPublicOpeningHours = (value: PlaceOpeningHours): PlaceMapPublicOp
   }))
 });
 
-const toPublicPlace = (place: Place): PlaceMapPublicItemDto => ({
+export const toPublicPlace = (place: Place): PlaceMapPublicItemDto => ({
   slug: place.slug,
   mapLayer: place.mapLayer,
   name: place.name,

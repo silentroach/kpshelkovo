@@ -34,8 +34,6 @@ export const buildRoadMapPayload = (
   );
   const clip = createRoadClipper(boundary);
   return RoadMapPublicSchema.parse({
-    source: snapshot.source,
-    license: snapshot.license,
     lines: snapshot.ways
       .flatMap((way) => {
         const line = way.nodes.map((id) => {

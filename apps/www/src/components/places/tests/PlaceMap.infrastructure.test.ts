@@ -9,8 +9,10 @@ import { getPlaceBounds, getSelectionSetBounds } from '../place-map-geometry';
 import PlaceMap from '../PlaceMap.svelte';
 import {
   areaFeatures,
+  baseLayerUrl,
   clustererProps,
   clustererUpdates,
+  infrastructureLayerUrl,
   map,
   mapElements,
   mapProps,
@@ -21,8 +23,7 @@ import {
   pondsPlace,
   publicPlace,
   registerPlaceMapSetup,
-  roadResponse,
-  roadsUrl
+  roads
 } from './support';
 
 const infrastructure: PlaceMapItem = {
@@ -48,6 +49,16 @@ const definition: MapSelectionSetPublicDto = {
   outline: false
 };
 const setUrl = '/map/data/selection-sets/infrastructure.json';
+const publicInfrastructure = {
+  ...publicPlace,
+  slug: infrastructure.slug,
+  mapLayer: 'infra',
+  coordinates: infrastructure.coordinates
+};
+const baseResponse = () =>
+  Response.json({ places: [publicPlace], placeLayers: { [infrastructure.slug]: 'infra' } });
+const infrastructureResponse = (lines = roads.lines) =>
+  Response.json({ places: [publicInfrastructure], roads: { ...roads, lines } });
 const ready = async () => {
   await waitFor(() => expect(map.addChild).toHaveBeenCalledWith(nativeControl));
   await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
@@ -67,55 +78,88 @@ vi.mock(import('@/lib/yandex-maps/runtime'), async (importOriginal) => ({
 describe('PlaceMap infrastructure layer', () => {
   registerPlaceMapSetup();
 
-  it('loads roads only on request and attaches a passive feature with attribution', async () => {
-    const fetchRoads = vi.fn(async () => roadResponse());
-    vi.stubGlobal('fetch', fetchRoads);
-    render(PlaceMap, { props: { places: [place, infrastructure] } });
+  it('loads infrastructure as one layer with passive roads and preserves parcel selection', async () => {
+    const fetch = vi.fn(async (url: string) => {
+      if (url === baseLayerUrl) return baseResponse();
+      if (url === infrastructureLayerUrl) return infrastructureResponse();
+      if (url === '/map/data/parcels/shr.json') return Response.json([parcel]);
+      throw new Error('Unexpected map request');
+    });
+    vi.stubGlobal('fetch', fetch);
+    render(PlaceMap, { props: { dataUrl: baseLayerUrl } });
     const checkbox = await ready();
-    expect(fetchRoads).not.toHaveBeenCalled();
+    expect(fetch).toHaveBeenCalledExactlyOnceWith(baseLayerUrl);
     await fireEvent.click(checkbox);
-    await screen.findByRole('link', { name: '© OpenStreetMap contributors' });
-    expect(fetchRoads).toHaveBeenCalledExactlyOnceWith(roadsUrl);
+    const credit = await screen.findByRole('link', { name: '© OpenStreetMap' });
+    expect(credit.getAttribute('href')).toBe('https://www.openstreetmap.org/copyright');
+    expect(fetch.mock.calls.map(([url]) => url)).toEqual([baseLayerUrl, infrastructureLayerUrl]);
+    expect(clusterIds()).toEqual([place.slug, infrastructure.slug]);
     const roadFeature = areaFeatures.find(({ props }) => props.geometry.type === 'MultiLineString');
     expect(roadFeature?.props.onClick).toBeUndefined();
     expect(roadFeature?.props.style?.interactive).toBe(false);
     expect(map.addChild).toHaveBeenCalledWith(roadFeature);
+    await fireEvent.click(screen.getByRole('checkbox', { name: 'Ривер' }));
+    const parcelFeature = await waitFor(() => {
+      const feature = areaFeatures.find(({ props }) => props.id === `parcel-${parcel.code}`);
+      expect(feature).toBeDefined();
+      return feature;
+    });
+    parcelFeature?.props.onClick?.({} as never, {} as never);
+    expect(window.location.search).toContain(`p=${parcel.code}`);
     await fireEvent.click(checkbox);
     expect(map.removeChild).toHaveBeenCalledWith(roadFeature);
-    expect(screen.queryByRole('link', { name: '© OpenStreetMap contributors' })).toBeNull();
+    expect(screen.queryByRole('link', { name: '© OpenStreetMap' })).toBeNull();
   });
 
   it('does not show late roads when infrastructure has been switched off', async () => {
     window.history.replaceState({}, '', '/map/?l=infra');
     const response = Promise.withResolvers<Response>();
-    const fetchRoads = vi.fn(() => response.promise);
-    vi.stubGlobal('fetch', fetchRoads);
-    render(PlaceMap, { props: { places: [place, infrastructure] } });
+    const fetch = vi.fn((url: string) =>
+      url === baseLayerUrl ? Promise.resolve(baseResponse()) : response.promise
+    );
+    vi.stubGlobal('fetch', fetch);
+    render(PlaceMap, { props: { dataUrl: baseLayerUrl } });
     const checkbox = await ready();
-    expect(fetchRoads).toHaveBeenCalledExactlyOnceWith(roadsUrl);
+    expect(fetch.mock.calls.map(([url]) => url)).toEqual([baseLayerUrl, infrastructureLayerUrl]);
     await fireEvent.click(checkbox);
-    response.resolve(roadResponse());
+    const late = infrastructureResponse();
+    const json = vi.spyOn(late, 'json');
+    response.resolve(late);
+    await waitFor(() => expect(json).toHaveBeenCalledOnce());
+    expect(clusterIds()).toEqual([place.slug]);
+    expect(screen.queryByRole('link', { name: '© OpenStreetMap' })).toBeNull();
+    expect(map.update).not.toHaveBeenCalled();
     await fireEvent.click(checkbox);
-    await screen.findByRole('link', { name: '© OpenStreetMap contributors' });
+    await screen.findByRole('link', { name: '© OpenStreetMap' });
     expect(
       areaFeatures.filter(({ props }) => props.geometry.type === 'MultiLineString')
     ).toHaveLength(1);
-    expect(fetchRoads).toHaveBeenCalledTimes(1);
+    expect(fetch).toHaveBeenCalledTimes(2);
   });
 
-  it('keeps the infrastructure places available when the roads file fails', async () => {
-    window.history.replaceState({}, '', '/map/?l=infra');
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(async () => new Response('', { status: 503 }))
-    );
+  it('retries a failed infrastructure layer without resetting loaded club places', async () => {
+    window.history.replaceState({}, '', '/map/?l=club,infra');
+    const loadInfrastructure = vi
+      .fn()
+      .mockResolvedValueOnce(new Response('', { status: 503 }))
+      .mockImplementationOnce(() => Promise.resolve(infrastructureResponse([])));
+    vi.stubGlobal('fetch', async (url: string) => {
+      if (url === baseLayerUrl) return baseResponse();
+      if (url === infrastructureLayerUrl) return loadInfrastructure();
+      return Response.json({ places: [{ ...publicPlace, slug: 'club', mapLayer: 'club' }] });
+    });
     const log = vi.spyOn(console, 'error').mockImplementation(() => {});
-    render(PlaceMap, { props: { places: [place, infrastructure] } });
+    render(PlaceMap, { props: { dataUrl: baseLayerUrl } });
     const checkbox = await ready();
-    await waitFor(() => expect(log).toHaveBeenCalledWith('Road layer error:', expect.any(Error)));
-    expect(checkbox).toHaveProperty('checked', true);
-    expect(clustererProps[0]?.features.map(({ id }) => id)).toContain(infrastructure.slug);
-    expect(screen.queryByRole('link', { name: '© OpenStreetMap contributors' })).toBeNull();
+    await waitFor(() =>
+      expect(log).toHaveBeenCalledWith('Place layer error:', 'infra', expect.any(Error))
+    );
+    expect(checkbox).toHaveProperty('checked', false);
+    expect(clusterIds()).toEqual([place.slug, 'club']);
+    await fireEvent.click(checkbox);
+    await waitFor(() => expect(clusterIds()).toEqual([place.slug, 'club', infrastructure.slug]));
+    expect(loadInfrastructure).toHaveBeenCalledTimes(2);
+    expect(screen.queryByRole('link', { name: '© OpenStreetMap' })).toBeNull();
   });
 
   it('starts hidden and toggles the scene independently without moving the camera', async () => {
@@ -224,61 +268,33 @@ describe('PlaceMap infrastructure layer', () => {
     );
   });
 
-  it('maps the layer from the public payload', async () => {
-    vi.stubGlobal(
-      'fetch',
-      vi.fn(async (url: string) =>
-        url === roadsUrl
-          ? roadResponse()
-          : Response.json({
-              places: [publicPlace, { ...publicPlace, slug: 'ktp-16', mapLayer: 'infra' }]
-            })
-      )
-    );
-    render(PlaceMap, { props: { dataUrl: '/map/data/places.json' } });
-    const checkbox = await ready();
-    expect(clustererProps[0]?.features.map(({ id }) => id)).toEqual([place.slug]);
-    await fireEvent.click(checkbox);
-    expect(clusterIds()).toEqual([place.slug, 'ktp-16']);
-  });
-
-  it('waits for delayed public places before enabling and focusing the requested infrastructure', async () => {
+  it('waits for the base index, then opens and focuses only the requested infrastructure layer', async () => {
     const pending = Promise.withResolvers<Response>();
-    vi.stubGlobal(
-      'fetch',
-      vi.fn((url: string) => (url === roadsUrl ? Promise.resolve(roadResponse()) : pending.promise))
+    const fetch = vi.fn((url: string) =>
+      url === infrastructureLayerUrl ? Promise.resolve(infrastructureResponse()) : pending.promise
     );
+    vi.stubGlobal('fetch', fetch);
     window.history.replaceState({}, '', '/map/?h=ktp-16');
-    render(PlaceMap, { props: { dataUrl: '/map/data/places.json' } });
+    render(PlaceMap, { props: { dataUrl: baseLayerUrl } });
     await waitFor(() => expect(window.ymaps3?.YMap).toHaveBeenCalled());
     expect((screen.getByRole('button', { name: 'Слои' }) as HTMLButtonElement).disabled).toBe(true);
     expect(map.update.mock.calls.some(([update]) => update.location?.center)).toBe(false);
-    pending.resolve(
-      Response.json({
-        places: [
-          {
-            ...publicPlace,
-            slug: 'ktp-16',
-            mapLayer: 'infra',
-            coordinates: infrastructure.coordinates
-          }
-        ]
-      })
-    );
+    pending.resolve(baseResponse());
     const checkbox = await ready();
     expect((checkbox as HTMLInputElement).checked).toBe(true);
-    expect(map.update).toHaveBeenCalledWith({
-      location: { center: [37.744332, 55.067389], zoom: 16, duration: 220, easing: 'ease-in-out' }
-    });
+    await waitFor(() =>
+      expect(map.update).toHaveBeenCalledWith({
+        location: { center: [37.744332, 55.067389], zoom: 16, duration: 220, easing: 'ease-in-out' }
+      })
+    );
+    expect(fetch.mock.calls.map(([url]) => url)).toEqual([baseLayerUrl, infrastructureLayerUrl]);
   });
 
   it('enables the whole layer for a mixed set, frames only members and preserves manual visibility', async () => {
     vi.stubGlobal(
       'fetch',
       vi.fn(async (url: string) =>
-        url === roadsUrl
-          ? roadResponse()
-          : Response.json(url === setUrl ? { ...definition, parcels: [parcel.code] } : [parcel])
+        Response.json(url === setUrl ? { ...definition, parcels: [parcel.code] } : [parcel])
       )
     );
     window.history.replaceState({ source: 'set' }, '', '/map/?flag&set=infrastructure#map');
@@ -314,9 +330,7 @@ describe('PlaceMap infrastructure layer', () => {
       const pending = Promise.withResolvers<Response>();
       vi.stubGlobal(
         'fetch',
-        vi.fn((url: string) =>
-          url === roadsUrl ? Promise.resolve(roadResponse()) : pending.promise
-        )
+        vi.fn(() => pending.promise)
       );
       window.history.replaceState({}, '', '/map/?set=infrastructure');
       const view = render(PlaceMap, { props: { places: [place, infrastructure] } });
