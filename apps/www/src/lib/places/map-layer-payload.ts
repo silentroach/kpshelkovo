@@ -1,37 +1,35 @@
 import type { RoadMapPublicDto } from '@/lib/roads/map-public-schema';
 
-import type { PlaceMapBasePayloadDto, PlaceMapInfraPayloadDto } from './map-layer-dto';
-import { PlaceMapBasePayloadSchema, PlaceMapInfraPayloadSchema } from './map-layer-schema';
+import type { PlaceMapBasePayloadDto, PlaceMapLayerPayloadDto } from './map-layer-dto';
+import { PlaceMapBasePayloadSchema, PlaceMapLayerPayloadSchema } from './map-layer-schema';
 import { toPublicPlace } from './map-public';
-import type { PlaceMapPublicPayloadDto } from './map-public-dto';
-import { PlaceMapPublicPayloadSchema } from './map-public-schema';
 import { selectMapPlaces } from './map-selection';
+import type { PlaceMapLayer } from './schema';
 import type { Place } from './types';
 
 export const buildPlaceMapBasePayload = (places: readonly Place[]): PlaceMapBasePayloadDto => {
   const visible = selectMapPlaces(places);
+  const placeLayers: Record<PlaceMapLayer, string[]> = { infra: [], club: [] };
+  for (const { slug, mapLayer } of visible) {
+    if (mapLayer) {
+      placeLayers[mapLayer].push(slug);
+    }
+  }
+
   return PlaceMapBasePayloadSchema.parse({
     places: visible.filter(({ mapLayer }) => !mapLayer).map(toPublicPlace),
-    placeLayers: Object.fromEntries(
-      visible.flatMap(({ slug, mapLayer }) => (mapLayer ? [[slug, mapLayer] as const] : []))
-    )
+    placeLayers
   });
 };
 
-export const buildPlaceMapInfraPayload = (
+export const buildPlaceMapLayerPayload = (
   places: readonly Place[],
-  roads: RoadMapPublicDto
-): PlaceMapInfraPayloadDto =>
-  PlaceMapInfraPayloadSchema.parse({
+  layer: PlaceMapLayer,
+  roads?: Readonly<RoadMapPublicDto>
+): PlaceMapLayerPayloadDto =>
+  PlaceMapLayerPayloadSchema.parse({
     places: selectMapPlaces(places)
-      .filter(({ mapLayer }) => mapLayer === 'infra')
+      .filter(({ mapLayer }) => mapLayer === layer)
       .map(toPublicPlace),
     roads
-  });
-
-export const buildPlaceMapClubPayload = (places: readonly Place[]): PlaceMapPublicPayloadDto =>
-  PlaceMapPublicPayloadSchema.parse({
-    places: selectMapPlaces(places)
-      .filter(({ mapLayer }) => mapLayer === 'club')
-      .map(toPublicPlace)
   });

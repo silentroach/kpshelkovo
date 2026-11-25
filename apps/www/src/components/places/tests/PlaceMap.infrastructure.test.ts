@@ -56,7 +56,7 @@ const publicInfrastructure = {
   coordinates: infrastructure.coordinates
 };
 const baseResponse = () =>
-  Response.json({ places: [publicPlace], placeLayers: { [infrastructure.slug]: 'infra' } });
+  Response.json({ places: [publicPlace], placeLayers: { infra: [infrastructure.slug], club: [] } });
 const infrastructureResponse = (lines = roads.lines) =>
   Response.json({ places: [publicInfrastructure], roads: { ...roads, lines } });
 const ready = async () => {
@@ -90,7 +90,7 @@ describe('PlaceMap infrastructure layer', () => {
     const checkbox = await ready();
     expect(fetch).toHaveBeenCalledExactlyOnceWith(baseLayerUrl);
     await fireEvent.click(checkbox);
-    const credit = await screen.findByRole('link', { name: 'OpenStreetMap', exact: true });
+    const credit = await screen.findByRole('link', { name: /^OpenStreetMap$/ });
     expect(credit.getAttribute('href')).toBe('https://www.openstreetmap.org/copyright');
     expect(fetch.mock.calls.map(([url]) => url)).toEqual([baseLayerUrl, infrastructureLayerUrl]);
     expect(clusterIds()).toEqual([place.slug, infrastructure.slug]);

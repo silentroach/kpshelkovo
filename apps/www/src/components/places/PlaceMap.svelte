@@ -3,6 +3,7 @@
   import type { Feature } from '@yandex/ymaps3-clusterer';
   import { onMount, tick } from 'svelte';
   import type { Attachment } from 'svelte/attachments';
+  import { SvelteMap } from 'svelte/reactivity';
 
   import { createEditorialMapObjects } from '@/components/maps/editorial-map';
   import type { EditorialFeatureCollection } from '@/lib/geometry/editorial-types';
@@ -14,12 +15,9 @@
     PARCEL_QUERY_PARAM
   } from '@/lib/parcels/parcel-url';
   import { PARCEL_CODE, type ParcelPart } from '@/lib/parcels/schema';
-  import type { PlaceMapBasePayloadDto, PlaceMapInfraPayloadDto } from '@/lib/places/map-layer-dto';
+  import type { PlaceMapBasePayloadDto, PlaceMapLayerPayloadDto } from '@/lib/places/map-layer-dto';
   import { isPlaceLayerVisible, PLACE_MAP_LAYER_OPTIONS } from '@/lib/places/map-layers';
-  import type {
-    PlaceMapPublicItemDto,
-    PlaceMapPublicPayloadDto
-  } from '@/lib/places/map-public-dto';
+  import type { PlaceMapPublicItemDto } from '@/lib/places/map-public-dto';
   import type { PlaceMapItem, PlaceMapProps } from '@/lib/places/map-types';
   import { getPlaceClosingTime } from '@/lib/places/opening-hours';
   import { placeUrl } from '@/lib/places/routes';
@@ -149,17 +147,18 @@
   let error: string | undefined = $state(undefined);
   let selectedParts = $state<ParcelPart[]>([]);
   let enabledPlaceLayers = $state<readonly PlaceMapLayer[]>([]);
-  let roadsShown = $state(false);
-  let roadFeature: ymaps3.YMapFeature | undefined;
-  const syncRoads = (roads?: PlaceMapInfraPayloadDto['roads']): void => {
+  const roadFeatures = new SvelteMap<PlaceMapLayer, ymaps3.YMapFeature>();
+  let roadsShown = $derived(roadFeatures.size > 0);
+  const syncRoads = (layer: PlaceMapLayer, roads?: LoadedPlaceMapLayer['roads']): void => {
     if (!map) return;
+    const existing = roadFeatures.get(layer);
     if (!roads?.lines.length) {
-      if (roadFeature) map.removeChild(roadFeature);
-      roadFeature = undefined;
-      roadsShown = false;
-    } else if (!roadFeature) {
-      roadFeature = new window.ymaps3.YMapFeature({
-        id: 'shelkovo-osm-roads',
+      if (!existing) return;
+      map.removeChild(existing);
+      roadFeatures.delete(layer);
+    } else if (!existing) {
+      const feature = new window.ymaps3.YMapFeature({
+        id: `shelkovo-osm-roads-${layer}`,
         geometry: { type: 'MultiLineString', coordinates: roads.lines },
         style: {
           interactive: false,
@@ -167,8 +166,8 @@
           stroke: [{ width: 2, color: 'rgba(84, 58, 44, 0.6)' }]
         }
       });
-      map.addChild(roadFeature);
-      roadsShown = true;
+      map.addChild(feature);
+      roadFeatures.set(layer, feature);
     }
   };
   let togglePlaceLayer = $state<(layer: PlaceMapLayer, checked: boolean) => void>(() => {});
@@ -495,8 +494,8 @@
     markerEvents.abort();
     cancelClusterFocus();
     clearSetGeometry();
-    syncRoads();
     if (map) {
+      for (const feature of roadFeatures.values()) map.removeChild(feature);
       for (const slug of visibleGeometry) {
         for (const object of mapEditorialObjects.get(slug) ?? []) map.removeChild(object);
       }
@@ -507,6 +506,7 @@
 
     mapClusterer = undefined;
     mapListener = undefined;
+    roadFeatures.clear();
     mapEditorialObjects.clear();
     markerContents = [];
     setMarkers.clear();
@@ -550,7 +550,7 @@
     const disabledPlaceLayers = new Set<PlaceMapLayer>();
     const placeLayerLoads = new Map<PlaceMapLayer, PlaceMapLayerLoad>();
     const pendingLayerFits = new Set<PlaceMapLayer>();
-    let placeLayers: PlaceMapBasePayloadDto['placeLayers'] | undefined;
+    const placeLayersBySlug = new Map<string, PlaceMapLayer>();
     let preserveLayerCamera = false;
     const setPlaceLayer = (layer: PlaceMapLayer, enabled: boolean): void => {
       if (enabled === enabledPlaceLayers.includes(layer)) return;
@@ -558,10 +558,8 @@
         ? [...enabledPlaceLayers, layer]
         : enabledPlaceLayers.filter((candidate) => candidate !== layer);
     };
-    const getIndexedLayer = (slug: string): PlaceMapLayer | undefined => {
-      const layer = placeLayers?.[slug] ?? places.find((place) => place.slug === slug)?.mapLayer;
-      return PLACE_MAP_LAYERS.find((candidate) => candidate === layer);
-    };
+    const getIndexedLayer = (slug: string): PlaceMapLayer | undefined =>
+      placeLayersBySlug.get(slug) ?? places.find((place) => place.slug === slug)?.mapLayer;
     const readyParcelParts = new Set<ParcelPart>();
     const cancelSetFit = (): void => {
       pendingSetFit = false;
@@ -1219,7 +1217,7 @@
         registerPlaces(loaded.places);
       }
       syncSetPlaces();
-      if (layer === 'infra') syncRoads(loaded?.roads);
+      syncRoads(layer, loaded?.roads);
       if (layer === highlightLayer) resolvePlaceHighlight();
       if (pendingLayerFits.delete(layer)) fitVisiblePlaceLayer(layer);
       fitSelectionSet();
@@ -1239,14 +1237,11 @@
         try {
           const data = await fetchMapData(withBase(`/map/data/layers/${layer}.json`));
           if (destroyed || setupFailed) return;
-          const payload = data as PlaceMapPublicPayloadDto;
-          const roads = layer === 'infra' ? (data as PlaceMapInfraPayloadDto).roads : undefined;
-          if (layer === 'infra' && !Array.isArray(roads?.lines))
-            throw new Error('Invalid road map geometry');
+          const payload = data as PlaceMapLayerPayloadDto;
           const loaded: LoadedPlaceMapLayer = {
             status: 'loaded',
             places: payload.places.map(toPlaceMapItem),
-            roads
+            roads: payload.roads
           };
           placeLayerLoads.set(layer, loaded);
           applyPlaceLayer(layer, loaded);
@@ -1281,7 +1276,7 @@
       cancelClusterFocus();
       if (layer === highlightLayer) resolvePlaceHighlight();
       if (highlightedPlace?.mapLayer === layer) clearPlaceHighlight();
-      if (layer === 'infra') syncRoads();
+      syncRoads(layer);
       for (const [place, content] of markerContents) {
         if (isPlaceVisible(place)) continue;
         if (content === document.activeElement) mapContainer?.focus({ preventScroll: true });
@@ -1360,7 +1355,9 @@
 
         if (base) {
           places = base.places.map(toPlaceMapItem);
-          placeLayers = base.placeLayers;
+          for (const layer of PLACE_MAP_LAYERS) {
+            for (const slug of base.placeLayers?.[layer] ?? []) placeLayersBySlug.set(slug, layer);
+          }
         }
         highlightLayer = pendingHighlight ? getIndexedLayer(pendingHighlight) : undefined;
         if (highlightLayer) setPlaceLayer(highlightLayer, true);

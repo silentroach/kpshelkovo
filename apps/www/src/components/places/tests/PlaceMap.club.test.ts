@@ -62,7 +62,7 @@ const clubDto = {
 const clubBase = () =>
   Response.json({
     places: [{ ...publicPlace, opening_hours: undefined }],
-    placeLayers: { [club.slug]: 'club', [infrastructure.slug]: 'infra' }
+    placeLayers: { club: [club.slug], infra: [infrastructure.slug] }
   });
 const clubResponse = () => Response.json({ places: [clubDto] });
 const ready = async () => {
@@ -85,6 +85,67 @@ describe('club place layer', () => {
   registerPlaceMapSetup();
   beforeEach(() => {
     layerOptions.club.fit = true;
+  });
+
+  it('draws roads from both layers independently with one attribution and no camera change', async () => {
+    const clubRoads = {
+      lines: [
+        [
+          [37.745, 55.029],
+          [37.746, 55.03]
+        ]
+      ]
+    };
+    const fetch = vi.fn(async (url: string) => {
+      if (url === baseLayerUrl) return clubBase();
+      if (url === clubLayerUrl) return Response.json({ places: [clubDto], roads: clubRoads });
+      if (url === infrastructureLayerUrl)
+        return Response.json({
+          places: [{ ...publicPlace, slug: infrastructure.slug, mapLayer: 'infra' }],
+          roads
+        });
+      throw new Error('Unexpected map request');
+    });
+    vi.stubGlobal('fetch', fetch);
+    window.history.replaceState({}, '', '/map/?l=club,infra');
+    const view = render(PlaceMap, { props: { dataUrl: baseLayerUrl } });
+    const clubCheckbox = await ready();
+    const infraCheckbox = screen.getByRole('checkbox', { name: 'Инфраструктура' });
+    await waitFor(() => expect(areaFeatures).toHaveLength(2));
+    const roadFeature = (startLng: number) => {
+      const feature = areaFeatures.find(
+        ({ props: { geometry } }) =>
+          geometry.type === 'MultiLineString' && geometry.coordinates[0]?.[0]?.[0] === startLng
+      );
+      if (!feature) throw new Error(`Missing road feature starting at longitude ${startLng}`);
+      return feature;
+    };
+    const clubRoadFeature = roadFeature(37.745);
+    const infraRoadFeature = roadFeature(37.74);
+    expect(clubRoadFeature.props.geometry).toEqual({
+      type: 'MultiLineString',
+      coordinates: clubRoads.lines
+    });
+    expect(clubRoadFeature.props.style).toEqual(infraRoadFeature.props.style);
+    expect(map.addChild).toHaveBeenCalledWith(clubRoadFeature);
+    expect(map.addChild).toHaveBeenCalledWith(infraRoadFeature);
+    const attribution = () => screen.queryAllByRole('link', { name: 'OpenStreetMap' });
+    expect(attribution()).toHaveLength(1);
+    await fireEvent.click(clubCheckbox);
+    expect(map.removeChild).toHaveBeenCalledWith(clubRoadFeature);
+    expect(map.removeChild).not.toHaveBeenCalledWith(infraRoadFeature);
+    expect(attribution()).toHaveLength(1);
+    await fireEvent.click(infraCheckbox);
+    expect(map.removeChild).toHaveBeenCalledWith(infraRoadFeature);
+    expect(attribution()).toHaveLength(0);
+    expect(map.update).not.toHaveBeenCalled();
+    await fireEvent.click(clubCheckbox);
+    expect(attribution()).toHaveLength(1);
+    expect(fetch).toHaveBeenCalledTimes(3);
+    const restoredRoad = areaFeatures.at(-1);
+    expect(map.addChild).toHaveBeenCalledWith(restoredRoad);
+    view.unmount();
+    expect(map.removeChild).toHaveBeenCalledWith(restoredRoad);
   });
 
   it('fits visible places on club enable and preserves the camera for other toggles', async () => {

@@ -70,7 +70,7 @@ static/PlaceMap.XXXXXXXX.js:
   apps/www/src/components/places/place-marker-badge.css:
     rendered: 0
   apps/www/src/components/places/PlaceMap.svelte:
-    rendered: 64315
+    rendered: 64417
   apps/www/src/components/places/PlaceMap.svelte?svelte&type=style&lang.css:
     rendered: 0
   apps/www/src/lib/parcels/parcel-url.ts:
@@ -187,7 +187,7 @@ static/client.XXXXXXXX.js:
   node_modules/.pnpm/svelte@5.57.3/node_modules/svelte/src/internal/client/dev/ownership.js:
     rendered: 0
   node_modules/.pnpm/svelte@5.57.3/node_modules/svelte/src/internal/client/dev/tracing.js:
-    rendered: 319
+    rendered: 554
   node_modules/.pnpm/svelte@5.57.3/node_modules/svelte/src/internal/client/dom/blocks/async.js:
     rendered: 0
   node_modules/.pnpm/svelte@5.57.3/node_modules/svelte/src/internal/client/dom/blocks/await.js:
@@ -401,12 +401,20 @@ static/explorer-component.XXXXXXXX.js:
     rendered: 1099
   node_modules/.pnpm/@turf+invariant@7.4.0/node_modules/@turf/invariant/dist/esm/index.js:
     rendered: 600
+  packages/format/src/currency.ts:
+    rendered: 282
+  packages/geo/src/distance.ts:
+    rendered: 169
+static/format-date.XXXXXXXX.js:
+  packages/format/src/format-date.ts:
+    rendered: 715
+static/index-client.XXXXXXXX.js:
   node_modules/.pnpm/svelte@5.57.3/node_modules/svelte/src/reactivity/date.js:
     rendered: 0
   node_modules/.pnpm/svelte@5.57.3/node_modules/svelte/src/reactivity/index-client.js:
     rendered: 0
   node_modules/.pnpm/svelte@5.57.3/node_modules/svelte/src/reactivity/map.js:
-    rendered: 0
+    rendered: 3305
   node_modules/.pnpm/svelte@5.57.3/node_modules/svelte/src/reactivity/media-query.js:
     rendered: 606
   node_modules/.pnpm/svelte@5.57.3/node_modules/svelte/src/reactivity/reactive-value.js:
@@ -417,13 +425,8 @@ static/explorer-component.XXXXXXXX.js:
     rendered: 0
   node_modules/.pnpm/svelte@5.57.3/node_modules/svelte/src/reactivity/url.js:
     rendered: 0
-  packages/format/src/currency.ts:
-    rendered: 282
-  packages/geo/src/distance.ts:
-    rendered: 169
-static/format-date.XXXXXXXX.js:
-  packages/format/src/format-date.ts:
-    rendered: 715
+  packages/url/src/index.ts:
+    rendered: 359
 static/index.astro_astro_type_script_index_0_lang.XXXXXXXX.js:
   apps/www/src/compare/client/explorer.ts:
     rendered: 3169
@@ -526,9 +529,6 @@ static/schema.XXXXXXXX.js:
     rendered: 140
   packages/format/src/plural.ts:
     rendered: 410
-static/src.XXXXXXXX.js:
-  packages/url/src/index.ts:
-    rendered: 359
 static/timeline.dom.XXXXXXXX.js:
   apps/www/src/lib/status/timeline.dom.ts:
     rendered: 5825

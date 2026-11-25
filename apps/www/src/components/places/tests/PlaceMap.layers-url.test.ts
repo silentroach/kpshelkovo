@@ -135,7 +135,7 @@ describe('PlaceMap initial layers from URL', () => {
     pending.resolve(
       Response.json({
         places: [publicPlace],
-        placeLayers: { [infrastructure.slug]: 'infra' }
+        placeLayers: { infra: [infrastructure.slug], club: [] }
       })
     );
     await ready();

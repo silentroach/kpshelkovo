@@ -4,9 +4,9 @@ import type { PlaceMapPublicPayloadDto } from './map-public-dto';
 import type { PlaceMapLayer } from './schema';
 
 export interface PlaceMapBasePayloadDto extends PlaceMapPublicPayloadDto {
-  readonly placeLayers: Readonly<Partial<Record<string, PlaceMapLayer>>>;
+  readonly placeLayers: Readonly<Partial<Record<PlaceMapLayer, readonly string[]>>>;
 }
 
-export interface PlaceMapInfraPayloadDto extends PlaceMapPublicPayloadDto {
-  readonly roads: Readonly<RoadMapPublicDto>;
+export interface PlaceMapLayerPayloadDto extends PlaceMapPublicPayloadDto {
+  readonly roads?: Readonly<RoadMapPublicDto>;
 }

@@ -10,9 +10,8 @@ import { GET as getClub } from '@/pages/map/data/layers/club.json';
 import { GET as getInfra } from '@/pages/map/data/layers/infra.json';
 
 import { loadPlaces } from '../load';
-import { PlaceMapBasePayloadSchema, PlaceMapInfraPayloadSchema } from '../map-layer-schema';
+import { PlaceMapBasePayloadSchema, PlaceMapLayerPayloadSchema } from '../map-layer-schema';
 import { buildPlaceMapPublicPayload } from '../map-public';
-import { PlaceMapPublicPayloadSchema } from '../map-public-schema';
 import { testPlace } from './place.test-helper';
 
 vi.mock('../load', () => ({ loadPlaces: vi.fn() }));
@@ -42,8 +41,8 @@ describe('place map layer routes', () => {
 
     const [base, infra, club] = await Promise.all([
       getBase().then(async (response) => PlaceMapBasePayloadSchema.parse(await response.json())),
-      getInfra().then(async (response) => PlaceMapInfraPayloadSchema.parse(await response.json())),
-      getClub().then(async (response) => PlaceMapPublicPayloadSchema.parse(await response.json()))
+      getInfra().then(async (response) => PlaceMapLayerPayloadSchema.parse(await response.json())),
+      getClub().then(async (response) => PlaceMapLayerPayloadSchema.parse(await response.json()))
     ]);
     const { places: publicPlaces } = buildPlaceMapPublicPayload(places);
 
@@ -56,8 +55,12 @@ describe('place map layer routes', () => {
     `);
     expect(base.placeLayers).toMatchInlineSnapshot(`
       {
-        "court": "club",
-        "gate": "infra",
+        "club": [
+          "court",
+        ],
+        "infra": [
+          "gate",
+        ],
       }
     `);
     expect(base.places).toEqual(publicPlaces.filter(({ mapLayer }) => !mapLayer));
@@ -66,6 +69,7 @@ describe('place map layer routes', () => {
     expect(infra.roads).toEqual({
       lines: buildRoadMapPayload(mapRoadSnapshot(osm), shelkovoBoundary).lines
     });
+    expect(club).not.toHaveProperty('roads');
   });
 
   it('rejects invalid prepared coordinates before emitting an optional-layer file', async () => {
