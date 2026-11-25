@@ -28,10 +28,10 @@ export const toPublicPlace = (place: Place): PlaceMapPublicItemDto => ({
   status: place.status,
   availability: place.availability,
   status_label: place.status === 'existing' ? undefined : formatPlaceStatus(place.status),
-  coordinates: {
-    lat: normalizeCoordinate(place.coordinates.lat),
-    lng: normalizeCoordinate(place.coordinates.lng)
-  },
+  coordinates: [
+    normalizeCoordinate(place.coordinates.lng),
+    normalizeCoordinate(place.coordinates.lat)
+  ],
   geometry: place.geometry ? toPublicEditorialGeometry(place.geometry) : undefined,
   opening_hours: place.openingHours ? toPublicOpeningHours(place.openingHours) : undefined,
   html_url: place.canonical

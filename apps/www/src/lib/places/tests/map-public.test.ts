@@ -118,7 +118,35 @@ describe('place map public DTO', () => {
   it('validates the prepared payload before publishing it', () => {
     expect(() =>
       buildPlaceMapPublicPayload([{ ...place, coordinates: { lat: 91, lng: 0 } }])
-    ).toThrow();
+    ).toThrow(/coordinates/u);
+  });
+
+  it.each([
+    { case: 'legacy object', coordinates: { lng: 37.716242, lat: 55.060526 } },
+    { case: 'one element', coordinates: [37.716242] },
+    { case: 'three elements', coordinates: [37.716242, 55.060526, 0] },
+    { case: 'string longitude', coordinates: ['37.716242', 55.060526] },
+    { case: 'longitude over 180', coordinates: [181, 55.060526] },
+    { case: 'longitude under -180', coordinates: [-181, 55.060526] },
+    { case: 'latitude over 90', coordinates: [37.716242, 91] },
+    { case: 'latitude under -90', coordinates: [37.716242, -91] },
+    { case: 'infinite longitude', coordinates: [Infinity, 55.060526] },
+    { case: 'NaN latitude', coordinates: [37.716242, NaN] }
+  ])('rejects a published point with $case', ({ coordinates }) => {
+    const payload = buildPlaceMapPublicPayload([place]);
+    const result = PlaceMapPublicPayloadSchema.safeParse({
+      places: [{ ...payload.places[0], coordinates }]
+    });
+    expect(result.error?.issues[0]?.path.slice(0, 3)).toEqual(['places', 0, 'coordinates']);
+  });
+
+  it('accepts the inclusive longitude and latitude limits', () => {
+    const places = buildPlaceMapPublicPayload([
+      { ...place, coordinates: { lng: -180, lat: 90 } },
+      { ...place, coordinates: { lng: 180, lat: -90 } }
+    ]).places;
+    expect(places[0]?.coordinates).toEqual([-180, 90]);
+    expect(places[1]?.coordinates).toEqual([180, -90]);
   });
 
   it('limits the map point without changing the source', () => {
@@ -128,10 +156,10 @@ describe('place map public DTO', () => {
 
     expect({ publicPoint, source: coordinates }).toMatchInlineSnapshot(`
       {
-        "publicPoint": {
-          "lat": 55.06070312,
-          "lng": 37.74689499,
-        },
+        "publicPoint": [
+          37.74689499,
+          55.06070312,
+        ],
         "source": {
           "lat": 55.06070312345,
           "lng": 37.74689498765,
@@ -181,7 +209,7 @@ describe('place map public DTO', () => {
     expect(buildPlacesMarkdown([hidden])).toBe(buildPlacesMarkdown([]));
   });
 
-  it('frames the same visible domain points as JSON without hidden places or extra geometry', () => {
+  it('frames visible domain points without hidden places or extra geometry', () => {
     const hidden: Place = {
       ...place,
       slug: 'hidden',
@@ -192,7 +220,6 @@ describe('place map public DTO', () => {
     const places = [hidden, place, outside];
     const bounds = getPlaceBounds(selectMapPlaces(places));
 
-    expect(bounds).toEqual(getPlaceBounds(buildPlaceMapPublicPayload(places).places));
     expect(bounds).toEqual(getPlaceBounds([place, outside]));
     expect(getPlaceBounds(selectMapPlaces([hidden]))).toEqual(getPlaceBounds([]));
     expect(getPlaceBounds([place])).toEqual(getPlaceBounds([{ coordinates: place.coordinates }]));
@@ -203,10 +230,10 @@ describe('place map public DTO', () => {
     expect(item).toMatchInlineSnapshot(`
       {
         "availability": undefined,
-        "coordinates": {
-          "lat": 55.05717,
-          "lng": 37.744987,
-        },
+        "coordinates": [
+          37.744987,
+          55.05717,
+        ],
         "html_url": "https://kpshelkovo.online/map/hunting-ponds/",
         "mapLayer": undefined,
         "marker": "fish",

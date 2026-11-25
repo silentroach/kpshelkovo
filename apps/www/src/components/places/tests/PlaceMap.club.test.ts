@@ -3,6 +3,7 @@ import { tick } from 'svelte';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ParcelMapPublicSchema } from '@/lib/parcels/map-public-schema';
+import type { PlaceMapPublicItemDto } from '@/lib/places/map-public-dto';
 import type { PlaceMapItem } from '@/lib/places/map-types';
 
 import { getPlaceBounds, getSelectionSetBounds } from '../place-map-geometry';
@@ -53,11 +54,11 @@ const definition = {
   parcels: [],
   outline: false
 };
-const clubDto = {
+const clubDto: PlaceMapPublicItemDto = {
   ...publicPlace,
   slug: club.slug,
   mapLayer: 'club',
-  coordinates: club.coordinates
+  coordinates: [37.745748, 55.029404]
 };
 const clubBase = () =>
   Response.json({
@@ -461,23 +462,36 @@ describe('club place layer', () => {
   );
 
   it.each([false, true])(
-    'focuses a club place and keeps the layer on after highlight (reduced=%s)',
+    'focuses a lazy club place and keeps the layer on after highlight (reduced=%s)',
     async (reduced) => {
       vi.stubGlobal('matchMedia', () => ({ matches: reduced }));
+      const fetch = vi.fn(async (url: string) => {
+        if (url === baseLayerUrl) return clubBase();
+        if (url === clubLayerUrl) return clubResponse();
+        if (url === infrastructureLayerUrl)
+          return Response.json({
+            places: [{ ...publicPlace, slug: infrastructure.slug, mapLayer: 'infra' }]
+          });
+        throw new Error('Unexpected map request');
+      });
+      vi.stubGlobal('fetch', fetch);
       const timeout = vi.spyOn(window, 'setTimeout');
       const state = { from: 'club' };
       window.history.replaceState(state, '', '/map/?flag&l=infra&h=greenforest-squash-time#map');
-      render(PlaceMap, { props: { places: [place, club, infrastructure] } });
+      render(PlaceMap, { props: { dataUrl: baseLayerUrl } });
       const checkbox = await ready();
       expect(checkbox.checked).toBe(true);
-      expect(map.update).toHaveBeenCalledWith({
-        location: {
-          center: [37.745748, 55.029404],
-          zoom: 16,
-          duration: reduced ? 0 : 220,
-          easing: 'ease-in-out'
-        }
-      });
+      expect(fetch).toHaveBeenCalledWith(clubLayerUrl);
+      await waitFor(() =>
+        expect(map.update).toHaveBeenCalledWith({
+          location: {
+            center: [37.745748, 55.029404],
+            zoom: 16,
+            duration: reduced ? 0 : 220,
+            easing: 'ease-in-out'
+          }
+        })
+      );
       const index = timeout.mock.calls.findIndex(([, delay]) => delay === 5_000);
       const expire = timeout.mock.calls[index]?.[0];
       if (typeof expire !== 'function') throw new Error('Missing highlight timer');

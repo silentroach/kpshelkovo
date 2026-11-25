@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import type { MapSelectionSetPublicDto } from '@/lib/map-selection-sets/public-types';
 import { ParcelMapPublicSchema } from '@/lib/parcels/map-public-schema';
+import type { PlaceMapPublicItemDto } from '@/lib/places/map-public-dto';
 import type { PlaceMapItem } from '@/lib/places/map-types';
 
 import { getPlaceBounds, getSelectionSetBounds } from '../place-map-geometry';
@@ -49,11 +50,11 @@ const definition: MapSelectionSetPublicDto = {
   outline: false
 };
 const setUrl = '/map/data/selection-sets/infrastructure.json';
-const publicInfrastructure = {
+const publicInfrastructure: PlaceMapPublicItemDto = {
   ...publicPlace,
   slug: infrastructure.slug,
   mapLayer: 'infra',
-  coordinates: infrastructure.coordinates
+  coordinates: [37.744332, 55.067389]
 };
 const baseResponse = () =>
   Response.json({ places: [publicPlace], placeLayers: { infra: [infrastructure.slug], club: [] } });

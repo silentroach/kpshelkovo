@@ -75,7 +75,7 @@ export const publicPlace: PlaceMapPublicItemDto = {
   slug: 'burzhuyka',
   name: 'Буржуйка',
   status: 'existing',
-  coordinates: { lat: 55.060526, lng: 37.716242 },
+  coordinates: [37.716242, 55.060526],
   opening_hours: {
     description: 'С 10:00 до 22:00, вторник — выходной',
     periods: [

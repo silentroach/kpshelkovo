@@ -31,9 +31,20 @@ const geometry = parseEditorialGeometry(
 );
 
 describe('place map layer routes', () => {
-  it('partitions the unchanged place DTOs and indexes only visible optional-layer places', async () => {
-    const basePlace = testPlace({ slug: 'ordinary', showOnMap: true, geometry });
-    const infraPlace = testPlace({ slug: 'gate', showOnMap: true, mapLayer: 'infra', geometry });
+  it('partitions the same place DTOs as the public catalog and indexes visible optional-layer places', async () => {
+    const basePlace = testPlace({
+      slug: 'ordinary',
+      showOnMap: true,
+      coordinates: { lng: 37.74689498765, lat: 55.06070312345 },
+      geometry
+    });
+    const infraPlace = testPlace({
+      slug: 'gate',
+      showOnMap: true,
+      mapLayer: 'infra',
+      coordinates: { lng: 37.716242, lat: 55.060526 },
+      geometry
+    });
     const clubPlace = testPlace({ slug: 'court', showOnMap: true, mapLayer: 'club', geometry });
     const hidden = testPlace({ slug: 'hidden', showOnMap: false, mapLayer: 'infra', geometry });
     const places = [basePlace, infraPlace, hidden, clubPlace];
@@ -66,19 +77,28 @@ describe('place map layer routes', () => {
     expect(base.places).toEqual(publicPlaces.filter(({ mapLayer }) => !mapLayer));
     expect(infra.places).toEqual(publicPlaces.filter(({ mapLayer }) => mapLayer === 'infra'));
     expect(club.places).toEqual(publicPlaces.filter(({ mapLayer }) => mapLayer === 'club'));
+    expect(base.places[0]?.coordinates).toEqual([37.74689499, 55.06070312]);
+    expect(infra.places[0]?.coordinates).toEqual([37.716242, 55.060526]);
     expect(infra.roads).toEqual({
       lines: buildRoadMapPayload(mapRoadSnapshot(osm), shelkovoBoundary).lines
     });
     expect(club).not.toHaveProperty('roads');
   });
 
-  it('rejects invalid prepared coordinates before emitting an optional-layer file', async () => {
-    const place = {
-      ...testPlace({ showOnMap: true, mapLayer: 'club' }),
-      coordinates: { lat: 91, lng: 0 }
-    };
-    vi.mocked(loadPlaces).mockResolvedValue([place]);
+  it.each([
+    { lng: 181, lat: 0 },
+    { lng: 0, lat: 91 },
+    { lng: Infinity, lat: 0 }
+  ])(
+    'rejects invalid coordinates %j before emitting an optional-layer file',
+    async (coordinates) => {
+      const place = {
+        ...testPlace({ showOnMap: true, mapLayer: 'club' }),
+        coordinates
+      };
+      vi.mocked(loadPlaces).mockResolvedValue([place]);
 
-    await expect(getClub()).rejects.toThrow(/coordinates/u);
-  });
+      await expect(getClub()).rejects.toThrow(/coordinates/u);
+    }
+  );
 });

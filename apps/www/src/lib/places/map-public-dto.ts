@@ -22,10 +22,7 @@ export interface PlaceMapPublicItemDto {
   readonly availability?: 'closed';
   /** Display label for non-existing places, prepared alongside the map data. */
   readonly status_label?: string;
-  readonly coordinates: {
-    readonly lat: number;
-    readonly lng: number;
-  };
+  readonly coordinates: readonly [lng: number, lat: number];
   readonly geometry?: EditorialPublicGeometry;
   readonly opening_hours?: PlaceMapPublicOpeningHoursDto;
   readonly html_url: string;

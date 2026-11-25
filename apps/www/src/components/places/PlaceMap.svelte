@@ -87,7 +87,7 @@
     status: place.status,
     availability: place.availability,
     statusLabel: place.status_label,
-    coordinates: place.coordinates,
+    coordinates: { lng: place.coordinates[0], lat: place.coordinates[1] },
     geometry: place.geometry ? fromPublicEditorialGeometry(place.geometry) : undefined,
     openingHours: place.opening_hours
       ? {
