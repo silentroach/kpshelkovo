@@ -215,6 +215,7 @@ describe('PlaceMap', () => {
     await waitFor(() => expect(markerElements).toHaveLength(1));
 
     const marker = markerElements[0];
+    expect(markerLocations[0]?.coordinates).toEqual([37.716242, 55.060526]);
     expect({
       open: marker?.dataset.open,
       title: marker?.title,

@@ -75,7 +75,7 @@ export const publicPlace: PlaceMapPublicItemDto = {
   slug: 'burzhuyka',
   name: 'Буржуйка',
   status: 'existing',
-  coordinates: { lat: 55.060526, lng: 37.716242 },
+  coordinates: [37.716242, 55.060526],
   opening_hours: {
     description: 'С 10:00 до 22:00, вторник — выходной',
     periods: [
@@ -324,6 +324,18 @@ const installYandexMaps = (): void => {
   });
 };
 
+export const baseLayerUrl = '/map/data/layers/base.json';
+export const infrastructureLayerUrl = '/map/data/layers/infra.json';
+export const clubLayerUrl = '/map/data/layers/club.json';
+export const roads = {
+  lines: [
+    [
+      [37.74, 55.06],
+      [37.75, 55.07]
+    ]
+  ]
+};
+
 export const registerPlaceMapSetup = (): void => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -361,6 +373,12 @@ export const registerPlaceMapSetup = (): void => {
     document.documentElement.style.setProperty('--parcel-map-selection', parcelSelectionColor);
     document.documentElement.style.setProperty('--parcel-map-set', '#935632');
     window.history.replaceState({}, '', '/map/');
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string) => {
+        throw new Error(`Unexpected map request: ${url}`);
+      })
+    );
     installYandexMaps();
   });
 
