@@ -1,4 +1,4 @@
-import { createDisplayOffset } from '@shelkovo/geo';
+import { createDisplayOffset, createLineClipper } from '@shelkovo/geo';
 import { parse } from 'yaml';
 import { z } from 'zod';
 
@@ -9,7 +9,6 @@ import type {
   EditorialPosition
 } from '@/lib/geometry/editorial-types';
 
-import { createRoadClipper } from './clip-to-boundary';
 import { RoadMapPublicSchema, type RoadMapPublicDto } from './map-public-schema';
 import type { RoadSnapshot } from './types';
 
@@ -32,7 +31,7 @@ export const buildRoadMapPayload = (
   const positions = new Map<number, EditorialPosition>(
     snapshot.nodes.map(({ id, lon, lat }) => [id, [lon, lat]])
   );
-  const clip = createRoadClipper(boundary);
+  const clip = createLineClipper(boundary);
   return RoadMapPublicSchema.parse({
     lines: snapshot.ways
       .flatMap((way) => {

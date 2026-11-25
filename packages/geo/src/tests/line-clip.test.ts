@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
 
-import { createRoadClipper } from '../clip-to-boundary';
+import { createLineClipper } from '../index.ts';
 
 // U-shaped area: the gap (1 < x < 3 above y=1) is outside.
-const clip = createRoadClipper([
+const clip = createLineClipper([
   [
     [0, 0],
     [4, 0],
@@ -17,9 +17,9 @@ const clip = createRoadClipper([
   ]
 ]);
 
-describe('road display boundary', () => {
+describe('createLineClipper', () => {
   it('leaves the excluded interior of a closed ring empty', () => {
-    const courtyard = createRoadClipper([
+    const courtyard = createLineClipper([
       [
         [0, 0],
         [4, 0],

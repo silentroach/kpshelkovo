@@ -1,13 +1,10 @@
-import type {
-  EditorialPolygonCoordinates,
-  EditorialPosition as Position
-} from '@/lib/geometry/editorial-types';
+import type { PolygonCoordinates, PolygonPosition } from './types.ts';
 
 const cross = (x: number, y: number, u: number, v: number): number => x * v - y * u;
 const epsilon = 1e-12;
 
-/** Split each source segment at all boundary crossings, then classify the open intervals. */
-export const createRoadClipper = (polygon: EditorialPolygonCoordinates) => {
+/** Clip planar polylines to a polygon with closed rings, keeping boundary runs but not point touches. */
+export const createLineClipper = (polygon: PolygonCoordinates) => {
   const edges = polygon.flatMap((ring) =>
     ring.slice(1).flatMap(([x, y], i) => {
       const [ax, ay] = ring[i]!;
@@ -17,7 +14,7 @@ export const createRoadClipper = (polygon: EditorialPolygonCoordinates) => {
     })
   );
 
-  const inside = ([x, y]: Position): boolean => {
+  const inside = ([x, y]: PolygonPosition): boolean => {
     let odd = false;
     for (const edge of edges) {
       const u = x - edge.ax;
@@ -32,9 +29,9 @@ export const createRoadClipper = (polygon: EditorialPolygonCoordinates) => {
     return odd;
   };
 
-  return (line: readonly Position[]): Position[][] => {
-    const fragments: Position[][] = [];
-    let active: Position[] | undefined;
+  return (line: readonly PolygonPosition[]): readonly (readonly PolygonPosition[])[] => {
+    const fragments: PolygonPosition[][] = [];
+    let active: PolygonPosition[] | undefined;
     for (let i = 1; i < line.length; i++) {
       const a = line[i - 1]!;
       const b = line[i]!;
@@ -63,7 +60,7 @@ export const createRoadClipper = (polygon: EditorialPolygonCoordinates) => {
         }
       }
       cuts.sort((m, n) => m - n);
-      const point = (t: number): Position =>
+      const point = (t: number): PolygonPosition =>
         t === 0 ? a : t === 1 ? b : [a[0] + dx * t, a[1] + dy * t];
       let start = 0;
       for (const end of cuts) {
