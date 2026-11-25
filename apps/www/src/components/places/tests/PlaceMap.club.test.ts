@@ -350,7 +350,7 @@ describe('club place layer', () => {
       });
       const checkbox = await ready();
       expect(checkbox.checked).toBe(true);
-      await screen.findByRole('link', { name: '© OpenStreetMap' });
+      await screen.findByRole('link', { name: 'OpenStreetMap' });
       expect(map.update).not.toHaveBeenCalled();
       const response = clubResponse();
       const json = vi.spyOn(response, 'json');

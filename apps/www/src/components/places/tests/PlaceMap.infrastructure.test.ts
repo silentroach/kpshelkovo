@@ -90,7 +90,7 @@ describe('PlaceMap infrastructure layer', () => {
     const checkbox = await ready();
     expect(fetch).toHaveBeenCalledExactlyOnceWith(baseLayerUrl);
     await fireEvent.click(checkbox);
-    const credit = await screen.findByRole('link', { name: '© OpenStreetMap' });
+    const credit = await screen.findByRole('link', { name: 'OpenStreetMap', exact: true });
     expect(credit.getAttribute('href')).toBe('https://www.openstreetmap.org/copyright');
     expect(fetch.mock.calls.map(([url]) => url)).toEqual([baseLayerUrl, infrastructureLayerUrl]);
     expect(clusterIds()).toEqual([place.slug, infrastructure.slug]);
@@ -108,7 +108,7 @@ describe('PlaceMap infrastructure layer', () => {
     expect(window.location.search).toContain(`p=${parcel.code}`);
     await fireEvent.click(checkbox);
     expect(map.removeChild).toHaveBeenCalledWith(roadFeature);
-    expect(screen.queryByRole('link', { name: '© OpenStreetMap' })).toBeNull();
+    expect(screen.queryByRole('link', { name: 'OpenStreetMap' })).toBeNull();
   });
 
   it('does not show late roads when infrastructure has been switched off', async () => {
@@ -127,10 +127,10 @@ describe('PlaceMap infrastructure layer', () => {
     response.resolve(late);
     await waitFor(() => expect(json).toHaveBeenCalledOnce());
     expect(clusterIds()).toEqual([place.slug]);
-    expect(screen.queryByRole('link', { name: '© OpenStreetMap' })).toBeNull();
+    expect(screen.queryByRole('link', { name: 'OpenStreetMap' })).toBeNull();
     expect(map.update).not.toHaveBeenCalled();
     await fireEvent.click(checkbox);
-    await screen.findByRole('link', { name: '© OpenStreetMap' });
+    await screen.findByRole('link', { name: 'OpenStreetMap' });
     expect(
       areaFeatures.filter(({ props }) => props.geometry.type === 'MultiLineString')
     ).toHaveLength(1);
@@ -159,7 +159,7 @@ describe('PlaceMap infrastructure layer', () => {
     await fireEvent.click(checkbox);
     await waitFor(() => expect(clusterIds()).toEqual([place.slug, 'club', infrastructure.slug]));
     expect(loadInfrastructure).toHaveBeenCalledTimes(2);
-    expect(screen.queryByRole('link', { name: '© OpenStreetMap' })).toBeNull();
+    expect(screen.queryByRole('link', { name: 'OpenStreetMap' })).toBeNull();
   });
 
   it('starts hidden and toggles the scene independently without moving the camera', async () => {

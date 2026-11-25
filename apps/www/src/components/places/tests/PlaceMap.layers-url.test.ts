@@ -140,7 +140,7 @@ describe('PlaceMap initial layers from URL', () => {
     );
     await ready();
     expect(checkbox('Инфраструктура').checked).toBe(true);
-    await screen.findByRole('link', { name: '© OpenStreetMap' });
+    await screen.findByRole('link', { name: 'OpenStreetMap' });
     expect(
       clustererUpdates.mock.lastCall?.[0].features.map(({ id }: { readonly id: string }) => id)
     ).toEqual([place.slug, infrastructure.slug]);

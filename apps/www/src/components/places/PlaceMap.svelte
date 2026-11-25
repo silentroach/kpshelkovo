@@ -1580,7 +1580,9 @@
     tabindex="-1"
   ></div>
   {#if roadsShown}
-    <a class="road-map-credit" href={OSM_SOURCE}><span>© OpenStreetMap</span></a>
+    <div class="road-map-credit">
+      <span>© <a href={OSM_SOURCE}>OpenStreetMap</a></span>
+    </div>
   {/if}
   {#if selectedParcel && (selectedParcel.status === 'available' || selectedParcel.status === 'reserved')}
     <div
@@ -1837,12 +1839,17 @@
       0.6875rem / 0.875rem Verdana,
       Arial,
       sans-serif;
-    text-decoration: underline;
   }
 
-  .road-map-credit span {
+  .road-map-credit > span {
     padding: 0 4px 1px;
+    border-radius: 3px;
     background: rgb(255 255 255 / 75%);
+  }
+
+  .road-map-credit a {
+    color: inherit;
+    text-decoration: underline;
   }
 
   .parcel-map-controls {
@@ -2228,7 +2235,7 @@
   }
 
   .place-map__canvas :global(:is(a, button):focus-visible),
-  .road-map-credit:focus-visible {
+  .road-map-credit a:focus-visible {
     outline: 0.1875rem solid var(--color-focus);
     outline-offset: 0.125rem;
     box-shadow: 0 0 0 0.4375rem var(--color-surface);
