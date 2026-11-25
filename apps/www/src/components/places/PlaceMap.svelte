@@ -1559,7 +1559,7 @@
   });
 </script>
 
-<div bind:this={mapRoot} data-testid="place-map" class={['place-map', { 'has-roads': roadsShown }]}>
+<div bind:this={mapRoot} data-testid="place-map" class="place-map">
   {#if error}
     <div class="map-placeholder map-placeholder--error" role="status">
       <div class="map-error-panel">
@@ -1827,7 +1827,7 @@
   .road-map-credit {
     position: absolute;
     z-index: 3;
-    bottom: calc(var(--map-copyright-offset) + 0.5rem);
+    bottom: calc(var(--map-copyright-offset) + 2.25rem);
     left: 10px;
     display: grid;
     align-items: center;
@@ -2236,11 +2236,6 @@
 
   .place-map__canvas :global(.ymaps3--map-copyrights_bottom) {
     bottom: var(--map-copyright-offset);
-  }
-
-  /* Keep the SDK credit and scale together above the extra credit row. */
-  .has-roads .place-map__canvas :global(.ymaps3--map-copyrights_bottom) {
-    bottom: calc(var(--map-copyright-offset) + var(--map-credit-height) + 0.5rem);
   }
 
   @container (max-width: 32rem) {
