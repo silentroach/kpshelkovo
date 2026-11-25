@@ -20,10 +20,22 @@ describe('road display geometry', () => {
       [55.048, 37.701, 55.077, 37.758],
       timestamp
     );
+    const boundary = [
+      [
+        [37.72, 55.05],
+        [37.75, 55.05],
+        [37.75, 55.08],
+        [37.72, 55.08],
+        [37.72, 55.05]
+      ]
+    ] as const;
     const original = JSON.stringify(snapshot);
-    const noShift = buildRoadMapPayload(snapshot, { offset_east_m: 0, offset_north_m: 0 });
+    const noShift = buildRoadMapPayload(snapshot, boundary, {
+      offset_east_m: 0,
+      offset_north_m: 0
+    });
     const config = { offset_east_m: 5, offset_north_m: 3 };
-    const shifted = buildRoadMapPayload(snapshot, config);
+    const shifted = buildRoadMapPayload(snapshot, boundary, config);
     expect(noShift.lines[0]?.[0]).toEqual([37.73123457, 55.06]);
     expect(shifted.lines[0]?.[1]).toBeDefined();
     expect(shifted.lines[0]?.[1]).toEqual(shifted.lines[1]?.[0]);
@@ -33,7 +45,7 @@ describe('road display geometry', () => {
         55.06002695,
       ]
     `);
-    expect(buildRoadMapPayload(snapshot, config)).toEqual(shifted);
+    expect(buildRoadMapPayload(snapshot, boundary, config)).toEqual(shifted);
     expect(JSON.stringify(snapshot)).toBe(original);
   });
 });

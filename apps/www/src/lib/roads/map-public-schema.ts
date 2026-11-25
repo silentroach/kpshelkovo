@@ -5,7 +5,7 @@ const position = z.tuple([z.number().min(-180).max(180), z.number().min(-90).max
 export const RoadMapPublicSchema = z.object({
   source: z.url(),
   license: z.url(),
-  lines: z.array(z.array(position).min(2)).min(1)
+  lines: z.array(z.array(position).min(2))
 });
 
 export type RoadMapPublicDto = z.output<typeof RoadMapPublicSchema>;

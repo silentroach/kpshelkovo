@@ -158,8 +158,7 @@
       const response = await fetch('/map/data/roads.json');
       if (!response.ok) throw new Error(`Road map: HTTP ${response.status}`);
       const payload = (await response.json()) as RoadMapPublicDto;
-      if (!Array.isArray(payload?.lines) || !payload.lines.length)
-        throw new Error('Invalid road map geometry');
+      if (!Array.isArray(payload?.lines)) throw new Error('Invalid road map geometry');
       return payload;
     })().catch((reason: unknown) => {
       roadPayload = undefined;
@@ -173,11 +172,16 @@
     let feature: ymaps3.YMapFeature | undefined;
     void loadRoads()
       .then(({ lines }) => {
-        if (cancelled || !enabledPlaceLayers.includes('infra') || map !== scene) return;
+        if (!lines.length || cancelled || !enabledPlaceLayers.includes('infra') || map !== scene)
+          return;
         feature = new window.ymaps3.YMapFeature({
           id: 'shelkovo-osm-roads',
           geometry: { type: 'MultiLineString', coordinates: lines },
-          style: { interactive: false, zIndex: -2, stroke: [{ width: 3, color: '#216a72' }] }
+          style: {
+            interactive: false,
+            zIndex: -2,
+            stroke: [{ width: 2, color: 'rgba(84, 58, 44, 0.6)' }]
+          }
         });
         scene.addChild(feature);
         roadsShown = true;
