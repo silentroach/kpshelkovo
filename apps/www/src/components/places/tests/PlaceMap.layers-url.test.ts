@@ -17,7 +17,9 @@ import {
   parcel,
   place,
   publicPlace,
-  registerPlaceMapSetup
+  registerPlaceMapSetup,
+  roadResponse,
+  roadsUrl
 } from './support';
 
 vi.mock(import('@/lib/yandex-maps/runtime'), async (importOriginal) => ({
@@ -51,6 +53,7 @@ const ready = async () => {
 const checkbox = (name: string) => screen.getByRole<HTMLInputElement>('checkbox', { name });
 const fetchParts = () =>
   vi.fn(async (url: string) => {
+    if (url === roadsUrl) return roadResponse();
     const part = url.split('/').at(-1)?.replace('.json', '');
     return Response.json([{ ...parcel, code: `${part?.toUpperCase()}-M1`, aliases: [], part }]);
   });
@@ -70,20 +73,21 @@ describe('PlaceMap initial layers from URL', () => {
       window.history.replaceState({ source: 'layers' }, '', `/map/${query}#map`);
       render(PlaceMap, { props: { places: [place, infrastructure] } });
       await ready();
-      await waitFor(() => expect(areaFeatures).toHaveLength(4));
+      await waitFor(() => expect(areaFeatures).toHaveLength(5));
       expect(
         ['Участки', 'Форест', 'Вилладж', 'Парк', 'Ривер', 'Инфраструктура'].every(
           (name) => checkbox(name).checked
         )
       ).toBe(true);
       expect(fetch.mock.calls.map(([url]) => url).sort()).toMatchInlineSnapshot(`
-      [
-        "/map/data/parcels/shf.json",
-        "/map/data/parcels/shp.json",
-        "/map/data/parcels/shr.json",
-        "/map/data/parcels/shv.json",
-      ]
-    `);
+        [
+          "/map/data/parcels/shf.json",
+          "/map/data/parcels/shp.json",
+          "/map/data/parcels/shr.json",
+          "/map/data/parcels/shv.json",
+          "/map/data/roads.json",
+        ]
+      `);
       expect(clustererProps[0]?.features.map(({ id }) => id)).toEqual([
         place.slug,
         infrastructure.slug
@@ -112,7 +116,9 @@ describe('PlaceMap initial layers from URL', () => {
 
   it('applies infrastructure after the public places arrive without a focus request', async () => {
     const pending = Promise.withResolvers<Response>();
-    const fetch = vi.fn(() => pending.promise);
+    const fetch = vi.fn((url: string) =>
+      url === roadsUrl ? Promise.resolve(roadResponse()) : pending.promise
+    );
     vi.stubGlobal('fetch', fetch);
     window.history.replaceState({}, '', '/map/?l=infra');
     render(PlaceMap, {
@@ -130,13 +136,15 @@ describe('PlaceMap initial layers from URL', () => {
       place.slug,
       infrastructure.slug
     ]);
-    expect(fetch).toHaveBeenCalledExactlyOnceWith('/map/data/places.json');
+    expect(fetch.mock.calls.map(([url]) => url)).toEqual(['/map/data/places.json', roadsUrl]);
     expect(map.update).not.toHaveBeenCalled();
   });
 
   it('combines extra layers with an alias p, suppresses h and preserves URL bytes on selection changes', async () => {
     const fetch = vi.fn(async (url: string) =>
-      Response.json(url.endsWith('shf.json') ? [forest] : [parcel])
+      url === roadsUrl
+        ? roadResponse()
+        : Response.json(url.endsWith('shf.json') ? [forest] : [parcel])
     );
     vi.stubGlobal('fetch', fetch);
     const state = { source: 'parcel' };
@@ -148,7 +156,13 @@ describe('PlaceMap initial layers from URL', () => {
     expect(
       checkbox('Форест').checked && checkbox('Ривер').checked && checkbox('Инфраструктура').checked
     ).toBe(true);
-    expect(fetch).toHaveBeenCalledTimes(2);
+    expect(fetch.mock.calls.map(([url]) => url).sort()).toMatchInlineSnapshot(`
+      [
+        "/map/data/parcels/shf.json",
+        "/map/data/parcels/shr.json",
+        "/map/data/roads.json",
+      ]
+    `);
     expect(
       map.update.mock.calls
         .filter(([update]) => update.location?.center)

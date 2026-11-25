@@ -23,6 +23,8 @@
   import { getPlaceClosingTime } from '@/lib/places/opening-hours';
   import { placeUrl } from '@/lib/places/routes';
   import { PLACE_MAP_LAYERS, type PlaceMapLayer } from '@/lib/places/schema';
+  import type { RoadMapPublicDto } from '@/lib/roads/map-public-schema';
+  import { OSM_SOURCE } from '@/lib/roads/osm';
   import { createOpenMapsControl } from '@/lib/yandex-maps/open-maps-control';
   import {
     installYandexMapsRuntimeHeadPersistence,
@@ -149,6 +151,47 @@
   let error: string | undefined = $state(undefined);
   let selectedParts = $state<ParcelPart[]>([]);
   let enabledPlaceLayers = $state<readonly PlaceMapLayer[]>([]);
+  let roadsShown = $state(false);
+  let roadPayload: Promise<RoadMapPublicDto> | undefined;
+  const loadRoads = (): Promise<RoadMapPublicDto> =>
+    (roadPayload ??= (async () => {
+      const response = await fetch('/map/data/roads.json');
+      if (!response.ok) throw new Error(`Road map: HTTP ${response.status}`);
+      const payload = (await response.json()) as RoadMapPublicDto;
+      if (!Array.isArray(payload?.lines) || !payload.lines.length)
+        throw new Error('Invalid road map geometry');
+      return payload;
+    })().catch((reason: unknown) => {
+      roadPayload = undefined;
+      throw reason;
+    }));
+
+  $effect(() => {
+    if (!mapReady || !enabledPlaceLayers.includes('infra') || !map) return;
+    const scene = map;
+    let cancelled = false;
+    let feature: ymaps3.YMapFeature | undefined;
+    void loadRoads()
+      .then(({ lines }) => {
+        if (cancelled || !enabledPlaceLayers.includes('infra') || map !== scene) return;
+        feature = new window.ymaps3.YMapFeature({
+          id: 'shelkovo-osm-roads',
+          geometry: { type: 'MultiLineString', coordinates: lines },
+          style: { interactive: false, zIndex: -2, stroke: [{ width: 3, color: '#216a72' }] }
+        });
+        scene.addChild(feature);
+        roadsShown = true;
+      })
+      .catch((reason: unknown) => {
+        if (!cancelled) console.error('Road layer error:', reason);
+      });
+
+    return () => {
+      cancelled = true;
+      if (feature && map === scene) scene.removeChild(feature);
+      roadsShown = false;
+    };
+  });
   let togglePlaceLayer = $state<(layer: PlaceMapLayer, checked: boolean) => void>(() => {});
   const isPlaceVisible = (place: PlaceMapItem): boolean =>
     isPlaceLayerVisible(place, enabledPlaceLayers);
@@ -1459,6 +1502,9 @@
     class="place-map__canvas"
     tabindex="-1"
   ></div>
+  {#if roadsShown && enabledPlaceLayers.includes('infra')}
+    <a class="road-map-credit site-text-link" href={OSM_SOURCE}>© OpenStreetMap contributors</a>
+  {/if}
   {#if selectedParcel && (selectedParcel.status === 'available' || selectedParcel.status === 'reserved')}
     <div
       bind:this={popupElement}
@@ -1697,6 +1743,17 @@
     outline: 0.1875rem solid var(--color-focus);
     outline-offset: -0.1875rem;
     box-shadow: inset 0 0 0 0.3125rem var(--color-surface);
+  }
+
+  .road-map-credit {
+    position: absolute;
+    z-index: 3;
+    bottom: 2.25rem;
+    left: 0.5rem;
+    padding: 0.25rem 0.375rem;
+    border-radius: var(--radius-sm);
+    background: var(--color-surface);
+    font-size: 0.75rem;
   }
 
   .parcel-map-controls {
@@ -2090,6 +2147,12 @@
   @container (max-width: 32rem) {
     .place-map__canvas :global(.ymaps3--map-copyrights_bottom) {
       bottom: 3.5rem;
+    }
+  }
+
+  @media (max-width: 32rem) {
+    .road-map-credit {
+      bottom: 5.75rem;
     }
   }
 

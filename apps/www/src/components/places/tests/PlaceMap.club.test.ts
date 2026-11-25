@@ -19,7 +19,9 @@ import {
   place,
   parcel,
   pondsPlace,
-  registerPlaceMapSetup
+  registerPlaceMapSetup,
+  roadResponse,
+  roadsUrl
 } from './support';
 
 const layerOptions = vi.hoisted(() => ({ club: { fit: true as boolean | undefined } }));
@@ -220,7 +222,10 @@ describe('club place layer', () => {
   it.each(['club', 'club,infra'])(
     'opens l=%s without fetching parcels or moving the initial camera',
     async (layers) => {
-      const fetch = vi.fn();
+      const fetch = vi.fn(async (url: string) => {
+        if (url !== roadsUrl) throw new Error(`Unexpected map request: ${url}`);
+        return roadResponse();
+      });
       vi.stubGlobal('fetch', fetch);
       window.history.replaceState({}, '', `/map/?l=${layers}`);
       render(PlaceMap, { props: { places: [place, club, infrastructure] } });
@@ -230,7 +235,9 @@ describe('club place layer', () => {
           ? [place.slug, club.slug, infrastructure.slug]
           : [place.slug, club.slug]
       );
-      expect(fetch).not.toHaveBeenCalled();
+      expect(fetch.mock.calls.map(([url]) => url)).toEqual(
+        layers.includes('infra') ? [roadsUrl] : []
+      );
       expect(mapProps[0]?.location.bounds).toEqual(getPlaceBounds([place]));
       expect(map.update.mock.calls.some(([update]) => update.location)).toBe(false);
     }

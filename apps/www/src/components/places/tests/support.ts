@@ -324,6 +324,17 @@ const installYandexMaps = (): void => {
   });
 };
 
+export const roadsUrl = '/map/data/roads.json';
+export const roadResponse = () =>
+  Response.json({
+    lines: [
+      [
+        [37.74, 55.06],
+        [37.75, 55.07]
+      ]
+    ]
+  });
+
 export const registerPlaceMapSetup = (): void => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -361,6 +372,13 @@ export const registerPlaceMapSetup = (): void => {
     document.documentElement.style.setProperty('--parcel-map-selection', parcelSelectionColor);
     document.documentElement.style.setProperty('--parcel-map-set', '#935632');
     window.history.replaceState({}, '', '/map/');
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string) => {
+        if (url === roadsUrl) return roadResponse();
+        throw new Error(`Unexpected map request: ${url}`);
+      })
+    );
     installYandexMaps();
   });
 

@@ -7,6 +7,7 @@ apps/*/.astro/
 .lighthouseci/
 .cache/pagefind/
 .cache/bundle/
+.cache/roads/
 .agents/skills/*
 !.agents/skills/openspec-*/
 !.agents/skills/openspec-*/**

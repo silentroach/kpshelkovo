@@ -70,7 +70,7 @@ static/PlaceMap.XXXXXXXX.js:
   apps/www/src/components/places/place-marker-badge.css:
     rendered: 0
   apps/www/src/components/places/PlaceMap.svelte:
-    rendered: 59970
+    rendered: 61789
   apps/www/src/components/places/PlaceMap.svelte?svelte&type=style&lang.css:
     rendered: 0
   apps/www/src/lib/parcels/parcel-url.ts:
@@ -81,6 +81,8 @@ static/PlaceMap.XXXXXXXX.js:
     rendered: 324
   apps/www/src/lib/places/schema.ts:
     rendered: 212
+  apps/www/src/lib/roads/osm.ts:
+    rendered: 84
   apps/www/src/lib/site.ts:
     rendered: 95
   packages/ui/src/markers/Animals.webp?url:
