@@ -7,6 +7,7 @@ import { parseArgs } from 'node:util';
 import { compareRoadSnapshots } from '../../src/lib/roads/compare.ts';
 import { mapOverpassRoads, mapRoadSnapshot } from '../../src/lib/roads/mapper.ts';
 import { OVERPASS_ENDPOINT } from '../../src/lib/roads/osm.ts';
+import { serializeRoadSnapshot } from '../../src/lib/roads/serialize.ts';
 import type { RoadBounds, RoadSnapshot } from '../../src/lib/roads/types.ts';
 
 const candidateFile = fileURLToPath(new URL('../../../../.cache/roads/osm.json', import.meta.url));
@@ -27,7 +28,7 @@ const writeSnapshot = async (file: string, snapshot: RoadSnapshot): Promise<void
   await mkdir(dirname(file), { recursive: true });
   const temporary = `${file}.${randomUUID()}.tmp`;
   try {
-    await writeFile(temporary, `${JSON.stringify(snapshot, undefined, 2)}\n`, { flag: 'wx' });
+    await writeFile(temporary, serializeRoadSnapshot(snapshot), { flag: 'wx' });
     await rename(temporary, file);
   } finally {
     await rm(temporary, { force: true });

@@ -1,5 +1,10 @@
 import { OSM_LICENSE, OSM_SOURCE, OVERPASS_ENDPOINT } from './osm.ts';
-import { OverpassErrorSchema, OverpassRoadsSchema, RawRoadSnapshotSchema } from './raw-schema.ts';
+import {
+  OverpassErrorSchema,
+  OverpassRoadsSchema,
+  RawRoadSnapshotSchema,
+  RoadCaptureSchema
+} from './raw-schema.ts';
 import type { RoadBounds, RoadSnapshot, RoadWay } from './types.ts';
 
 const vehicleHighways = new Set([
@@ -39,9 +44,8 @@ const isRoad = ({ tags }: RoadWay): boolean => {
 const sortedTags = (tags: Readonly<Record<string, string>>) =>
   Object.fromEntries(Object.entries(tags).sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)));
 
-export const mapRoadSnapshot = (input: unknown): RoadSnapshot => {
-  const data = RawRoadSnapshotSchema.parse(input);
-  const nodes = new Map(data.nodes.map((node) => [node.id, node]));
+const normalizeRoadSnapshot = (data: RoadSnapshot): RoadSnapshot => {
+  const nodes = new Set(data.nodes.map(({ id }) => id));
   const ways = new Set<number>();
   if (nodes.size !== data.nodes.length) throw new Error('Duplicate OSM node ID');
 
@@ -63,7 +67,7 @@ export const mapRoadSnapshot = (input: unknown): RoadSnapshot => {
     osmTimestamp: data.osmTimestamp,
     bounds: data.bounds,
     nodes: data.nodes
-      .sort((a, b) => a.id - b.id)
+      .toSorted((a, b) => a.id - b.id)
       .map(({ id, lat, lon, tags }) => ({
         id,
         lat,
@@ -71,13 +75,36 @@ export const mapRoadSnapshot = (input: unknown): RoadSnapshot => {
         tags: tags ? sortedTags(tags) : undefined
       })),
     ways: data.ways
-      .sort((a, b) => a.id - b.id)
+      .toSorted((a, b) => a.id - b.id)
       .map(({ id, nodes, tags }) => ({
         id,
         nodes,
         tags: sortedTags(tags)
       }))
   };
+};
+
+export const mapRoadSnapshot = (input: unknown): RoadSnapshot => {
+  const data = RawRoadSnapshotSchema.parse(input);
+  const nodeTags = new Map(Object.entries(data.nodeTags));
+  const nodes = data.nodes.map(([id, lat, lon]) => {
+    const key = String(id);
+    const tags = nodeTags.get(key);
+    nodeTags.delete(key);
+    return { id, lat, lon, tags };
+  });
+  const { value: unmatched } = nodeTags.keys().next();
+  if (unmatched !== undefined) throw new Error(`OSM node tags reference missing node ${unmatched}`);
+  return normalizeRoadSnapshot({
+    source: data.source,
+    license: data.license,
+    endpoint: data.endpoint,
+    capturedAt: data.capturedAt,
+    osmTimestamp: data.osmTimestamp,
+    bounds: data.bounds,
+    nodes,
+    ways: data.ways
+  });
 };
 
 export const mapOverpassRoads = (
@@ -91,14 +118,18 @@ export const mapOverpassRoads = (
   const ways = elements.filter((element) => element.type === 'way').filter(isRoad);
   if (!ways.length) throw new Error('Overpass returned no motor roads');
   const referenced = new Set(ways.flatMap((way) => way.nodes));
-  return mapRoadSnapshot({
+  const capture = RoadCaptureSchema.parse({ capturedAt, bounds });
+  const nodes = elements
+    .filter((element) => element.type === 'node')
+    .filter(({ id }) => referenced.has(id));
+  return normalizeRoadSnapshot({
     source: OSM_SOURCE,
     license: OSM_LICENSE,
     endpoint: OVERPASS_ENDPOINT,
-    capturedAt,
+    capturedAt: capture.capturedAt,
     osmTimestamp: osm3s.timestamp_osm_base,
-    bounds,
-    nodes: elements.filter((element) => element.type === 'node' && referenced.has(element.id)),
+    bounds: capture.bounds,
+    nodes,
     ways
   });
 };

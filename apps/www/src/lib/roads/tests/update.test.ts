@@ -6,7 +6,8 @@ import { describe, expect, it } from 'vitest';
 
 import { updateRoadSnapshot } from '../../../../scripts/roads/update.ts';
 import { compareRoadSnapshots } from '../compare.ts';
-import { mapOverpassRoads } from '../mapper.ts';
+import { mapOverpassRoads, mapRoadSnapshot } from '../mapper.ts';
+import { serializeRoadSnapshot } from '../serialize.ts';
 
 const timestamp = '2026-11-25T00:00:00Z';
 const nodes = [
@@ -78,7 +79,16 @@ describe('road snapshot updates', () => {
       `);
   });
 
-  it('preserves the accepted file on failed downloads and does not rewrite an identical input', async () => {
+  it('round-trips the domain snapshot and rejects tags without a node', () => {
+    const before = snapshot([...nodes, ...ways]);
+    const stored = JSON.parse(serializeRoadSnapshot(before));
+    expect(mapRoadSnapshot(stored)).toEqual(before);
+    expect(() => mapRoadSnapshot({ ...stored, nodeTags: { 5: { barrier: 'gate' } } })).toThrow(
+      'OSM node tags reference missing node 5'
+    );
+  });
+
+  it('writes compact snapshots, preserves them on failure and skips identical input', async () => {
     const directory = await mkdtemp(join(tmpdir(), 'shelkovo-roads-'));
     const output = {
       accepted: join(directory, 'accepted.json'),
@@ -89,10 +99,22 @@ describe('road snapshot updates', () => {
         Response.json(response([...nodes, ...ways]))
       );
       await expect(readFile(output.accepted)).rejects.toHaveProperty('code', 'ENOENT');
+      const candidate = await readFile(output.candidate, 'utf8');
+      const { nodes: storedNodes, nodeTags } = JSON.parse(candidate);
+      expect({ nodes: JSON.stringify(storedNodes), nodeTags }).toMatchInlineSnapshot(`
+        {
+          "nodeTags": {
+            "2": {
+              "barrier": "lift_gate",
+            },
+          },
+          "nodes": "[[1,55.06,37.73],[2,55.06,37.74],[3,55.07,37.74],[4,55.06,37.74]]",
+        }
+      `);
       await updateRoadSnapshot(output, output.candidate, async () => {
         throw new Error('unexpected network');
       });
-      const original = await readFile(output.accepted, 'utf8');
+      expect(await readFile(output.accepted, 'utf8')).toBe(candidate);
       const originalFile = await stat(output.accepted);
       await expect(
         updateRoadSnapshot(output, undefined, async () => {
@@ -113,7 +135,7 @@ describe('road snapshot updates', () => {
         )
       ).rejects.toThrow('OSM way 11 references missing node 1');
       await updateRoadSnapshot(output, output.candidate);
-      expect(await readFile(output.accepted, 'utf8')).toBe(original);
+      expect(await readFile(output.accepted, 'utf8')).toBe(candidate);
       expect((await stat(output.accepted)).ino).toBe(originalFile.ino);
     } finally {
       await rm(directory, { recursive: true, force: true });
