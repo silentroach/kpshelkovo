@@ -78,9 +78,13 @@
     shr: 'Ривер'
   };
   const ROAD_SURFACES = [
-    { key: 'gravel', label: 'Щебень', width: 2, color: '#a3684d' },
-    { key: 'asphalt', label: 'Асфальт', width: 3, color: '#687f9b' }
-  ] as const;
+    {
+      key: 'gravel' as const,
+      label: 'Щебень',
+      stroke: { width: 2, color: '#b27a35', dash: [5, 3] }
+    },
+    { key: 'asphalt' as const, label: 'Асфальт', stroke: { width: 2.25, color: '#7b858e' } }
+  ];
   const areaFormatter = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 2 });
   const priceFormatter = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 });
   const toPlaceMapItem = (place: PlaceMapPublicItemDto): PlaceMapItem => ({
@@ -166,7 +170,7 @@
     if (existing) return;
 
     const features: ymaps3.YMapFeature[] = [];
-    for (const { key, width, color } of ROAD_SURFACES) {
+    for (const { key, stroke } of ROAD_SURFACES) {
       const lines = roads[key];
       if (!lines.length) continue;
       const feature = new window.ymaps3.YMapFeature({
@@ -175,7 +179,7 @@
         style: {
           interactive: false,
           zIndex: -2,
-          stroke: [{ width, color }]
+          stroke: [stroke]
         }
       });
       currentMap.addChild(feature);
@@ -1595,10 +1599,15 @@
     <div class="road-map-legend">
       <p>Дорожное покрытие</p>
       <ul role="list">
-        {#each ROAD_SURFACES as { key, label, width, color } (key)}
+        {#each ROAD_SURFACES as { key, label, stroke } (key)}
           <li>
-            <svg width="18" height="8" viewBox="0 0 18 8" aria-hidden="true">
-              <path d="M0 4h18" stroke={color} stroke-width={width} />
+            <svg width="30" height="8" viewBox="0 0 30 8" aria-hidden="true">
+              <path
+                d="M0 4h30"
+                stroke={stroke.color}
+                stroke-width={stroke.width}
+                stroke-dasharray={stroke.dash?.join(' ')}
+              />
             </svg>
             {label}
           </li>
