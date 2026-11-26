@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -18,6 +18,10 @@ export function verifyGeneratedSkills(directory) {
   for (const name of generatedSkillNames) {
     if (!existsSync(join(directory, name, 'SKILL.md')))
       throw new Error(`Missing generated skill: ${name}`);
+  }
+  for (const name of readdirSync(directory)) {
+    if (name.startsWith('openspec-') && !generatedSkillNames.includes(name))
+      throw new Error(`Unexpected OpenSpec skill: ${name}`);
   }
   if (readFileSync(join(directory, '.openspec-target'), 'utf8').trim() !== 'agents')
     throw new Error('Unexpected OpenSpec target');

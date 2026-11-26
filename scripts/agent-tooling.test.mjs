@@ -16,7 +16,7 @@ const tree = (directory) =>
     })
     .sort(([a], [b]) => a.localeCompare(b));
 
-test('generation ignores the caller profile and leaves it untouched', () => {
+test('project setup restores a missing workflow independently of the caller profile', () => {
   const temp = mkdtempSync(join(tmpdir(), 'openspec-test-'));
   const previous = process.env.XDG_CONFIG_HOME;
   try {
@@ -95,7 +95,8 @@ test('generated skills coexist with pinned skills without accepting unknown work
     writeFileSync(join(directory, '.openspec-target'), 'agents\n');
     verifySkillHashes(directory, skills, allowed);
     mkdirSync(join(directory, 'openspec-unknown'));
-    assert.throws(() => verifySkillHashes(directory, skills, allowed), /Unexpected skills/);
+    assert.throws(() => verifyGeneratedSkills(directory), /Unexpected OpenSpec skill/);
+    rmSync(join(directory, 'openspec-unknown'), { recursive: true });
     rmSync(join(directory, generatedSkillNames[0], 'SKILL.md'));
     assert.throws(() => verifyGeneratedSkills(directory), /Missing generated skill/);
   } finally {
