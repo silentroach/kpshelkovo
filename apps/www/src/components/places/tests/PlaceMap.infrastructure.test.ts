@@ -121,6 +121,8 @@ describe('PlaceMap infrastructure layer', () => {
     const [gravel, asphalt] = roadFeatures.map(({ props }) => props.style?.stroke?.[0]);
     expect(asphalt?.width).toBeGreaterThan(gravel?.width ?? Infinity);
     expect(asphalt?.color).not.toBe(gravel?.color);
+    expect(gravel?.dash?.length).toBeGreaterThan(0);
+    expect(asphalt).not.toHaveProperty('dash');
     for (const feature of roadFeatures) {
       expect(feature.props.onClick).toBeUndefined();
       expect(feature.props.style?.interactive).toBe(false);
