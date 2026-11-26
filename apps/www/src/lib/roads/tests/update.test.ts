@@ -1,4 +1,4 @@
-import { mkdtemp, readFile, rm, stat } from 'node:fs/promises';
+import { mkdtemp, readFile, rm, stat, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -92,9 +92,14 @@ describe('road snapshot updates', () => {
     const directory = await mkdtemp(join(tmpdir(), 'shelkovo-roads-'));
     const output = {
       accepted: join(directory, 'accepted.json'),
-      candidate: join(directory, 'candidate.json')
+      candidate: join(directory, 'candidate.json'),
+      localRoads: join(directory, 'local-roads.yaml')
     };
     try {
+      await writeFile(
+        output.localRoads,
+        '- id: connector\n  points: [{osm_node: 3}, {osm_node: 4}]'
+      );
       await updateRoadSnapshot(output, undefined, async () =>
         Response.json(response([...nodes, ...ways]))
       );
@@ -137,6 +142,37 @@ describe('road snapshot updates', () => {
       await updateRoadSnapshot(output, output.candidate);
       expect(await readFile(output.accepted, 'utf8')).toBe(candidate);
       expect((await stat(output.accepted)).ino).toBe(originalFile.ino);
+    } finally {
+      await rm(directory, { recursive: true, force: true });
+    }
+  });
+
+  it('keeps the accepted snapshot when a valid OSM candidate loses a local junction', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'shelkovo-roads-'));
+    const files = {
+      accepted: join(directory, 'accepted.json'),
+      candidate: join(directory, 'candidate.json'),
+      localRoads: join(directory, 'local-roads.yaml')
+    };
+    const original = serializeRoadSnapshot(snapshot([...nodes, ...ways]));
+    const candidate = serializeRoadSnapshot(snapshot([...nodes.slice(0, 3), ...ways.slice(0, 2)]));
+    const localRoads = `
+      - id: connector
+        points:
+          - osm_node: 4
+          - osm_node: 3
+    `;
+    try {
+      await Promise.all([
+        writeFile(files.accepted, original),
+        writeFile(files.candidate, candidate),
+        writeFile(files.localRoads, localRoads)
+      ]);
+      await expect(updateRoadSnapshot(files, files.candidate)).rejects.toThrow(
+        'Local road connector references missing OSM node 4'
+      );
+      expect(await readFile(files.accepted, 'utf8')).toBe(original);
+      expect(await readFile(files.localRoads, 'utf8')).toBe(localRoads);
     } finally {
       await rm(directory, { recursive: true, force: true });
     }

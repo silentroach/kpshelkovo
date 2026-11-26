@@ -1,5 +1,5 @@
 export type { CivilTwilight, Coordinates } from './types.ts';
-export { createLineClipper } from './line-clip.ts';
+export { createLineClipper, createLineSplitter, isSimpleClosedRing } from './line-clip.ts';
 export { polygonLabelCoordinates } from './polygon-label.ts';
 export { unionPolygonGeometries } from './polygon-union.ts';
 export { createDisplayOffset, fromWebMercator, toWebMercator } from './mercator.ts';

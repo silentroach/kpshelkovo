@@ -77,6 +77,10 @@
     shp: 'Парк',
     shr: 'Ривер'
   };
+  const ROAD_SURFACES = [
+    { key: 'gravel', label: 'Щебень', width: 2, color: '#a3684d' },
+    { key: 'asphalt', label: 'Асфальт', width: 3, color: '#687f9b' }
+  ] as const;
   const areaFormatter = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 2 });
   const priceFormatter = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 });
   const toPlaceMapItem = (place: PlaceMapPublicItemDto): PlaceMapItem => ({
@@ -147,28 +151,37 @@
   let error: string | undefined = $state(undefined);
   let selectedParts = $state<ParcelPart[]>([]);
   let enabledPlaceLayers = $state<readonly PlaceMapLayer[]>([]);
-  const roadFeatures = new SvelteMap<PlaceMapLayer, ymaps3.YMapFeature>();
+  const roadFeatures = new SvelteMap<PlaceMapLayer, readonly ymaps3.YMapFeature[]>();
   let roadsShown = $derived(roadFeatures.size > 0);
   const syncRoads = (layer: PlaceMapLayer, roads?: LoadedPlaceMapLayer['roads']): void => {
-    if (!map) return;
+    const currentMap = map;
+    if (!currentMap) return;
     const existing = roadFeatures.get(layer);
-    if (!roads?.lines.length) {
+    if (!roads) {
       if (!existing) return;
-      map.removeChild(existing);
+      for (const feature of existing) currentMap.removeChild(feature);
       roadFeatures.delete(layer);
-    } else if (!existing) {
+      return;
+    }
+    if (existing) return;
+
+    const features: ymaps3.YMapFeature[] = [];
+    for (const { key, width, color } of ROAD_SURFACES) {
+      const lines = roads[key];
+      if (!lines.length) continue;
       const feature = new window.ymaps3.YMapFeature({
-        id: `shelkovo-osm-roads-${layer}`,
-        geometry: { type: 'MultiLineString', coordinates: roads.lines },
+        id: `shelkovo-osm-roads-${layer}-${key}`,
+        geometry: { type: 'MultiLineString', coordinates: lines },
         style: {
           interactive: false,
           zIndex: -2,
-          stroke: [{ width: 2, color: 'rgba(84, 58, 44, 0.6)' }]
+          stroke: [{ width, color }]
         }
       });
-      map.addChild(feature);
-      roadFeatures.set(layer, feature);
+      currentMap.addChild(feature);
+      features.push(feature);
     }
+    if (features.length) roadFeatures.set(layer, features);
   };
   let togglePlaceLayer = $state<(layer: PlaceMapLayer, checked: boolean) => void>(() => {});
   const isPlaceVisible = (place: PlaceMapItem): boolean =>
@@ -495,7 +508,9 @@
     cancelClusterFocus();
     clearSetGeometry();
     if (map) {
-      for (const feature of roadFeatures.values()) map.removeChild(feature);
+      for (const features of roadFeatures.values()) {
+        for (const feature of features) map.removeChild(feature);
+      }
       for (const slug of visibleGeometry) {
         for (const object of mapEditorialObjects.get(slug) ?? []) map.removeChild(object);
       }
@@ -1577,6 +1592,19 @@
     tabindex="-1"
   ></div>
   {#if roadsShown}
+    <div class="road-map-legend">
+      <p>Дорожное покрытие</p>
+      <ul role="list">
+        {#each ROAD_SURFACES as { key, label, width, color } (key)}
+          <li>
+            <svg width="18" height="8" viewBox="0 0 18 8" aria-hidden="true">
+              <path d="M0 4h18" stroke={color} stroke-width={width} />
+            </svg>
+            {label}
+          </li>
+        {/each}
+      </ul>
+    </div>
     <div class="road-map-credit">
       <span>© <a href={OSM_SOURCE}>OpenStreetMap</a></span>
     </div>
@@ -1799,6 +1827,7 @@
   .place-map {
     --map-copyright-offset: 0px;
     --map-credit-height: 1.5rem;
+    --map-controls-top: 4.5rem;
     --parcel-map-boundary: oklch(55.4% 0.041 257.4);
     --parcel-map-selection: oklch(46.9% 0.067 241.9);
     --parcel-map-set: #7c3aed;
@@ -1821,6 +1850,41 @@
     outline: 0.1875rem solid var(--color-focus);
     outline-offset: -0.1875rem;
     box-shadow: inset 0 0 0 0.3125rem var(--color-surface);
+  }
+
+  .road-map-legend {
+    position: absolute;
+    z-index: 2;
+    inset-inline-end: 1rem;
+    inset-block-start: var(--map-controls-top);
+    max-inline-size: calc(100% - 5.5rem);
+    padding: 0.375rem 0.625rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    color: var(--color-text);
+    font-size: 0.8125rem;
+    line-height: 1.4;
+    pointer-events: none;
+  }
+
+  .road-map-legend p {
+    margin: 0 0 0.1875rem;
+    font-weight: 600;
+  }
+
+  .road-map-legend ul {
+    display: grid;
+    gap: 0.125rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .road-map-legend li {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
   }
 
   .road-map-credit {
@@ -1851,7 +1915,7 @@
 
   .parcel-map-controls {
     position: absolute;
-    top: 4.5rem;
+    top: var(--map-controls-top);
     left: 1rem;
     z-index: 4;
     display: flex;

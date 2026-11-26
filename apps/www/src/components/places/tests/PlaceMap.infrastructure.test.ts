@@ -5,6 +5,7 @@ import type { MapSelectionSetPublicDto } from '@/lib/map-selection-sets/public-t
 import { ParcelMapPublicSchema } from '@/lib/parcels/map-public-schema';
 import type { PlaceMapPublicItemDto } from '@/lib/places/map-public-dto';
 import type { PlaceMapItem } from '@/lib/places/map-types';
+import type { RoadMapPublicDto } from '@/lib/roads/map-public-schema';
 
 import { getPlaceBounds, getSelectionSetBounds } from '../place-map-geometry';
 import PlaceMap from '../PlaceMap.svelte';
@@ -58,8 +59,19 @@ const publicInfrastructure: PlaceMapPublicItemDto = {
 };
 const baseResponse = () =>
   Response.json({ places: [publicPlace], placeLayers: { infra: [infrastructure.slug], club: [] } });
-const infrastructureResponse = (lines = roads.lines) =>
-  Response.json({ places: [publicInfrastructure], roads: { ...roads, lines } });
+const mixedRoads: RoadMapPublicDto = {
+  gravel: roads.gravel,
+  asphalt: [
+    [
+      [37.75, 55.07],
+      [37.76, 55.08]
+    ]
+  ]
+};
+const infrastructureResponse = (roads: RoadMapPublicDto = mixedRoads) =>
+  Response.json({ places: [publicInfrastructure], roads });
+const getRoadFeatures = () =>
+  areaFeatures.filter(({ props }) => props.geometry.type === 'MultiLineString');
 const ready = async () => {
   await waitFor(() => expect(map.addChild).toHaveBeenCalledWith(nativeControl));
   await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
@@ -90,15 +102,30 @@ describe('PlaceMap infrastructure layer', () => {
     render(PlaceMap, { props: { dataUrl: baseLayerUrl } });
     const checkbox = await ready();
     expect(fetch).toHaveBeenCalledExactlyOnceWith(baseLayerUrl);
+    expect(screen.queryByText('Щебень')).toBeNull();
+    expect(screen.queryByText('Асфальт')).toBeNull();
     await fireEvent.click(checkbox);
     const credit = await screen.findByRole('link', { name: /^OpenStreetMap$/ });
+    await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
+    expect(screen.getByText('Щебень')).toBeDefined();
+    expect(screen.getByText('Асфальт')).toBeDefined();
+    await fireEvent.click(screen.getByRole('button', { name: 'Слои' }));
     expect(credit.getAttribute('href')).toBe('https://www.openstreetmap.org/copyright');
     expect(fetch.mock.calls.map(([url]) => url)).toEqual([baseLayerUrl, infrastructureLayerUrl]);
     expect(clusterIds()).toEqual([place.slug, infrastructure.slug]);
-    const roadFeature = areaFeatures.find(({ props }) => props.geometry.type === 'MultiLineString');
-    expect(roadFeature?.props.onClick).toBeUndefined();
-    expect(roadFeature?.props.style?.interactive).toBe(false);
-    expect(map.addChild).toHaveBeenCalledWith(roadFeature);
+    const roadFeatures = getRoadFeatures();
+    expect(roadFeatures.map(({ props }) => props.geometry.coordinates)).toEqual([
+      mixedRoads.gravel,
+      mixedRoads.asphalt
+    ]);
+    const [gravel, asphalt] = roadFeatures.map(({ props }) => props.style?.stroke?.[0]);
+    expect(asphalt?.width).toBeGreaterThan(gravel?.width ?? Infinity);
+    expect(asphalt?.color).not.toBe(gravel?.color);
+    for (const feature of roadFeatures) {
+      expect(feature.props.onClick).toBeUndefined();
+      expect(feature.props.style?.interactive).toBe(false);
+      expect(map.addChild).toHaveBeenCalledWith(feature);
+    }
     await fireEvent.click(screen.getByRole('checkbox', { name: 'Ривер' }));
     const parcelFeature = await waitFor(() => {
       const feature = areaFeatures.find(({ props }) => props.id === `parcel-${parcel.code}`);
@@ -107,43 +134,53 @@ describe('PlaceMap infrastructure layer', () => {
     });
     parcelFeature?.props.onClick?.({} as never, {} as never);
     expect(window.location.search).toContain(`p=${parcel.code}`);
-    await fireEvent.click(checkbox);
-    expect(map.removeChild).toHaveBeenCalledWith(roadFeature);
+    await fireEvent.click(screen.getByRole('checkbox', { name: 'Инфраструктура' }));
+    for (const feature of roadFeatures) expect(map.removeChild).toHaveBeenCalledWith(feature);
     expect(screen.queryByRole('link', { name: 'OpenStreetMap' })).toBeNull();
+    expect(screen.queryByText('Асфальт')).toBeNull();
   });
 
-  it('does not show late roads when infrastructure has been switched off', async () => {
-    window.history.replaceState({}, '', '/map/?l=infra');
-    const response = Promise.withResolvers<Response>();
-    const fetch = vi.fn((url: string) =>
-      url === baseLayerUrl ? Promise.resolve(baseResponse()) : response.promise
-    );
-    vi.stubGlobal('fetch', fetch);
-    render(PlaceMap, { props: { dataUrl: baseLayerUrl } });
-    const checkbox = await ready();
-    expect(fetch.mock.calls.map(([url]) => url)).toEqual([baseLayerUrl, infrastructureLayerUrl]);
-    await fireEvent.click(checkbox);
-    const late = infrastructureResponse();
-    const json = vi.spyOn(late, 'json');
-    response.resolve(late);
-    await waitFor(() => expect(json).toHaveBeenCalledOnce());
-    expect(clusterIds()).toEqual([place.slug]);
-    expect(screen.queryByRole('link', { name: 'OpenStreetMap' })).toBeNull();
-    expect(map.update).not.toHaveBeenCalled();
-    await fireEvent.click(checkbox);
-    await screen.findByRole('link', { name: 'OpenStreetMap' });
-    expect(
-      areaFeatures.filter(({ props }) => props.geometry.type === 'MultiLineString')
-    ).toHaveLength(1);
-    expect(fetch).toHaveBeenCalledTimes(2);
-  });
+  it.each([false, true])(
+    'shows late roads once after infrastructure is switched off and back on (before response: %s)',
+    async (enableWhilePending) => {
+      window.history.replaceState({}, '', '/map/?l=infra');
+      const response = Promise.withResolvers<Response>();
+      const fetch = vi.fn((url: string) =>
+        url === baseLayerUrl ? Promise.resolve(baseResponse()) : response.promise
+      );
+      vi.stubGlobal('fetch', fetch);
+      render(PlaceMap, { props: { dataUrl: baseLayerUrl } });
+      const checkbox = await ready();
+      expect(fetch.mock.calls.map(([url]) => url)).toEqual([baseLayerUrl, infrastructureLayerUrl]);
+      await fireEvent.click(checkbox);
+      if (enableWhilePending) await fireEvent.click(checkbox);
+      const late = infrastructureResponse({ gravel: [], asphalt: mixedRoads.asphalt });
+      const json = vi.spyOn(late, 'json');
+      response.resolve(late);
+      if (!enableWhilePending) {
+        await waitFor(() => expect(json).toHaveBeenCalledOnce());
+        expect(clusterIds()).toEqual([place.slug]);
+        expect(getRoadFeatures()).toHaveLength(0);
+        expect(screen.queryByRole('link', { name: 'OpenStreetMap' })).toBeNull();
+        await fireEvent.click(checkbox);
+      }
+      await screen.findByRole('link', { name: 'OpenStreetMap' });
+      expect(getRoadFeatures().map(({ props }) => props.geometry.coordinates)).toEqual([
+        mixedRoads.asphalt
+      ]);
+      expect(map.update).not.toHaveBeenCalled();
+      expect(fetch).toHaveBeenCalledTimes(2);
+    }
+  );
 
   it('retries a failed infrastructure layer without resetting loaded club places', async () => {
     window.history.replaceState({}, '', '/map/?l=club,infra');
     const loadInfrastructure = vi
       .fn()
       .mockResolvedValueOnce(new Response('', { status: 503 }))
-      .mockImplementationOnce(() => Promise.resolve(infrastructureResponse([])));
+      .mockImplementationOnce(() =>
+        Promise.resolve(infrastructureResponse({ gravel: [], asphalt: [] }))
+      );
     vi.stubGlobal('fetch', async (url: string) => {
       if (url === baseLayerUrl) return baseResponse();
       if (url === infrastructureLayerUrl) return loadInfrastructure();
@@ -160,6 +197,7 @@ describe('PlaceMap infrastructure layer', () => {
     await fireEvent.click(checkbox);
     await waitFor(() => expect(clusterIds()).toEqual([place.slug, 'club', infrastructure.slug]));
     expect(loadInfrastructure).toHaveBeenCalledTimes(2);
+    expect(getRoadFeatures()).toHaveLength(0);
     expect(screen.queryByRole('link', { name: 'OpenStreetMap' })).toBeNull();
   });
 
