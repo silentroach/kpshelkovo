@@ -5,14 +5,19 @@ import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 
 import { compareRoadSnapshots } from '../../src/lib/roads/compare.ts';
+import { parseLocalRoads } from '../../src/lib/roads/local-mapper.ts';
 import { mapOverpassRoads, mapRoadSnapshot } from '../../src/lib/roads/mapper.ts';
 import { OVERPASS_ENDPOINT } from '../../src/lib/roads/osm.ts';
+import { buildRoadNetwork } from '../../src/lib/roads/road-network.ts';
 import { serializeRoadSnapshot } from '../../src/lib/roads/serialize.ts';
 import type { RoadBounds, RoadSnapshot } from '../../src/lib/roads/types.ts';
 
 const candidateFile = fileURLToPath(new URL('../../../../.cache/roads/osm.json', import.meta.url));
 const acceptedFile = fileURLToPath(
   new URL('../../src/data/road-sources/osm.json', import.meta.url)
+);
+const localRoadsFile = fileURLToPath(
+  new URL('../../src/data/road-sources/local-roads.yaml', import.meta.url)
 );
 const bounds: RoadBounds = [55.048, 37.701, 55.077, 37.758];
 
@@ -48,18 +53,22 @@ export const acquireRoadSnapshot = async (fetcher = fetch): Promise<RoadSnapshot
 };
 
 export const updateRoadSnapshot = async (
-  output: { readonly accepted: string; readonly candidate: string },
+  files: { readonly accepted: string; readonly candidate: string; readonly localRoads: string },
   input?: string,
   fetcher?: typeof fetch
 ) => {
   const candidate = input ? await readSnapshot(input) : await acquireRoadSnapshot(fetcher);
   if (!candidate) throw new Error(`No road snapshot at ${input}`);
-  const accepted = await readSnapshot(output.accepted);
+  if (input) {
+    const localRoads = parseLocalRoads(await readFile(files.localRoads, 'utf8'));
+    buildRoadNetwork(candidate, localRoads);
+  }
+  const accepted = await readSnapshot(files.accepted);
   const changes = compareRoadSnapshots(candidate, accepted);
   if (!input) {
-    await writeSnapshot(output.candidate, candidate);
+    await writeSnapshot(files.candidate, candidate);
   } else if (JSON.stringify(accepted) !== JSON.stringify(candidate)) {
-    await writeSnapshot(output.accepted, candidate);
+    await writeSnapshot(files.accepted, candidate);
   }
   return { changes, bounds: candidate.bounds, previousBounds: accepted?.bounds };
 };
@@ -67,7 +76,7 @@ export const updateRoadSnapshot = async (
 const main = async (): Promise<void> => {
   const { values } = parseArgs({ options: { snapshot: { type: 'string' } } });
   const { changes, bounds, previousBounds } = await updateRoadSnapshot(
-    { accepted: acceptedFile, candidate: candidateFile },
+    { accepted: acceptedFile, candidate: candidateFile, localRoads: localRoadsFile },
     values.snapshot ? resolve(values.snapshot) : undefined
   );
   if (previousBounds && previousBounds.join(',') !== bounds.join(',')) {

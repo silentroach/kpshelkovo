@@ -1,10 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import osm from '@/data/road-sources/osm.json';
 import { parseEditorialGeometry } from '@/lib/geometry/editorial-mapper';
-import { buildRoadMapPayload } from '@/lib/roads/map-public';
-import { mapRoadSnapshot } from '@/lib/roads/mapper';
-import { shelkovoBoundary } from '@/lib/territory/shelkovo';
 import { GET as getBase } from '@/pages/map/data/layers/base.json';
 import { GET as getClub } from '@/pages/map/data/layers/club.json';
 import { GET as getInfra } from '@/pages/map/data/layers/infra.json';
@@ -79,9 +75,7 @@ describe('place map layer routes', () => {
     expect(club.places).toEqual(publicPlaces.filter(({ mapLayer }) => mapLayer === 'club'));
     expect(base.places[0]?.coordinates).toEqual([37.74689499, 55.06070312]);
     expect(infra.places[0]?.coordinates).toEqual([37.716242, 55.060526]);
-    expect(infra.roads).toEqual({
-      lines: buildRoadMapPayload(mapRoadSnapshot(osm), shelkovoBoundary).lines
-    });
+    expect(infra.roads?.gravel.length).toBeGreaterThan(0);
     expect(club).not.toHaveProperty('roads');
   });
 

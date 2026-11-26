@@ -90,7 +90,8 @@ describe('club place layer', () => {
 
   it('draws roads from both layers independently with one attribution and no camera change', async () => {
     const clubRoads = {
-      lines: [
+      asphalt: [],
+      gravel: [
         [
           [37.745, 55.029],
           [37.746, 55.03]
@@ -125,7 +126,7 @@ describe('club place layer', () => {
     const infraRoadFeature = roadFeature(37.74);
     expect(clubRoadFeature.props.geometry).toEqual({
       type: 'MultiLineString',
-      coordinates: clubRoads.lines
+      coordinates: clubRoads.gravel
     });
     expect(clubRoadFeature.props.style).toEqual(infraRoadFeature.props.style);
     expect(map.addChild).toHaveBeenCalledWith(clubRoadFeature);

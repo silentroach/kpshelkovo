@@ -10,7 +10,8 @@ import type {
 } from '@/lib/geometry/editorial-types';
 
 import { RoadMapPublicSchema, type RoadMapPublicDto } from './map-public-schema';
-import type { RoadSnapshot } from './types';
+import type { RoadNetwork } from './road-network-types';
+import { createRoadSurfaceSplitter } from './road-surfaces';
 
 const offset = z
   .object({ offset_east_m: z.number(), offset_north_m: z.number() })
@@ -18,30 +19,32 @@ const offset = z
   .parse(parse(displayConfig));
 
 export const buildRoadMapPayload = (
-  snapshot: RoadSnapshot,
+  network: RoadNetwork,
   boundary: EditorialPolygonCoordinates,
+  asphaltAreas: string,
   config = offset
 ): RoadMapPublicDto => {
-  const [south, , north] = snapshot.bounds;
+  const [south, , north] = network.bounds;
   const shift = createDisplayOffset(
     config.offset_east_m,
     config.offset_north_m,
     (south + north) / 2
   );
-  const positions = new Map<number, EditorialPosition>(
-    snapshot.nodes.map(({ id, lon, lat }) => [id, [lon, lat]])
-  );
   const clip = createLineClipper(boundary);
-  return RoadMapPublicSchema.parse({
-    lines: snapshot.ways
-      .flatMap((way) => {
-        const line = way.nodes.map((id) => {
-          const position = positions.get(id);
-          if (!position) throw new Error(`OSM way ${way.id} references missing node ${id}`);
-          return position;
-        });
-        return clip(line).map((fragment) => fragment.map((point) => roundPosition(shift(point))));
-      })
-      .filter((line) => line.some(([x, y]) => x !== line[0]![0] || y !== line[0]![1]))
-  });
+  const split = createRoadSurfaceSplitter(asphaltAreas);
+  const lines: Record<'asphalt' | 'gravel', EditorialPosition[][]> = { asphalt: [], gravel: [] };
+  for (const way of network.ways) {
+    const line = way.nodes.map((id) => {
+      const node = network.nodes.get(id);
+      if (!node) throw new Error(`Road ${way.source}:${way.id} references missing node ${id}`);
+      return node.position;
+    });
+    for (const { surface, line: fragment } of clip(line).flatMap(split)) {
+      const shifted = fragment.map((point) => roundPosition(shift(point)));
+      if (shifted.some(([x, y]) => x !== shifted[0]![0] || y !== shifted[0]![1])) {
+        lines[surface].push(shifted);
+      }
+    }
+  }
+  return RoadMapPublicSchema.parse(lines);
 };

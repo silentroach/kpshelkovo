@@ -10,6 +10,7 @@ import { afterEach, beforeEach, vi } from 'vitest';
 import type { ParcelDetailsPublicDto } from '@/lib/parcels/details-public-schema';
 import type { PlaceMapPublicItemDto } from '@/lib/places/map-public-dto';
 import type { PlaceMapItem } from '@/lib/places/map-types';
+import type { RoadMapPublicDto } from '@/lib/roads/map-public-schema';
 
 export const clustererProps: YMapClustererProps[] = [];
 export const clustererImport = vi.fn<() => Promise<void>>();
@@ -327,8 +328,9 @@ const installYandexMaps = (): void => {
 export const baseLayerUrl = '/map/data/layers/base.json';
 export const infrastructureLayerUrl = '/map/data/layers/infra.json';
 export const clubLayerUrl = '/map/data/layers/club.json';
-export const roads = {
-  lines: [
+export const roads: RoadMapPublicDto = {
+  asphalt: [],
+  gravel: [
     [
       [37.74, 55.06],
       [37.75, 55.07]
