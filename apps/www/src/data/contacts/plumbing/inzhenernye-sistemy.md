@@ -1,7 +1,7 @@
 ---
 title: Инженерные системы
 slug: inzhenernye-sistemy
-category: construction
+category: plumbing
 updated_at: 2026-10-12
 summary: Проектирование и монтаж электроснабжения, отопления, водопровода и внутренней канализации под ключ
 contacts:

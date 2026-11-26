@@ -99,6 +99,7 @@ describe('buildContactsDataset', () => {
     const entries = [
       entry({ id: 'fence/fence', data: { category: 'fence' } }),
       entry({ id: 'services/services', data: { category: 'services' } }),
+      entry({ id: 'plumbing/septic', data: { category: 'plumbing' } }),
       entry({
         id: 'education/education',
         data: { category: 'education' }
@@ -114,6 +115,7 @@ describe('buildContactsDataset', () => {
       }),
       entry({ id: 'furniture/furniture', data: { category: 'furniture' } }),
       entry({ id: 'food/food', data: { category: 'food' } }),
+      entry({ id: 'houses/builder', data: { category: 'houses' } }),
       entry({
         id: 'electricity/electricity',
         data: { category: 'electricity' }
@@ -123,6 +125,8 @@ describe('buildContactsDataset', () => {
     const categories = buildContactsDataset(entries).categories.map((item) => item.category);
     expect(categories).toMatchInlineSnapshot(`
       [
+        "houses",
+        "plumbing",
         "construction",
         "electricity",
         "fence",

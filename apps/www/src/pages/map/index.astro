@@ -7,7 +7,8 @@ import BaseLayout from '@/layouts/BaseLayout.astro';
 import { loadPlaces } from '@/lib/places/load';
 import { isPlaceLayerVisible } from '@/lib/places/map-layers';
 import { selectMapPlaces } from '@/lib/places/map-selection';
-import { placesDataUrl, placesUrl } from '@/lib/places/routes';
+import { placesUrl } from '@/lib/places/routes';
+import { withBase } from '@/lib/site';
 
 const places = selectMapPlaces(await loadPlaces());
 const initialPlaces = places.filter((place) => isPlaceLayerVisible(place));
@@ -53,7 +54,7 @@ const schema = {
       <PageHeading title="Карта мест и объектов Шелково" />
     </div>
     <PlaceMap
-      dataUrl={placesDataUrl()}
+      dataUrl={withBase('/map/data/layers/base.json')}
       {fallbackPlace}
       {initialBounds}
       client:load

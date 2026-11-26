@@ -3,6 +3,7 @@
   import type { Feature } from '@yandex/ymaps3-clusterer';
   import { onMount, tick } from 'svelte';
   import type { Attachment } from 'svelte/attachments';
+  import { SvelteMap } from 'svelte/reactivity';
 
   import { createEditorialMapObjects } from '@/components/maps/editorial-map';
   import type { EditorialFeatureCollection } from '@/lib/geometry/editorial-types';
@@ -14,15 +15,15 @@
     PARCEL_QUERY_PARAM
   } from '@/lib/parcels/parcel-url';
   import { PARCEL_CODE, type ParcelPart } from '@/lib/parcels/schema';
+  import type { PlaceMapBasePayloadDto, PlaceMapLayerPayloadDto } from '@/lib/places/map-layer-dto';
   import { isPlaceLayerVisible, PLACE_MAP_LAYER_OPTIONS } from '@/lib/places/map-layers';
-  import type {
-    PlaceMapPublicItemDto,
-    PlaceMapPublicPayloadDto
-  } from '@/lib/places/map-public-dto';
+  import type { PlaceMapPublicItemDto } from '@/lib/places/map-public-dto';
   import type { PlaceMapItem, PlaceMapProps } from '@/lib/places/map-types';
   import { getPlaceClosingTime } from '@/lib/places/opening-hours';
   import { placeUrl } from '@/lib/places/routes';
   import { PLACE_MAP_LAYERS, type PlaceMapLayer } from '@/lib/places/schema';
+  import { OSM_SOURCE } from '@/lib/roads/osm';
+  import { withBase } from '@/lib/site';
   import { createOpenMapsControl } from '@/lib/yandex-maps/open-maps-control';
   import {
     installYandexMapsRuntimeHeadPersistence,
@@ -34,6 +35,7 @@
 
   import './place-marker-badge.css';
   import type { ParcelLayer, ParcelMapItem, ParcelMapPayload } from './parcel-layer-types';
+  import type { LoadedPlaceMapLayer, PlaceMapLayerLoad } from './place-map-data-types';
   import {
     createMapFeatures,
     fromPublicEditorialGeometry,
@@ -54,7 +56,7 @@
     dataUrl = '',
     fallbackPlace,
     initialBounds,
-    places = [] as readonly PlaceMapItem[],
+    places = [],
     forest,
     village,
     park,
@@ -75,6 +77,14 @@
     shp: 'Парк',
     shr: 'Ривер'
   };
+  const ROAD_SURFACES = [
+    {
+      key: 'gravel' as const,
+      label: 'Щебень',
+      stroke: { width: 2, color: '#b27a35', dash: [5, 3] }
+    },
+    { key: 'asphalt' as const, label: 'Асфальт', stroke: { width: 2.25, color: '#7b858e' } }
+  ];
   const areaFormatter = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 2 });
   const priceFormatter = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 });
   const toPlaceMapItem = (place: PlaceMapPublicItemDto): PlaceMapItem => ({
@@ -85,7 +95,7 @@
     status: place.status,
     availability: place.availability,
     statusLabel: place.status_label,
-    coordinates: place.coordinates,
+    coordinates: { lng: place.coordinates[0], lat: place.coordinates[1] },
     geometry: place.geometry ? fromPublicEditorialGeometry(place.geometry) : undefined,
     openingHours: place.opening_hours
       ? {
@@ -99,14 +109,10 @@
       : undefined,
     url: placeUrl(place.slug)
   });
-  const fetchPlaces = async (url: string): Promise<readonly PlaceMapItem[]> => {
-    if (!url) throw new Error('Не указан источник данных карты');
-
+  const fetchMapData = async (url: string): Promise<unknown> => {
     const response = await fetch(url);
     if (!response.ok) throw new Error('Не удалось загрузить данные карты');
-
-    const payload = (await response.json()) as PlaceMapPublicPayloadDto;
-    return payload.places.map(toPlaceMapItem);
+    return response.json();
   };
   const getCurrentPlaceBounds = (): ymaps3.LngLatBounds =>
     initialBounds ?? getPlaceBounds(places.filter((place) => isPlaceLayerVisible(place)));
@@ -149,6 +155,38 @@
   let error: string | undefined = $state(undefined);
   let selectedParts = $state<ParcelPart[]>([]);
   let enabledPlaceLayers = $state<readonly PlaceMapLayer[]>([]);
+  const roadFeatures = new SvelteMap<PlaceMapLayer, readonly ymaps3.YMapFeature[]>();
+  let roadsShown = $derived(roadFeatures.size > 0);
+  const syncRoads = (layer: PlaceMapLayer, roads?: LoadedPlaceMapLayer['roads']): void => {
+    const currentMap = map;
+    if (!currentMap) return;
+    const existing = roadFeatures.get(layer);
+    if (!roads) {
+      if (!existing) return;
+      for (const feature of existing) currentMap.removeChild(feature);
+      roadFeatures.delete(layer);
+      return;
+    }
+    if (existing) return;
+
+    const features: ymaps3.YMapFeature[] = [];
+    for (const { key, stroke } of ROAD_SURFACES) {
+      const lines = roads[key];
+      if (!lines.length) continue;
+      const feature = new window.ymaps3.YMapFeature({
+        id: `shelkovo-osm-roads-${layer}-${key}`,
+        geometry: { type: 'MultiLineString', coordinates: lines },
+        style: {
+          interactive: false,
+          zIndex: -2,
+          stroke: [stroke]
+        }
+      });
+      currentMap.addChild(feature);
+      features.push(feature);
+    }
+    if (features.length) roadFeatures.set(layer, features);
+  };
   let togglePlaceLayer = $state<(layer: PlaceMapLayer, checked: boolean) => void>(() => {});
   const isPlaceVisible = (place: PlaceMapItem): boolean =>
     isPlaceLayerVisible(place, enabledPlaceLayers);
@@ -474,6 +512,9 @@
     cancelClusterFocus();
     clearSetGeometry();
     if (map) {
+      for (const features of roadFeatures.values()) {
+        for (const feature of features) map.removeChild(feature);
+      }
       for (const slug of visibleGeometry) {
         for (const object of mapEditorialObjects.get(slug) ?? []) map.removeChild(object);
       }
@@ -484,6 +525,7 @@
 
     mapClusterer = undefined;
     mapListener = undefined;
+    roadFeatures.clear();
     mapEditorialObjects.clear();
     markerContents = [];
     setMarkers.clear();
@@ -525,35 +567,46 @@
     let setGeometry: EditorialFeatureCollection | undefined;
     const disabledSetParts = new Set<ParcelPart>();
     const disabledPlaceLayers = new Set<PlaceMapLayer>();
+    const placeLayerLoads = new Map<PlaceMapLayer, PlaceMapLayerLoad>();
+    const pendingLayerFits = new Set<PlaceMapLayer>();
+    const placeLayersBySlug = new Map<string, PlaceMapLayer>();
     let preserveLayerCamera = false;
-    const enablePlaceLayer = (layer: PlaceMapLayer): void => {
-      if (!disabledPlaceLayers.has(layer) && !enabledPlaceLayers.includes(layer))
-        enabledPlaceLayers = [...enabledPlaceLayers, layer];
+    const setPlaceLayer = (layer: PlaceMapLayer, enabled: boolean): void => {
+      if (enabled === enabledPlaceLayers.includes(layer)) return;
+      enabledPlaceLayers = enabled
+        ? [...enabledPlaceLayers, layer]
+        : enabledPlaceLayers.filter((candidate) => candidate !== layer);
     };
+    const getIndexedLayer = (slug: string): PlaceMapLayer | undefined =>
+      placeLayersBySlug.get(slug) ?? places.find((place) => place.slug === slug)?.mapLayer;
     const readyParcelParts = new Set<ParcelPart>();
     const cancelSetFit = (): void => {
       pendingSetFit = false;
     };
     const syncSetPlaces = (): void => {
       if (!map || !mapClusterer) return;
-      const previousPlaces = new Set(setPlaces);
-      for (const marker of setMarkers.values()) map.removeChild(marker);
-      setMarkers.clear();
       setPlaces.clear();
       for (const slug of activeSet?.places ?? []) setPlaces.add(slug);
+      for (const [place] of markerContents) {
+        const marker = setMarkers.get(place.slug);
+        if (!marker || (setPlaces.has(place.slug) && isPlaceVisible(place))) continue;
+        map.removeChild(marker);
+        setMarkers.delete(place.slug);
+      }
       mapClusterer.update({
         features: createMapFeatures(
           places.filter((place) => isPlaceVisible(place) && !setPlaces.has(place.slug))
         )
       });
       for (const [place, content] of markerContents) {
-        if (place.geometry && previousPlaces.has(place.slug) !== setPlaces.has(place.slug)) {
+        const isMember = setPlaces.has(place.slug);
+        if (place.geometry && (content.dataset.selectionSet === 'true') !== isMember) {
           if (visibleGeometry.delete(place.slug))
             for (const object of mapEditorialObjects.get(place.slug) ?? []) map.removeChild(object);
           const color =
             getComputedStyle(mapContainer!).getPropertyValue('--parcel-map-set').trim() ||
             document.documentElement.style.getPropertyValue('--parcel-map-set').trim();
-          const geometry = setPlaces.has(place.slug)
+          const geometry = isMember
             ? {
                 type: 'FeatureCollection' as const,
                 features: place.geometry.features.map((feature) => ({
@@ -569,12 +622,10 @@
             : place.geometry;
           mapEditorialObjects.set(place.slug, createEditorialMapObjects(window.ymaps3, geometry));
         }
-        if (setPlaces.has(place.slug)) {
-          content.dataset.selectionSet = 'true';
-          if (!isPlaceVisible(place)) {
-            updateGeometryVisibility(place);
-            continue;
-          }
+        if (isMember) content.dataset.selectionSet = 'true';
+        else delete content.dataset.selectionSet;
+        const currentMarker = setMarkers.get(place.slug);
+        if (isMember && isPlaceVisible(place) && !currentMarker) {
           const marker = new window.ymaps3.YMapMarker(
             {
               coordinates: [place.coordinates.lng, place.coordinates.lat]
@@ -583,13 +634,16 @@
           );
           setMarkers.set(place.slug, marker);
           map.addChild(marker);
-        } else delete content.dataset.selectionSet;
+        }
         updateGeometryVisibility(place);
       }
     };
     const fitSelectionSet = (): void => {
       if (!activeSet || !map) return;
-      if (places.some((place) => setPlaces.has(place.slug) && !isPlaceVisible(place))) return;
+      const setMembers = places.filter(
+        (place) => setPlaces.has(place.slug) && isPlaceVisible(place)
+      );
+      if (setMembers.length !== setPlaces.size) return;
       const parts = new Set(
         activeSet.parcels.map((code) => code.slice(0, 3).toLowerCase() as ParcelPart)
       );
@@ -603,11 +657,7 @@
         return;
       }
       if (!pendingSetFit) return;
-      const bounds = getSelectionSetBounds(
-        members,
-        places.filter((place) => setPlaces.has(place.slug)),
-        setGeometry
-      );
+      const bounds = getSelectionSetBounds(members, setMembers, setGeometry);
       if (!bounds) return;
       pendingSetFit = false;
       map.update({
@@ -1082,10 +1132,11 @@
     };
     let highlightTimer: number | undefined;
     let markerUpdateTimer: number | undefined;
-    const highlightUrl = new URL(window.location.href);
     const requestedSlug = !requestedParcelCode
-      ? highlightUrl.searchParams.get(PLACE_HIGHLIGHT_QUERY_PARAM) || undefined
+      ? initialUrl.searchParams.get(PLACE_HIGHLIGHT_QUERY_PARAM) || undefined
       : undefined;
+    let pendingHighlight = requestedSlug;
+    let highlightLayer: PlaceMapLayer | undefined;
     let highlightedPlace: PlaceMapItem | undefined;
 
     const clearPlaceHighlight = (): void => {
@@ -1103,14 +1154,20 @@
       removeHighlightQuery(place.slug);
     };
 
+    const canFitPlaceLayer = (layer: PlaceMapLayer): boolean =>
+      Boolean(
+        PLACE_MAP_LAYER_OPTIONS[layer]?.fit &&
+        !requestedSet &&
+        !pendingHighlight &&
+        !highlightedPlace &&
+        !selectedParcel &&
+        !pendingParcelCode
+      );
+
     const fitVisiblePlaceLayer = (layer: PlaceMapLayer): void => {
       if (
         !map ||
-        !PLACE_MAP_LAYER_OPTIONS[layer]?.fit ||
-        requestedSet ||
-        highlightedPlace ||
-        selectedParcel ||
-        pendingParcelCode ||
+        !canFitPlaceLayer(layer) ||
         !places.some((place) => place.mapLayer === layer && isPlaceVisible(place))
       )
         return;
@@ -1128,28 +1185,6 @@
       map.update({ location: { bounds, duration: 0 }, margin: getViewMargin() });
     };
 
-    togglePlaceLayer = (layer, checked): void => {
-      const newlyEnabled = checked && !enabledPlaceLayers.includes(layer);
-      enabledPlaceLayers = enabledPlaceLayers.filter((candidate) => candidate !== layer);
-      if (checked) {
-        disabledPlaceLayers.delete(layer);
-        enablePlaceLayer(layer);
-      } else disabledPlaceLayers.add(layer);
-      if (!checked) {
-        cancelSetFit();
-        cancelClusterFocus();
-        if (highlightedPlace?.mapLayer === layer) clearPlaceHighlight();
-        for (const [place, content] of markerContents) {
-          if (isPlaceVisible(place)) continue;
-          if (content === document.activeElement) mapContainer?.focus({ preventScroll: true });
-          markerHoveredGeometry.delete(place.slug);
-          focusedGeometry.delete(place.slug);
-        }
-      }
-      syncSetPlaces();
-      if (newlyEnabled) fitVisiblePlaceLayer(layer);
-    };
-
     const startPlaceHighlight = (place: PlaceMapItem): void => {
       const marker = markerContents.find(([candidate]) => candidate.slug === place.slug)?.[1];
 
@@ -1164,6 +1199,110 @@
       setGeometryState(place, highlightedGeometry, true);
       focusPlace(place, getMapZoomDuration());
       highlightTimer = window.setTimeout(clearPlaceHighlight, HIGHLIGHT_DURATION_MS);
+    };
+
+    const resolvePlaceHighlight = (): void => {
+      if (!pendingHighlight) return;
+      const slug = pendingHighlight;
+      pendingHighlight = undefined;
+      if (new URL(window.location.href).searchParams.get(PLACE_HIGHLIGHT_QUERY_PARAM) !== slug)
+        return;
+      const place = places.find((candidate) => candidate.slug === slug);
+      if (!place || !isPlaceVisible(place)) {
+        removeHighlightQuery(slug);
+        return;
+      }
+      highlightedPlace = place;
+      startPlaceHighlight(place);
+    };
+
+    const registerPlaces = (items: readonly PlaceMapItem[]): void => {
+      for (const place of items) {
+        markerContents.push([place, createMarkerContent(place)]);
+        if (place.geometry)
+          mapEditorialObjects.set(
+            place.slug,
+            createEditorialMapObjects(window.ymaps3, place.geometry)
+          );
+      }
+      if (markerUpdateTimer === undefined && items.some((place) => place.openingHours))
+        markerUpdateTimer = window.setInterval(refreshMarkerContents, 60_000);
+    };
+
+    const applyPlaceLayer = (layer: PlaceMapLayer, loaded?: LoadedPlaceMapLayer): void => {
+      if (!enabledPlaceLayers.includes(layer)) return;
+      if (loaded && !places.some((place) => place.mapLayer === layer)) {
+        places = [...places, ...loaded.places];
+        registerPlaces(loaded.places);
+      }
+      syncSetPlaces();
+      syncRoads(layer, loaded?.roads);
+      if (layer === highlightLayer) resolvePlaceHighlight();
+      if (pendingLayerFits.delete(layer)) fitVisiblePlaceLayer(layer);
+      fitSelectionSet();
+    };
+
+    const enablePlaceLayer = (layer: PlaceMapLayer): void => {
+      const load = placeLayerLoads.get(layer);
+      if (disabledPlaceLayers.has(layer) || load?.status === 'failed') return;
+      setPlaceLayer(layer, true);
+      if (!dataUrl || load?.status === 'loaded') {
+        applyPlaceLayer(layer, load?.status === 'loaded' ? load : undefined);
+        return;
+      }
+      if (load?.status === 'pending') return;
+      placeLayerLoads.set(layer, { status: 'pending' });
+      void (async () => {
+        try {
+          const data = await fetchMapData(withBase(`/map/data/layers/${layer}.json`));
+          if (destroyed || setupFailed) return;
+          const payload = data as PlaceMapLayerPayloadDto;
+          const loaded: LoadedPlaceMapLayer = {
+            status: 'loaded',
+            places: payload.places.map(toPlaceMapItem),
+            roads: payload.roads
+          };
+          placeLayerLoads.set(layer, loaded);
+          applyPlaceLayer(layer, loaded);
+        } catch (reason) {
+          if (destroyed || setupFailed) return;
+          if (!enabledPlaceLayers.includes(layer)) {
+            placeLayerLoads.delete(layer);
+            return;
+          }
+          console.error('Place layer error:', layer, reason);
+          placeLayerLoads.set(layer, { status: 'failed' });
+          setPlaceLayer(layer, false);
+          pendingLayerFits.delete(layer);
+          if (layer === highlightLayer) resolvePlaceHighlight();
+        }
+      })();
+    };
+
+    togglePlaceLayer = (layer, checked): void => {
+      if (checked) {
+        if (enabledPlaceLayers.includes(layer)) return;
+        disabledPlaceLayers.delete(layer);
+        if (placeLayerLoads.get(layer)?.status === 'failed') placeLayerLoads.delete(layer);
+        if (canFitPlaceLayer(layer)) pendingLayerFits.add(layer);
+        enablePlaceLayer(layer);
+        return;
+      }
+      setPlaceLayer(layer, false);
+      disabledPlaceLayers.add(layer);
+      pendingLayerFits.delete(layer);
+      cancelSetFit();
+      cancelClusterFocus();
+      if (layer === highlightLayer) resolvePlaceHighlight();
+      if (highlightedPlace?.mapLayer === layer) clearPlaceHighlight();
+      syncRoads(layer);
+      for (const [place, content] of markerContents) {
+        if (isPlaceVisible(place)) continue;
+        if (content === document.activeElement) mapContainer?.focus({ preventScroll: true });
+        markerHoveredGeometry.delete(place.slug);
+        focusedGeometry.delete(place.slug);
+      }
+      syncSetPlaces();
     };
 
     installYandexMapsRuntimeHeadPersistence();
@@ -1186,8 +1325,11 @@
     void (async () => {
       try {
         const sdkRequest = loadYandexMaps();
+        const baseRequest = dataUrl
+          ? fetchMapData(dataUrl).then((payload) => payload as PlaceMapBasePayloadDto)
+          : undefined;
         const objectsRequest = Promise.all([
-          places.length ? Promise.resolve(places) : fetchPlaces(dataUrl),
+          baseRequest,
           // The module extends SDK classes at evaluation time; load it alongside layout, not before SDK.
           sdkRequest.then(() => {
             if (destroyed || setupFailed) return;
@@ -1226,33 +1368,29 @@
           );
         })();
         // Observe both branches immediately, including failures before SDK/layout readiness.
-        const [, [loadedPlaces, clusterer]] = await Promise.all([basemapRequest, objectsRequest]);
+        const [, [base, clusterer]] = await Promise.all([basemapRequest, objectsRequest]);
         if (destroyed || setupFailed || !map || !mapContainer || !clusterer) return;
         const { YMapClusterer, clusterByGrid } = clusterer;
 
-        places = loadedPlaces;
-        highlightedPlace = requestedSlug
-          ? places.find((place) => place.slug === requestedSlug)
-          : undefined;
-        if (highlightedPlace?.mapLayer) {
-          if (disabledPlaceLayers.has(highlightedPlace.mapLayer)) highlightedPlace = undefined;
-          else enablePlaceLayer(highlightedPlace.mapLayer);
+        if (base) {
+          places = base.places.map(toPlaceMapItem);
+          for (const layer of PLACE_MAP_LAYERS) {
+            for (const slug of base.placeLayers?.[layer] ?? []) placeLayersBySlug.set(slug, layer);
+          }
         }
+        highlightLayer = pendingHighlight ? getIndexedLayer(pendingHighlight) : undefined;
+        if (highlightLayer) setPlaceLayer(highlightLayer, true);
         if (
           !requestedParcelCode &&
-          highlightUrl.searchParams.has(PLACE_HIGHLIGHT_QUERY_PARAM) &&
-          !highlightedPlace
+          initialUrl.searchParams.has(PLACE_HIGHLIGHT_QUERY_PARAM) &&
+          !pendingHighlight
         ) {
           removeHighlightQuery(requestedSlug);
         }
         const ymaps3 = window.ymaps3;
         const { YMapListener, YMapMarker } = ymaps3;
 
-        markerContents = places.map((place) => [place, createMarkerContent(place)] as const);
-        for (const place of places) {
-          if (!place.geometry) continue;
-          mapEditorialObjects.set(place.slug, createEditorialMapObjects(ymaps3, place.geometry));
-        }
+        registerPlaces(places);
         mapListener = new YMapListener({
           onUpdate: ({ location }) => {
             updateMarkerScale(location.zoom);
@@ -1317,13 +1455,9 @@
         map.addChild(mapClusterer);
         updateMarkerScale(map.zoom);
 
-        if (highlightedPlace) {
-          startPlaceHighlight(highlightedPlace);
-        }
-        if (markerContents.some(([place]) => place.openingHours)) {
-          markerUpdateTimer = window.setInterval(refreshMarkerContents, 60_000);
-        }
+        if (!highlightLayer || !dataUrl) resolvePlaceHighlight();
         mapReady = true;
+        if (dataUrl) for (const layer of enabledPlaceLayers) enablePlaceLayer(layer);
         if (requestedParcelCode) {
           if (!parcelCode || !PARCEL_CODE.test(parcelCode)) {
             removeParcelQuery(requestedParcelCode);
@@ -1348,7 +1482,7 @@
               );
               if (!response.ok) throw new Error('Set unavailable');
               const definition = (await response.json()) as MapSelectionSetPublicDto;
-              if (destroyed || requestedSet !== setId) return;
+              if (destroyed || setupFailed || requestedSet !== setId) return;
               if (
                 definition.id !== setId ||
                 !Array.isArray(definition.parcels) ||
@@ -1356,8 +1490,13 @@
                 typeof definition.outline !== 'boolean'
               )
                 throw new Error('Invalid set data');
-              if (definition.places.some((slug) => !places.some((place) => place.slug === slug)))
-                throw new Error('Missing set place');
+              const memberLayers = new Set<PlaceMapLayer>();
+              for (const slug of definition.places) {
+                const layer = getIndexedLayer(slug);
+                if (layer) memberLayers.add(layer);
+                else if (!places.some((place) => place.slug === slug))
+                  throw new Error('Missing set place');
+              }
               if (definition.geometry) {
                 const geometry = fromPublicEditorialGeometry(definition.geometry);
                 const objects = createEditorialMapObjects(ymaps3, geometry);
@@ -1368,10 +1507,7 @@
                 setGeometry = geometry;
               }
               activeSet = definition;
-              for (const place of places) {
-                if (place.mapLayer && definition.places.includes(place.slug))
-                  enablePlaceLayer(place.mapLayer);
-              }
+              for (const layer of memberLayers) enablePlaceLayer(layer);
               syncSetPlaces();
               parcelLayer?.setMembership(definition.parcels, definition.outline);
               const parts = new Set(
@@ -1459,6 +1595,29 @@
     class="place-map__canvas"
     tabindex="-1"
   ></div>
+  {#if roadsShown}
+    <div class="road-map-legend">
+      <p>Дорожное покрытие</p>
+      <ul role="list">
+        {#each ROAD_SURFACES as { key, label, stroke } (key)}
+          <li>
+            <svg width="30" height="8" viewBox="0 0 30 8" aria-hidden="true">
+              <path
+                d="M0 4h30"
+                stroke={stroke.color}
+                stroke-width={stroke.width}
+                stroke-dasharray={stroke.dash?.join(' ')}
+              />
+            </svg>
+            {label}
+          </li>
+        {/each}
+      </ul>
+    </div>
+    <div class="road-map-credit">
+      <span>© <a href={OSM_SOURCE}>OpenStreetMap</a></span>
+    </div>
+  {/if}
   {#if selectedParcel && (selectedParcel.status === 'available' || selectedParcel.status === 'reserved')}
     <div
       bind:this={popupElement}
@@ -1675,10 +1834,14 @@
 
 <style>
   .place-map {
+    --map-copyright-offset: 0px;
+    --map-credit-height: 1.5rem;
+    --map-controls-top: 4.5rem;
     --parcel-map-boundary: oklch(55.4% 0.041 257.4);
     --parcel-map-selection: oklch(46.9% 0.067 241.9);
     --parcel-map-set: #7c3aed;
     position: relative;
+    container-type: inline-size;
     /* Keep SDK control layers below site navigation. */
     isolation: isolate;
     width: 100%;
@@ -1688,7 +1851,6 @@
   }
 
   .place-map__canvas {
-    container-type: inline-size;
     width: 100%;
     height: 100%;
   }
@@ -1699,9 +1861,70 @@
     box-shadow: inset 0 0 0 0.3125rem var(--color-surface);
   }
 
+  .road-map-legend {
+    position: absolute;
+    z-index: 2;
+    inset-inline-end: 1rem;
+    inset-block-start: var(--map-controls-top);
+    max-inline-size: calc(100% - 5.5rem);
+    padding: 0.375rem 0.625rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    color: var(--color-text);
+    font-size: 0.8125rem;
+    line-height: 1.4;
+    pointer-events: none;
+  }
+
+  .road-map-legend p {
+    margin: 0 0 0.1875rem;
+    font-weight: 600;
+  }
+
+  .road-map-legend ul {
+    display: grid;
+    gap: 0.125rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .road-map-legend li {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+
+  .road-map-credit {
+    position: absolute;
+    z-index: 3;
+    bottom: calc(var(--map-copyright-offset) + 2.25rem);
+    left: 10px;
+    display: grid;
+    align-items: center;
+    min-block-size: var(--map-credit-height);
+    color: #000;
+    font:
+      0.6875rem / 0.875rem Verdana,
+      Arial,
+      sans-serif;
+  }
+
+  .road-map-credit > span {
+    padding: 0 4px 1px;
+    border-radius: 3px;
+    background: rgb(255 255 255 / 75%);
+  }
+
+  .road-map-credit a {
+    color: inherit;
+    text-decoration: underline;
+  }
+
   .parcel-map-controls {
     position: absolute;
-    top: 4.5rem;
+    top: var(--map-controls-top);
     left: 1rem;
     z-index: 4;
     display: flex;
@@ -2081,15 +2304,21 @@
     border-bottom: 0;
   }
 
-  .place-map__canvas :global(:is(a, button):focus-visible) {
+  .place-map__canvas :global(:is(a, button):focus-visible),
+  .road-map-credit a:focus-visible {
     outline: 0.1875rem solid var(--color-focus);
     outline-offset: 0.125rem;
     box-shadow: 0 0 0 0.4375rem var(--color-surface);
   }
 
+  .place-map__canvas :global(.ymaps3--map-copyrights_bottom) {
+    bottom: var(--map-copyright-offset);
+  }
+
   @container (max-width: 32rem) {
-    .place-map__canvas :global(.ymaps3--map-copyrights_bottom) {
-      bottom: 3.5rem;
+    .place-map__canvas,
+    .road-map-credit {
+      --map-copyright-offset: 3.5rem;
     }
   }
 
