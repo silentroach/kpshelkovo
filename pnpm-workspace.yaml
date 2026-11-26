@@ -1,7 +1,9 @@
 packages:
   - apps/*
   - packages/*
-ignoreScripts: true
+allowBuilds:
+  esbuild: false
+optimisticRepeatInstall: false
 
 minimumReleaseAge: 2880
 autoInstallPeers: false

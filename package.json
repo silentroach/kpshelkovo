@@ -22,16 +22,17 @@
     "parcels:update": "node apps/www/scripts/parcels/update.ts",
     "roads:update": "node apps/www/scripts/roads/update.ts",
     "test:watch": "turbo run test:watch",
-    "agents:setup": "pnpm install --frozen-lockfile && pnpm skills:install && pnpm openspec:generate",
+    "agents:setup": "pnpm install --frozen-lockfile && pnpm skills:install",
     "skills:install": "node scripts/skills.mjs install",
     "skills:check": "node scripts/skills.mjs check",
     "openspec:generate": "node scripts/openspec.mjs",
     "openspec:validate": "pnpm exec openspec validate --all --strict --no-interactive && pnpm exec openspec validate --archived --strict --no-interactive",
     "test:agent-tooling": "node --test scripts/agent-tooling.test.mjs",
-    "postinstall": "node scripts/hooks.mjs"
+    "postinstall": "node scripts/hooks.mjs",
+    "prepare": "pnpm openspec:generate"
   },
   "devDependencies": {
-    "@fission-ai/openspec": "2.0.0",
+    "@fission-ai/openspec": "2.1.0",
     "@lhci/cli": "^0.16.0",
     "@oxlint/plugins": "1.93.0",
     "@sveltejs/vite-plugin-svelte": "^7.3.1",
@@ -66,5 +67,5 @@
   "engines": {
     "node": ">=26"
   },
-  "packageManager": "pnpm@12.4.1"
+  "packageManager": "pnpm@12.23.0"
 }

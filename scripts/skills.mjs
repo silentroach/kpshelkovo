@@ -16,7 +16,7 @@ import { fileURLToPath } from 'node:url';
 
 import { z } from 'zod';
 
-import { generatedSkillNames } from './openspec.mjs';
+import { generatedSkillNames, verifyGeneratedSkills } from './openspec.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const skillName = z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
@@ -78,15 +78,6 @@ export function verifyOpenCodeSkills(directory) {
   }
 }
 
-export function verifyGeneratedSkills(directory) {
-  for (const name of generatedSkillNames) {
-    if (!existsSync(join(directory, name, 'SKILL.md')))
-      throw new Error(`Missing generated skill: ${name}`);
-  }
-  if (readFileSync(join(directory, '.openspec-target'), 'utf8').trim() !== 'agents')
-    throw new Error('Unexpected OpenSpec target');
-}
-
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const mode = process.argv[2];
   if (!['install', 'check'].includes(mode))
@@ -102,7 +93,6 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
       .split('\0')
       .filter(Boolean)
       .map((path) => path.split('/')[2])
-      .filter((name) => !generatedSkillNames.includes(name) && name !== '.openspec-target')
   );
   for (const name of names)
     if (owned.has(name)) throw new Error(`Skill is both project-owned and external: ${name}`);

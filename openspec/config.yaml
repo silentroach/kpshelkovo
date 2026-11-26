@@ -1,4 +1,5 @@
 schema: spec-driven
+skillsScope: project
 
 context: |
   kpshelkovo.online — статический сайт для жителей КП Шелково; Astro workspace с pnpm.
