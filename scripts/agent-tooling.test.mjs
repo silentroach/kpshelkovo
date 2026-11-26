@@ -4,13 +4,8 @@ import { tmpdir } from 'node:os';
 import { join, relative } from 'node:path';
 import { test } from 'node:test';
 
-import { generatedSkillNames, generateOpenSpec } from './openspec.mjs';
-import {
-  hashSkill,
-  verifyGeneratedSkills,
-  verifyOpenCodeSkills,
-  verifySkillHashes
-} from './skills.mjs';
+import { generatedSkillNames, generateOpenSpec, verifyGeneratedSkills } from './openspec.mjs';
+import { hashSkill, verifyOpenCodeSkills, verifySkillHashes } from './skills.mjs';
 
 const tree = (directory) =>
   readdirSync(directory, { recursive: true, withFileTypes: true })
@@ -31,9 +26,11 @@ test('generation ignores the caller profile and leaves it untouched', () => {
     const profile = '{"profile":"custom","workflows":["onboard"],"delivery":"commands"}';
     writeFileSync(join(temp, 'profile/openspec/config.json'), profile);
     generateOpenSpec(expected);
-    verifyGeneratedSkills(join(expected, '.agents/skills'));
     verifyOpenCodeSkills(expected);
     process.env.XDG_CONFIG_HOME = join(temp, 'profile');
+    generateOpenSpec(actual);
+    assert.deepEqual(tree(actual), tree(expected));
+    rmSync(join(actual, '.agents/skills/openspec-propose'), { recursive: true });
     generateOpenSpec(actual);
     assert.deepEqual(tree(actual), tree(expected));
     assert.equal(readFileSync(join(temp, 'profile/openspec/config.json'), 'utf8'), profile);
