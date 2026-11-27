@@ -48,7 +48,7 @@ describe('contact vCard', () => {
     expect(buildContactVcard(contact).replaceAll('\r\n', '\n')).toMatchInlineSnapshot(`
         "BEGIN:VCARD
         VERSION:3.0
-        PRODID:-//vcard-creator//vcard-creator 1.0.0//EN
+        PRODID:-//vcard-creator//vcard-creator 1.1.0//EN
         FN;CHARSET=UTF-8:Александр Ерёмин
         N;CHARSET=UTF-8:Ерёмин;Александр;;;
         TEL;TYPE=CELL,VOICE:+79000000000
@@ -66,7 +66,7 @@ describe('contact vCard', () => {
         GEO:55.123456;38.654321
         NOTE;CHARSET=UTF-8:Помогает с электричеством\\, Ро
          ссетями\\nи Мосэнергосбытом.
-        REV:2026-07-13T00:00:00.000Z
+        REV:2026-07-13T00:00:00Z
         END:VCARD
         "
       `);
@@ -100,7 +100,7 @@ describe('contact vCard', () => {
     expect(buildContactVcard(organization).replaceAll('\r\n', '\n')).toMatchInlineSnapshot(`
         "BEGIN:VCARD
         VERSION:3.0
-        PRODID:-//vcard-creator//vcard-creator 1.0.0//EN
+        PRODID:-//vcard-creator//vcard-creator 1.1.0//EN
         FN;CHARSET=UTF-8:Золото Сибири
         N;CHARSET=UTF-8:;;;;
         TEL;TYPE=CELL,VOICE:+79917375556
@@ -113,7 +113,7 @@ describe('contact vCard', () => {
         item3.X-ABLABEL;CHARSET=UTF-8:Карта
         GEO:55.116326;38.16951
         NOTE;CHARSET=UTF-8:Производство коры в Малино.
-        REV:2026-07-13T00:00:00.000Z
+        REV:2026-07-13T00:00:00Z
         END:VCARD
         "
       `);
