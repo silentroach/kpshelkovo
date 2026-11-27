@@ -70,7 +70,7 @@ static/PlaceMap.XXXXXXXX.js:
   apps/www/src/components/places/place-marker-badge.css:
     rendered: 0
   apps/www/src/components/places/PlaceMap.svelte:
-    rendered: 65937
+    rendered: 66015
   apps/www/src/components/places/PlaceMap.svelte?svelte&type=style&lang.css:
     rendered: 0
   apps/www/src/lib/parcels/parcel-url.ts:
@@ -523,7 +523,7 @@ static/runtime.XXXXXXXX.js:
   apps/www/src/lib/yandex-maps/open-maps-control.ts:
     rendered: 349
   apps/www/src/lib/yandex-maps/runtime.ts:
-    rendered: 3635
+    rendered: 2355
 static/schema.XXXXXXXX.js:
   apps/www/src/lib/parcels/schema.ts:
     rendered: 140

@@ -1,10 +1,10 @@
 - file: static/404.XXXXXXXX.css
   bytes: 1647
-  brotli: 620
+  brotli: 612
   gzip: 720
 - file: static/BaseLayout.XXXXXXXX.css
   bytes: 58710
-  brotli: 9249
+  brotli: 9250
   gzip: 10361
 - file: static/BaseLayout.astro_astro_type_script_index_0_lang.XXXXXXXX.js
   bytes: 11277
@@ -12,7 +12,7 @@
   gzip: 4114
 - file: static/Breadcrumbs.XXXXXXXX.css
   bytes: 2418
-  brotli: 535
+  brotli: 533
   gzip: 627
 - file: static/ClientRouter.astro_astro_type_script_index_0_lang.XXXXXXXX.js
   bytes: 14184
@@ -40,8 +40,8 @@
   gzip: 518
 - file: static/EditorialMapScript.astro_astro_type_script_index_0_lang.XXXXXXXX.js
   bytes: 3265
-  brotli: 1253
-  gzip: 1452
+  brotli: 1254
+  gzip: 1451
 - file: static/EventList.XXXXXXXX.css
   bytes: 555
   brotli: 197
@@ -80,16 +80,16 @@
   gzip: 184
 - file: static/LinkWithIcon.XXXXXXXX.css
   bytes: 488
-  brotli: 202
-  gzip: 243
+  brotli: 196
+  gzip: 242
 - file: static/MapPreview.XXXXXXXX.css
   bytes: 1200
   brotli: 350
   gzip: 457
 - file: static/MapPreview.astro_astro_type_script_index_0_lang.XXXXXXXX.js
   bytes: 4169
-  brotli: 1518
-  gzip: 1761
+  brotli: 1517
+  gzip: 1759
 - file: static/NewsArchiveSummary.XXXXXXXX.css
   bytes: 261
   brotli: 115
@@ -115,9 +115,9 @@
   brotli: 3115
   gzip: 3573
 - file: static/PlaceMap.XXXXXXXX.js
-  bytes: 35162
-  brotli: 11214
-  gzip: 12512
+  bytes: 35211
+  brotli: 11258
+  gzip: 12552
 - file: static/PlaceOpeningHours.astro_astro_type_script_index_0_lang.XXXXXXXX.js
   bytes: 693
   brotli: 338
@@ -125,7 +125,7 @@
 - file: static/ReviewMeta.XXXXXXXX.css
   bytes: 863
   brotli: 268
-  gzip: 324
+  gzip: 325
 - file: static/ServiceTable.XXXXXXXX.js
   bytes: 920
   brotli: 494
@@ -209,7 +209,7 @@
   gzip: 2432
 - file: static/explorer-component.XXXXXXXX.js
   bytes: 23605
-  brotli: 7838
+  brotli: 7850
   gzip: 8965
 - file: static/format-date.XXXXXXXX.js
   bytes: 429
@@ -368,8 +368,8 @@
   gzip: 1118
 - file: static/index.astro_astro_type_script_index_0_lang.XXXXXXXX.js
   bytes: 2146
-  brotli: 1025
-  gzip: 1180
+  brotli: 1028
+  gzip: 1179
 - file: static/lazy.XXXXXXXX.css
   bytes: 2417
   brotli: 619
@@ -431,9 +431,9 @@
   brotli: 276
   gzip: 350
 - file: static/runtime.XXXXXXXX.js
-  bytes: 2158
-  brotli: 1012
-  gzip: 1178
+  bytes: 1500
+  brotli: 746
+  gzip: 886
 - file: static/schema.XXXXXXXX.js
   bytes: 250
   brotli: 197

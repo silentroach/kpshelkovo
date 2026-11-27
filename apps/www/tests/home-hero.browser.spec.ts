@@ -112,15 +112,17 @@ test('loads the built panorama on a direct no-JavaScript visit', async ({ baseUR
       };
     });
 
+    const winter = resourceContract.currentSrc.includes('-winter.');
+    const width = winter ? '2048' : '2172';
     expect(resourceContract).toMatchObject({
       alt: 'Панорама поселка Шелково',
       decoding: 'async',
       fetchPriority: 'high',
-      height: '724',
+      height: winter ? '682' : '724',
       loading: 'eager',
       sizes: '100vw',
-      srcsetWidths: ['960w', '1280w', '1536w', '1916w', '2172w'],
-      width: '2172'
+      srcsetWidths: ['960w', '1280w', '1536w', '1916w', `${width}w`],
+      width
     });
     expect(getHeroAssetMode(resourceContract.currentSrc)).toBe(buildMode);
     expect(heroRequests).toEqual([buildMode]);
