@@ -35,6 +35,7 @@
 ## Обложка главной
 
 - `apps/www/src/assets/home/home-social.jpg` — согласованная в [#696](https://github.com/silentroach/kpshelkovo/issues/696) обложка без текста, JPEG 1200×630. [Исходник](https://github.com/silentroach/kpshelkovo/issues/696#issuecomment-5625896157) уменьшен с центральной обрезкой, качество JPEG 85. Вариант без надписи выбран, чтобы название не повторялось внутри картинки и в подписи карточки.
+- Для зимнего комплекта панорам используется `apps/www/src/assets/home/home-social-winter.jpg`, JPEG 1200×630 без текста. Сезон обложки совпадает с сезоном панорамы на момент сборки.
 - Главная передаёт обложку в `BaseLayout` через `image`, `imageAlt`, `imageWidth` и `imageHeight`; размеры берутся из импортированного файла. Astro публикует готовый JPEG с хешем в имени, layout формирует абсолютный HTTPS URL.
 - В статическом HTML должны быть `og:image`, `og:image:width`, `og:image:height`, `og:image:type` и `og:image:alt`. Ссылка на изображение должна отвечать без авторизации с `Content-Type: image/jpeg`.
 - После публикации проверять карточку в Suggestions на реальном iPhone и сохранять скриншот в issue. Safari кеширует превью и сам выбирает обрезку, подложку и подпись; браузерная эмуляция не подтверждает результат в Suggestions.
