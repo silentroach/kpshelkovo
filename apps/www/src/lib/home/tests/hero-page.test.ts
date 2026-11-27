@@ -81,6 +81,7 @@ describe('home hero markup', () => {
     `);
   });
 
+  // Both Moscow date boundaries fall at night, so the no-JS fallback is the night image.
   it.each([
     ['2026-10-31T20:59:59Z', '', 2172],
     ['2026-10-31T21:00:00Z', '-winter', 2048],
