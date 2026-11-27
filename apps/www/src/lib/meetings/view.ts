@@ -1,4 +1,5 @@
 import { dateTimeFromISO } from '@shelkovo/format';
+import { extractMarkdownText } from '@shelkovo/markdown';
 
 import type {
   Meeting,
@@ -47,7 +48,7 @@ export const formatMeetingMetaDate = (date: MeetingMoment): string =>
   date.hasTime ? date.iso : date.iso.slice(0, 10);
 
 export const describeMeeting = (meeting: Meeting): string => {
-  const context = normalizeMetaText(meeting.context).trim();
+  const context = normalizeMetaText(extractMarkdownText(meeting.context) ?? '').trim();
   const description =
     context.length < 80 ? `${context} ${transcriptSourcePhrase(meeting)}` : context;
 

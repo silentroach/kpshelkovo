@@ -6,6 +6,7 @@ import type { createPersonMentionTarget as createPersonMentionTargetType } from 
 import type { createPlaceMentionTarget as createPlaceMentionTargetType } from '@/lib/places/mentions';
 
 import type { RawMeetingTranscriptEntryInput, mapRawMeeting as mapRawMeetingType } from './mapper';
+import { RawMeetingTranscriptSchema } from './raw-schema';
 import type { RawMeeting, RawMeetingTranscript } from './raw-schema';
 
 let mapRawMeeting: typeof mapRawMeetingType;
@@ -362,6 +363,7 @@ describe('mapRawMeeting', () => {
               speaker: 'moderator',
               text: 'Первая реплика.'
             },
+            { note: 'Пауза' },
             {
               start: '00:00:09',
               speaker: 'moderator',
@@ -371,6 +373,42 @@ describe('mapRawMeeting', () => {
         }
       })
     ).toThrow('start cannot be earlier than previous segment');
+  });
+
+  it.each([
+    { note: '  ' },
+    { note: 'Пауза', start: '00:00:00', speaker: 'moderator', text: 'Начало.' }
+  ])('rejects an invalid editorial note %j', (entry) => {
+    expect(RawMeetingTranscriptSchema.safeParse({ segments: [entry] }).success).toBe(false);
+  });
+
+  it('rejects a part with notes but no speech', () => {
+    const data = RawMeetingTranscriptSchema.parse({ segments: [{ note: 'Пауза' }] });
+
+    expect(() => map({ transcript: data })).toThrow('must have at least one speech segment');
+  });
+
+  it('preserves notes between speeches without using up repeated timestamps', () => {
+    const data = RawMeetingTranscriptSchema.parse({
+      segments: [
+        { start: '00:00:00', speaker: 'moderator', text: 'Начало.' },
+        { note: 'Запись прерывается' },
+        { start: '00:00:00', speaker: 'moderator', text: 'Продолжение.' }
+      ]
+    });
+    const part = map({ transcript: data }).transcript.parts[0];
+
+    expect(part?.entries.map((entry) => (entry.kind === 'note' ? entry : entry.anchor)))
+      .toMatchInlineSnapshot(`
+      [
+        "t-00-00-00",
+        {
+          "kind": "note",
+          "text": "Запись прерывается",
+        },
+        "t-00-00-00-2",
+      ]
+    `);
   });
 
   it('generates duplicate anchors with deterministic suffixes', () => {

@@ -1,12 +1,18 @@
 import { preprocessSiteMarkdownContent, renderMarkdown } from '@/lib/markdown/render';
 import type { SiteMentionRegistry } from '@/lib/mentions';
 
-import type { RawMeeting, RawMeetingTranscript, RawMeetingTranscriptSegment } from './raw-schema';
+import type {
+  RawMeeting,
+  RawMeetingTranscript,
+  RawMeetingTranscriptEntry,
+  RawMeetingTranscriptSegment
+} from './raw-schema';
 import { meetingCanonical, meetingUrl } from './routes';
 import type {
   Meeting,
   MeetingMoment,
   MeetingSpeaker,
+  MeetingTranscriptEntry,
   MeetingTranscriptPart,
   MeetingTranscriptSegment,
   MeetingTranscriptTime
@@ -128,6 +134,7 @@ const mapSegment = (
   ).markdown;
 
   return {
+    kind: 'segment',
     anchor: segmentAnchor(start, anchorCounts),
     start,
     speakerId: raw.speaker,
@@ -139,48 +146,46 @@ const mapSegment = (
 };
 
 const mapPart = (
-  rawSegments: readonly RawMeetingTranscriptSegment[],
+  rawEntries: readonly RawMeetingTranscriptEntry[],
   index: number,
   hasMultipleParts: boolean,
   mentionRegistry: SiteMentionRegistry,
   speakers: ReadonlyMap<string, MeetingSpeaker>,
   anchorCounts: Map<string, number>
 ): MeetingTranscriptPart => {
-  const firstStart = parseMeetingTranscriptTime(
-    rawSegments[0]?.start ?? '',
-    hasMultipleParts
-      ? `meeting transcript part ${index} first segment start`
-      : 'meeting transcript first segment start'
-  );
-
-  if (firstStart.totalSeconds !== 0) {
-    throw new Error(
-      hasMultipleParts
-        ? `meeting transcript part ${index} must start at 00:00:00`
-        : 'meeting transcript must start at 00:00:00'
-    );
-  }
-
+  const context = hasMultipleParts ? `meeting transcript part ${index}` : 'meeting transcript';
+  const segments: MeetingTranscriptSegment[] = [];
   let previousStart: MeetingTranscriptTime | undefined;
-  const segments = rawSegments.map((raw, segmentIndex) => {
-    const context = hasMultipleParts
-      ? `meeting transcript part ${index} segment ${segmentIndex}`
-      : `meeting transcript segment ${segmentIndex}`;
+  const entries = rawEntries.map((raw, entryIndex): MeetingTranscriptEntry => {
+    if ('note' in raw) {
+      return { kind: 'note', text: raw.note };
+    }
+
     const segment = mapSegment(
       raw,
-      context,
+      `${context} segment ${entryIndex}`,
       mentionRegistry,
       speakers,
       anchorCounts,
       previousStart
     );
 
+    if (!previousStart && segment.start.totalSeconds !== 0) {
+      throw new Error(`${context} must start at 00:00:00`);
+    }
+
     previousStart = segment.start;
+    segments.push(segment);
     return segment;
   });
 
+  if (segments.length === 0) {
+    throw new Error(`${context} must have at least one speech segment`);
+  }
+
   return {
     index,
+    entries,
     segments
   };
 };

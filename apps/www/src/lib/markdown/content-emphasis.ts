@@ -43,10 +43,12 @@ const transformQuote = (quote: EmphasisQuote, output: EmphasisOutput): void => {
   if (!first.children.length) quote.children.shift();
 
   const candidate = quote.children[0];
+  const titleChild = candidate?.type === 'paragraph' ? candidate.children[0] : undefined;
   const title =
     candidate?.type === 'paragraph' &&
     candidate.children.length === 1 &&
-    candidate.children[0]?.type === 'strong'
+    titleChild?.type === 'strong' &&
+    titleChild.data?.hName !== 'mark'
       ? candidate
       : md.paragraph([
           { type: 'strong', children: [md.text(kind === 'note' ? 'Примечание' : 'Внимание')] }

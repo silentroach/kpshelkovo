@@ -16,6 +16,7 @@ import {
 import type {
   Meeting,
   MeetingSpeaker,
+  MeetingTranscriptEntry,
   MeetingTranscriptPart,
   MeetingTranscriptSegment
 } from './types';
@@ -78,7 +79,7 @@ const meetingLine = (meeting: Meeting): MarkdownListItem =>
         ` — ${formatMeetingDate(meeting.date)}; ${partsCount(meeting)}, ${segmentCount(meeting)}.`
       )
     ]),
-    md.paragraph(inline(meeting.context))
+    ...parseMarkdownFragment(meeting.context).filter(isBlockContent)
   ]);
 
 const speakerLine = (speaker: MeetingSpeaker): MarkdownListItem => {
@@ -128,6 +129,19 @@ const segmentLine = (meeting: Meeting, segment: MeetingTranscriptSegment): Markd
   }
 
   return md.listItem([lead, ...blocks], { spread: blocks.length > 0 });
+};
+
+const transcriptEntryLine = (meeting: Meeting, entry: MeetingTranscriptEntry): MarkdownListItem => {
+  switch (entry.kind) {
+    case 'segment':
+      return segmentLine(meeting, entry);
+    case 'note':
+      return md.listItem([
+        md.paragraph([{ type: 'emphasis', children: [md.text(inline(entry.text))] }])
+      ]);
+    default:
+      throw new Error('Unsupported transcript entry', { cause: entry satisfies never });
+  }
 };
 
 const navigationItems = (
@@ -203,7 +217,7 @@ export const buildMeetingsIndexMarkdown = (meetings: readonly Meeting[]): string
 export const buildMeetingMarkdown = (meeting: Meeting): string =>
   serialize([
     md.heading(1, meeting.title),
-    md.paragraph(inline(meeting.context)),
+    ...parseMarkdownFragment(meeting.context),
     md.heading(2, 'Ссылки'),
     md.list([
       linkedItem('HTML-страница встречи', abs(meeting.url)),
@@ -239,5 +253,5 @@ export const buildMeetingTranscriptPartMarkdown = (
     md.heading(2, 'Навигация'),
     md.list(navigationItems(meeting, part)),
     md.heading(2, 'Транскрипт'),
-    md.list(part.segments.map((segment) => segmentLine(meeting, segment)))
+    md.list(part.entries.map((entry) => transcriptEntryLine(meeting, entry)))
   ]);
