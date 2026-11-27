@@ -32,7 +32,7 @@
     "prepare": "pnpm openspec:generate"
   },
   "devDependencies": {
-    "@fission-ai/openspec": "2.1.0",
+    "@fission-ai/openspec": "2.1.1",
     "@lhci/cli": "^0.16.1",
     "@oxlint/plugins": "1.95.0",
     "@sveltejs/vite-plugin-svelte": "^7.3.2",
