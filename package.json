@@ -46,7 +46,7 @@
     "prettier": "^3.10.0",
     "prettier-plugin-astro": "^1.1.2",
     "skills": "1.8.1",
-    "svelte": "^5.57.3",
+    "svelte": "^5.59.1",
     "turbo": "^2.11.11",
     "typescript": "^7.0.2",
     "vite": "^8.3.8",
