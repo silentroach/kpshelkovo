@@ -23,12 +23,7 @@ export const PlaceMapPublicPayloadSchema = z
           status: z.enum(PLACE_STATUSES),
           availability: z.literal('closed').optional(),
           status_label: z.string().optional(),
-          coordinates: z
-            .object({
-              lat: z.number().min(-90).max(90),
-              lng: z.number().min(-180).max(180)
-            })
-            .strict(),
+          coordinates: z.tuple([z.number().min(-180).max(180), z.number().min(-90).max(90)]),
           geometry: EditorialPublicGeometrySchema.optional(),
           opening_hours: z
             .object({

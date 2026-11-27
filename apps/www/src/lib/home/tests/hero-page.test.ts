@@ -1,6 +1,6 @@
 /// <reference types="astro/client" />
 
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // @ts-expect-error Astro page modules are resolved by Astro/Vitest at test time.
 import HomePage from '@/pages/index.astro';
@@ -19,6 +19,12 @@ const getImageTag = (html: string, attribute?: string): string => {
 
 const getResourceAttributes = (tag: string): readonly string[] =>
   [...tag.matchAll(/\s(src|srcset)="[^"]+"/gu)].map((match) => match[1] ?? '');
+
+beforeEach(() => {
+  vi.useFakeTimers({ toFake: ['Date'] });
+  vi.setSystemTime(new Date('2026-10-06T12:00:00+03:00'));
+});
+afterEach(() => vi.useRealTimers());
 
 describe('home hero markup', () => {
   it('leaves resource discovery to runtime while retaining a no-JS fallback', async () => {
@@ -73,5 +79,28 @@ describe('home hero markup', () => {
         ],
       }
     `);
+  });
+
+  // Both Moscow date boundaries fall at night, so the no-JS fallback is the night image.
+  it.each([
+    ['2026-10-31T20:59:59Z', '', 2172],
+    ['2026-10-31T21:00:00Z', '-winter', 2048],
+    ['2027-03-31T20:59:59Z', '-winter', 2048],
+    ['2027-03-31T21:00:00Z', '', 2172]
+  ])('renders one seasonal set at %s', async (instant, suffix, width) => {
+    vi.setSystemTime(new Date(instant));
+    const container = await createAstroContainer();
+    const html = await container.renderToString(HomePage);
+    const active = getImageTag(html, 'data-home-hero-image');
+    const fallback = getImageTag(html, 'data-home-hero-fallback');
+
+    for (const mode of ['day', 'night']) {
+      expect(active).toContain(`home-hero-${mode}${suffix}.png`);
+    }
+    expect(fallback).toContain(`home-hero-night${suffix}.png`);
+    expect(fallback).toContain(` ${width}w"`);
+    expect(html).toMatch(
+      new RegExp(`property="og:image" content="[^"]*/home-social${suffix}\\.jpg`)
+    );
   });
 });

@@ -11,6 +11,8 @@ export interface ContactPlace {
 }
 
 const CONTACT_CATEGORY_LABELS: Record<ContactCategory, string> = {
+  houses: 'Дома',
+  plumbing: 'Вода, отопление и канализация',
   fence: 'Забор',
   construction: 'Строительство и ремонт',
   furniture: 'Мебель',
@@ -23,6 +25,8 @@ const CONTACT_CATEGORY_LABELS: Record<ContactCategory, string> = {
 };
 
 const CONTACT_CATEGORY_EMOJI: Record<ContactCategory, string> = {
+  houses: '🏠',
+  plumbing: '🚰',
   fence: '🚧',
   construction: '🛠️',
   furniture: '🪑',

@@ -9,7 +9,10 @@ import { getPlaceBounds, getSelectionSetBounds } from '../place-map-geometry';
 import PlaceMap from '../PlaceMap.svelte';
 import {
   areaFeatures,
+  baseLayerUrl,
   clustererProps,
+  clustererUpdates,
+  infrastructureLayerUrl,
   map,
   mapProps,
   markerElements,
@@ -17,7 +20,8 @@ import {
   parcel,
   place,
   publicPlace,
-  registerPlaceMapSetup
+  registerPlaceMapSetup,
+  roads
 } from './support';
 
 vi.mock(import('@/lib/yandex-maps/runtime'), async (importOriginal) => ({
@@ -77,13 +81,13 @@ describe('PlaceMap initial layers from URL', () => {
         )
       ).toBe(true);
       expect(fetch.mock.calls.map(([url]) => url).sort()).toMatchInlineSnapshot(`
-      [
-        "/map/data/parcels/shf.json",
-        "/map/data/parcels/shp.json",
-        "/map/data/parcels/shr.json",
-        "/map/data/parcels/shv.json",
-      ]
-    `);
+        [
+          "/map/data/parcels/shf.json",
+          "/map/data/parcels/shp.json",
+          "/map/data/parcels/shr.json",
+          "/map/data/parcels/shv.json",
+        ]
+      `);
       expect(clustererProps[0]?.features.map(({ id }) => id)).toEqual([
         place.slug,
         infrastructure.slug
@@ -110,27 +114,37 @@ describe('PlaceMap initial layers from URL', () => {
     }
   );
 
-  it('applies infrastructure after the public places arrive without a focus request', async () => {
+  it('applies an initially requested layer after the base arrives without moving the camera', async () => {
     const pending = Promise.withResolvers<Response>();
-    const fetch = vi.fn(() => pending.promise);
+    const fetch = vi.fn((url: string) =>
+      url === infrastructureLayerUrl
+        ? Promise.resolve(
+            Response.json({
+              places: [{ ...publicPlace, slug: infrastructure.slug, mapLayer: 'infra' }],
+              roads
+            })
+          )
+        : pending.promise
+    );
     vi.stubGlobal('fetch', fetch);
     window.history.replaceState({}, '', '/map/?l=infra');
     render(PlaceMap, {
-      props: { dataUrl: '/map/data/places.json', initialBounds: getPlaceBounds([place]) }
+      props: { dataUrl: baseLayerUrl, initialBounds: getPlaceBounds([place]) }
     });
     await waitFor(() => expect(mapProps).toHaveLength(1));
     pending.resolve(
       Response.json({
-        places: [publicPlace, { ...publicPlace, slug: infrastructure.slug, mapLayer: 'infra' }]
+        places: [publicPlace],
+        placeLayers: { infra: [infrastructure.slug], club: [] }
       })
     );
     await ready();
     expect(checkbox('Инфраструктура').checked).toBe(true);
-    expect(clustererProps[0]?.features.map(({ id }) => id)).toEqual([
-      place.slug,
-      infrastructure.slug
-    ]);
-    expect(fetch).toHaveBeenCalledExactlyOnceWith('/map/data/places.json');
+    await screen.findByRole('link', { name: 'OpenStreetMap' });
+    expect(
+      clustererUpdates.mock.lastCall?.[0].features.map(({ id }: { readonly id: string }) => id)
+    ).toEqual([place.slug, infrastructure.slug]);
+    expect(fetch.mock.calls.map(([url]) => url)).toEqual([baseLayerUrl, infrastructureLayerUrl]);
     expect(map.update).not.toHaveBeenCalled();
   });
 
@@ -148,7 +162,12 @@ describe('PlaceMap initial layers from URL', () => {
     expect(
       checkbox('Форест').checked && checkbox('Ривер').checked && checkbox('Инфраструктура').checked
     ).toBe(true);
-    expect(fetch).toHaveBeenCalledTimes(2);
+    expect(fetch.mock.calls.map(([url]) => url).sort()).toMatchInlineSnapshot(`
+      [
+        "/map/data/parcels/shf.json",
+        "/map/data/parcels/shr.json",
+      ]
+    `);
     expect(
       map.update.mock.calls
         .filter(([update]) => update.location?.center)

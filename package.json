@@ -20,35 +20,37 @@
     "test": "turbo run test",
     "test:search-quality": "pnpm --filter @shelkovo/www test:search-quality",
     "parcels:update": "node apps/www/scripts/parcels/update.ts",
+    "roads:update": "node apps/www/scripts/roads/update.ts",
     "test:watch": "turbo run test:watch",
-    "agents:setup": "pnpm install --frozen-lockfile && pnpm skills:install && pnpm openspec:generate",
+    "agents:setup": "pnpm install --frozen-lockfile && pnpm skills:install",
     "skills:install": "node scripts/skills.mjs install",
     "skills:check": "node scripts/skills.mjs check",
     "openspec:generate": "node scripts/openspec.mjs",
     "openspec:validate": "pnpm exec openspec validate --all --strict --no-interactive && pnpm exec openspec validate --archived --strict --no-interactive",
     "test:agent-tooling": "node --test scripts/agent-tooling.test.mjs",
-    "postinstall": "node scripts/hooks.mjs"
+    "postinstall": "node scripts/hooks.mjs",
+    "prepare": "pnpm openspec:generate"
   },
   "devDependencies": {
-    "@fission-ai/openspec": "2.0.0",
-    "@lhci/cli": "^0.16.0",
-    "@oxlint/plugins": "1.93.0",
-    "@sveltejs/vite-plugin-svelte": "^7.3.1",
+    "@fission-ai/openspec": "2.1.0",
+    "@lhci/cli": "^0.16.1",
+    "@oxlint/plugins": "1.95.0",
+    "@sveltejs/vite-plugin-svelte": "^7.3.2",
     "@testing-library/svelte": "^5.4.2",
-    "@yandex/ymaps3-types": "^1.0.21772363",
+    "@yandex/ymaps3-types": "^1.0.22020827",
     "astro-compressor": "^2.0.1",
     "happy-dom": "^21.0.4",
-    "lint-staged": "^17.6.0",
-    "oxfmt": "^0.78.0",
-    "oxlint": "1.93.0",
-    "prettier": "^3.10.0",
+    "lint-staged": "^17.6.2",
+    "oxfmt": "^0.80.0",
+    "oxlint": "1.95.0",
+    "prettier": "^3.10.1",
     "prettier-plugin-astro": "^1.1.2",
-    "skills": "1.8.1",
-    "svelte": "^5.57.3",
-    "turbo": "^2.11.11",
+    "skills": "1.9.0",
+    "svelte": "^5.59.1",
+    "turbo": "^2.11.13",
     "typescript": "^7.0.2",
     "vite": "^8.3.8",
-    "vitest": "^5.1.0",
+    "vitest": "^5.1.1",
     "zod": "^4.6.7"
   },
   "lint-staged": {
@@ -65,5 +67,5 @@
   "engines": {
     "node": ">=26"
   },
-  "packageManager": "pnpm@12.4.1"
+  "packageManager": "pnpm@12.23.0"
 }

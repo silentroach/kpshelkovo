@@ -27,7 +27,7 @@ ops/         # nginx и deploy-конфиги
 pnpm agents:setup
 ```
 
-Нужны Git, Node.js 26+ и версия pnpm из `packageManager`. Подробности восстановления skills, генерации OpenSpec, проверок, обновления и отката — в [руководстве разработчика](/docs/development.md). После изменения интеграции перезапусти OpenCode.
+Нужны Git, Node.js 26+ и версия pnpm из `packageManager`. Обычный `pnpm install` устанавливает зависимости и базовые скиллы OpenSpec в текущий ворктри. `pnpm agents:setup` добавляет остальные скиллы проекта. После установки перезапусти OpenCode. Подробности и порядок обновления описаны в [руководстве разработчика](/docs/development.md#чистый-checkout).
 
 Для работы с аудиозаписями см. [как расшифровать встречу и разметить голоса](/docs/meeting-audio.md).
 
