@@ -19,6 +19,7 @@ export interface MeetingSpeaker {
 }
 
 export interface MeetingTranscriptSegment {
+  readonly kind: 'segment';
   readonly anchor: string;
   readonly start: MeetingTranscriptTime;
   readonly speakerId: string;
@@ -28,8 +29,18 @@ export interface MeetingTranscriptSegment {
   readonly textHtml: string;
 }
 
+export interface MeetingTranscriptNote {
+  readonly kind: 'note';
+  readonly text: string;
+}
+
+export type MeetingTranscriptEntry = MeetingTranscriptSegment | MeetingTranscriptNote;
+
 export interface MeetingTranscriptPart {
   readonly index: number;
+  /** Render order, including editorial notes. */
+  readonly entries: readonly MeetingTranscriptEntry[];
+  /** Speech only, for counts and timestamp ranges. */
   readonly segments: readonly MeetingTranscriptSegment[];
 }
 

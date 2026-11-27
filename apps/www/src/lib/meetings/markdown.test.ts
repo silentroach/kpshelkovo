@@ -1,6 +1,13 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 
-import type { Meeting, MeetingMoment, MeetingTranscriptTime } from './types';
+import type {
+  Meeting,
+  MeetingMoment,
+  MeetingSpeaker,
+  MeetingTranscriptNote,
+  MeetingTranscriptSegment,
+  MeetingTranscriptTime
+} from './types';
 
 let buildMeetingMarkdown: typeof import('./markdown').buildMeetingMarkdown;
 let buildMeetingsIndexMarkdown: typeof import('./markdown').buildMeetingsIndexMarkdown;
@@ -17,14 +24,15 @@ const time = (value: string, totalSeconds: number): MeetingTranscriptTime => ({
   totalSeconds
 });
 
-const meeting = (): Meeting => {
-  const speaker = {
+const meeting = (note?: MeetingTranscriptNote): Meeting => {
+  const speaker: MeetingSpeaker = {
     id: 'moderator',
-    kind: 'local' as const,
+    kind: 'local',
     label: 'Модератор',
     description: 'участник встречи'
   };
-  const first = {
+  const first: MeetingTranscriptSegment = {
+    kind: 'segment',
     anchor: 't-00-00-00',
     start: time('00:00:00', 0),
     speakerId: speaker.id,
@@ -33,7 +41,8 @@ const meeting = (): Meeting => {
     textMarkdown: 'Добрый день. Начинаем встречу.',
     textHtml: '<p>Добрый день. Начинаем встречу.</p>'
   };
-  const second = {
+  const second: MeetingTranscriptSegment = {
+    kind: 'segment',
     anchor: 't-00-00-15',
     start: time('00:00:15', 15),
     speakerId: speaker.id,
@@ -42,7 +51,8 @@ const meeting = (): Meeting => {
     textMarkdown: 'Полный текст второй реплики хранится только в файле части.',
     textHtml: '<p>Полный текст второй реплики хранится только в файле части.</p>'
   };
-  const third = {
+  const third: MeetingTranscriptSegment = {
+    kind: 'segment',
     anchor: 't-00-00-00-2',
     start: time('00:00:00', 0),
     speakerId: speaker.id,
@@ -65,8 +75,14 @@ const meeting = (): Meeting => {
     transcript: {
       speakers: [speaker],
       parts: [
-        { index: 1, segments: [first, second] },
-        { index: 2, segments: [third] }
+        {
+          index: 1,
+          segments: [first, second],
+          entries: note
+            ? [{ kind: 'note', text: 'До начала обсуждения' }, first, note, second]
+            : [first, second]
+        },
+        { index: 2, segments: [third], entries: [third] }
       ],
       segments: [first, second, third]
     }
@@ -168,18 +184,37 @@ describe('meetings markdown', () => {
     `);
   });
 
+  it('keeps notes in transcript order as literal italic text without changing anchors or metadata', () => {
+    const item = meeting({
+      kind: 'note',
+      text: 'Пауза: *шум*, [метка](/notes), `код`, <i>,\n\nhttps://example.com.'
+    });
+    const plain = meeting();
+    const markdown = buildMeetingTranscriptPartMarkdown(item, item.transcript.parts[0]!);
+
+    expect(markdown.split('## Транскрипт\n\n')[1]).toMatchInlineSnapshot(`
+      "- *До начала обсуждения*
+      - [00:00:00](https://example.com/meetings/2026-06-13-ok-comfort/#t-00-00-00) — Модератор: Добрый день. Начинаем встречу.
+      - *Пауза: \\*шум\\*, \\[метка]\\(/notes), \\\`код\\\`, \\<i>, https\\://example.com.*
+      - [00:00:15](https://example.com/meetings/2026-06-13-ok-comfort/#t-00-00-15) — Модератор: Полный текст второй реплики хранится только в файле части.
+      "
+    `);
+    expect(buildMeetingMarkdown(item)).toBe(buildMeetingMarkdown(plain));
+    expect(buildMeetingsIndexMarkdown([item])).toBe(buildMeetingsIndexMarkdown([plain]));
+  });
+
   it('preserves markdown blocks inside transcript segment text', () => {
     const item = meeting();
     const segment = item.transcript.parts[0]!.segments[1]!;
+    const annotatedSegment = {
+      ...segment,
+      text: 'Категории:\n\n- Первая.\n- Вторая.\n- Третья.',
+      textMarkdown: 'Категории:\n\n- Первая.\n- Вторая.\n- Третья.'
+    };
     const part = {
       ...item.transcript.parts[0]!,
-      segments: [
-        {
-          ...segment,
-          text: 'Категории:\n\n- Первая.\n- Вторая.\n- Третья.',
-          textMarkdown: 'Категории:\n\n- Первая.\n- Вторая.\n- Третья.'
-        }
-      ]
+      segments: [annotatedSegment],
+      entries: [annotatedSegment]
     };
 
     expect(buildMeetingTranscriptPartMarkdown(item, part)).toMatch(

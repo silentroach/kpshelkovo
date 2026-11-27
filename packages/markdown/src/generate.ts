@@ -31,16 +31,23 @@ import type {
   MarkdownListOptions,
   MarkdownPhrasingInput
 } from './generate-types';
+import { markerFromMarkdown, markerSyntax } from './marker-syntax';
 import { assertNoMarkdownTables } from './no-tables';
 import { expandTableOfContents } from './toc';
 import { prepareTocAnnotations, tocDirectiveSyntax } from './toc-annotations';
 
-const createParseExtensions = () => [gfm(), frontmatter(['yaml']), tocDirectiveSyntax()];
+const createParseExtensions = () => [
+  gfm(),
+  frontmatter(['yaml']),
+  tocDirectiveSyntax(),
+  markerSyntax()
+];
 
 const createMdastExtensions = () => [
   gfmFromMarkdown(),
   frontmatterFromMarkdown(['yaml']),
-  directiveFromMarkdown()
+  directiveFromMarkdown(),
+  markerFromMarkdown()
 ];
 
 const createSerializeExtensions = () => [

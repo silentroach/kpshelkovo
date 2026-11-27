@@ -11,6 +11,7 @@ import { uniqueHeadingSlug } from './heading-slugs';
 import type { HtmlTreeNode } from './html-tree.types';
 import { rehypeImageFigures } from './image-figures';
 import { rehypeLocalIds } from './local-ids';
+import { remarkMarkerSyntax } from './marker-syntax';
 import { assertNoMarkdownTables } from './no-tables';
 import type { MarkdownAstTransform, RenderedMarkdown, RenderOptions } from './render.types';
 import { rehypeTaskListItemLabels } from './task-list-labels';
@@ -123,6 +124,7 @@ const createProcessor = (localIds: Map<string, string>, options?: RenderOptions)
   unified()
     .use(remarkParse)
     .use(remarkGfm)
+    .use(remarkMarkerSyntax)
     .use(remarkTocSyntax)
     .use(remarkDocument, options?.transform, options?.reservedIds)
     .use(remarkTables, { allowTables: options?.allowTables })

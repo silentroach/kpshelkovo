@@ -187,6 +187,23 @@
     white-space: nowrap;
   }
 
+  .site-page-content .ui-editorial-marker {
+    color: inherit;
+    background: transparent;
+    border: 0 solid transparent;
+    border-image: url('./editorial-marker.svg') 0 5 fill / 0 0.22em / 0.06em 0.24em stretch;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+
+  @media print, (forced-colors: active) {
+    .site-page-content .ui-editorial-marker {
+      border-image: none;
+      text-decoration: underline dotted;
+      text-underline-offset: 0.32em;
+    }
+  }
+
   /* Loaded 70/65ch in Fira Sans 400 (0 = 0.558em), stable while fonts load. */
   .ui-prose {
     max-width: 39.06rem;

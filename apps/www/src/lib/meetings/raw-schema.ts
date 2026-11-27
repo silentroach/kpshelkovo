@@ -46,8 +46,13 @@ const RawMeetingTranscriptSegmentSchema = z
   })
   .strict();
 
+const RawMeetingTranscriptEntrySchema = z.union([
+  RawMeetingTranscriptSegmentSchema,
+  z.object({ note: text.min(1) }).strict()
+]);
+
 const RawMeetingTranscriptSegmentsSchema = z
-  .array(RawMeetingTranscriptSegmentSchema)
+  .array(RawMeetingTranscriptEntrySchema)
   .min(1, 'segments must have at least one segment');
 
 const RawMeetingSpeakersSchema = z
@@ -94,4 +99,5 @@ export const RawMeetingTranscriptSchema = z
   .strict();
 
 export type RawMeetingTranscript = z.output<typeof RawMeetingTranscriptSchema>;
+export type RawMeetingTranscriptEntry = z.output<typeof RawMeetingTranscriptEntrySchema>;
 export type RawMeetingTranscriptSegment = z.output<typeof RawMeetingTranscriptSegmentSchema>;
