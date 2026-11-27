@@ -50,10 +50,10 @@
     "test:visual:sticky-table:serve": "node ../../scripts/visual-fixture-launcher.mjs tests/sticky-table-visual 4329"
   },
   "dependencies": {
-    "@astrojs/markdown-satteri": "^0.4.7",
+    "@astrojs/markdown-satteri": "^0.4.10",
     "@astrojs/rss": "^4.0.19",
-    "@astrojs/sitemap": "^3.7.4",
-    "@astrojs/svelte": "^9.1.2",
+    "@astrojs/sitemap": "^3.7.6",
+    "@astrojs/svelte": "^9.1.6",
     "@shelkovo/format": "workspace:*",
     "@shelkovo/geo": "workspace:*",
     "@shelkovo/ical": "workspace:*",
@@ -63,20 +63,20 @@
     "@shelkovo/ui": "workspace:*",
     "@shelkovo/url": "workspace:*",
     "@yandex/ymaps3-clusterer": "^0.0.13",
-    "astro": "^7.4.8",
+    "astro": "^7.4.13",
     "diff": "^9.0.0",
     "parse5": "^8.1.1",
-    "svelte": "^5.57.3",
-    "vcard-creator": "^1.0.0",
+    "svelte": "^5.59.1",
+    "vcard-creator": "^1.1.0",
     "yaml": "^2.9.1",
     "zod": "^4.6.7"
   },
   "devDependencies": {
-    "@playwright/test": "^1.65.0",
-    "@sveltejs/vite-plugin-svelte": "^7.3.1",
+    "@playwright/test": "^1.65.1",
+    "@sveltejs/vite-plugin-svelte": "^7.3.2",
     "@testing-library/svelte": "^5.4.2",
     "@types/css-tree": "^3.2.0",
-    "@yandex/ymaps3-types": "^1.0.21772363",
+    "@yandex/ymaps3-types": "^1.0.22020827",
     "astro-compressor": "^2.0.1",
     "css-tree": "^3.2.1",
     "happy-dom": "^21.0.4",
@@ -88,6 +88,6 @@
     "typescript": "^7.0.2",
     "unified": "^11.0.5",
     "vite": "^8.3.8",
-    "vitest": "^5.1.0"
+    "vitest": "^5.1.1"
   }
 }

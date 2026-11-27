@@ -75,9 +75,9 @@
     "@shelkovo/url": "workspace:*"
   },
   "devDependencies": {
-    "@playwright/test": "^1.65.0",
-    "astro": "^7.4.8",
-    "svelte": "^5.57.3",
+    "@playwright/test": "^1.65.1",
+    "astro": "^7.4.13",
+    "svelte": "^5.59.1",
     "typescript": "^7.0.2"
   }
 }

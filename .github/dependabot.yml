@@ -7,16 +7,18 @@ updates:
     cooldown:
       default-days: 3
     groups:
-      production:
-        dependency-type: production
+      npm-minor-and-patch:
         patterns:
           - '*'
-      development:
-        dependency-type: development
-        patterns:
-          - '*'
+        update-types:
+          - minor
+          - patch
         exclude-patterns:
           - '@fission-ai/openspec'
+      npm-security:
+        applies-to: security-updates
+        patterns:
+          - '*'
 
   - package-ecosystem: github-actions
     directory: /
