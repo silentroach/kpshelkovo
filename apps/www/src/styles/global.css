@@ -298,6 +298,22 @@
     color: var(--color-telegram);
   }
 
+  @media screen {
+    /* WebKit can wrap after an inline SVG. Reserve its space on the first link fragment instead. */
+    a:has(> :is(.ui-markdown-telegram-icon, .ui-markdown-navigator-icon)):not(:has(img)) {
+      position: relative;
+      padding-inline-start: calc(0.875rem + 0.25rem);
+      white-space: normal;
+
+      > :is(.ui-markdown-telegram-icon, .ui-markdown-navigator-icon) {
+        position: absolute;
+        inset-inline-start: 0;
+        inset-block-start: 0.5em;
+        translate: 0 -50%;
+      }
+    }
+  }
+
   .ui-prose .ui-file-link__icon {
     display: inline-block;
     width: 1.45em;
