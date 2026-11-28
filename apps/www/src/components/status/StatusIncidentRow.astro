@@ -75,6 +75,10 @@ const TitleIcon = titleIcon?.Icon;
     padding: 1.25rem var(--page-content-inset);
   }
 
+  .status-incident-row[data-status-phase='active'] {
+    padding-inline-start: max(1rem, var(--page-content-inset));
+  }
+
   .status-incident-row[data-status-kind='maintenance'][data-status-phase='active'] {
     background: color-mix(
       in oklab,
